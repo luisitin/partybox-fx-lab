@@ -1,0 +1,3 @@
+# Read by Codex (CLI, app and cloud tasks) when this repo is trusted.
+# Compact the conversation at 250k tokens.
+model_auto_compact_token_limit = 250000
