@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Murmuration Lobby</title>
+<style>
+:root{--ui:#f5f6ff}
+html,body{margin:0;height:100%;background:#0f1020;overflow:hidden;font-family:system-ui,Segoe UI,Arial,sans-serif}
+#moon{position:fixed;inset:0;pointer-events:none;display:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+#hud{position:fixed;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:96vw;opacity:.6}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{font:700 12px system-ui,sans-serif;color:var(--ui);background:rgba(20,16,50,.72);border:1px solid rgba(233,230,255,.45);border-radius:999px;padding:5px 11px;min-height:28px;cursor:pointer;white-space:nowrap}
+#hud button:focus-visible{outline:3px solid #ffd166}
+#cap{position:fixed;left:0;right:0;top:12%;text-align:center;color:var(--ui);font:900 clamp(28px,7vw,90px)/1 system-ui,sans-serif;letter-spacing:.04em;opacity:0;transition:opacity .3s;pointer-events:none}
+.kiosk #hud{display:none}
+</style></head>
+<body>
+<div id="moon"></div>
+<canvas id="c" aria-label="A flock of birds swirling in a lobby"></canvas>
+<div id="cap" role="status" aria-live="polite"></div>
+<div id="hud"><button id="bJoin">join</button><button id="bCode">room code</button><button id="bWin">winner</button><button id="bTheme">theme</button><button id="bLook" title="bird colours">look</button><button id="bShape" title="bird shapes">shape</button></div>
+<script>
+(() => {
+'use strict';
+const Q = new URLSearchParams(location.search);
+const PORTRAIT0 = innerHeight > innerWidth;
+const N = PORTRAIT0 ? 400 : 640, CAPW = PORTRAIT0 ? 290 : 440;
+const INK = Q.get('ambient') !== 'rainbow';
+const TAU = 6.283185307;
+const LOOKS = ['ink', 'rainbow', 'players', 'shimmer'], SHAPES = ['bird', 'dart', 'petal', 'comet'];
+let look = Math.max(0, LOOKS.indexOf(Q.get('look') || 'rainbow')), shape = Math.max(0, SHAPES.indexOf(Q.get('shape') || 'bird'));
+const PL_POP = ['#ff5d8f','#ffd166','#06d6a0','#4cc9f0','#b388ff','#ff9f43','#48dbfb','#f368e0'];
+const PL_GOU = ['#fc93b6','#fcde9c','#5ae1c1','#87d9f5','#caaeff','#fcbd85','#85e4fc','#f49aeb'];
+const THEMES = {
+  pop: { bg: '#0f1020', sky: null, outline: '#0a0620', lw: 2.4, ink: '#b3b7d9', alpha: 1, tails: false,
+    rainbow: ['#ff4d8d','#ffd23f','#2ee6a6','#42c6ff','#ff8a3d','#a970ff'], players: PL_POP, code: '#ffd166', win: '#ffd166', ui: '#f5f6ff' },
+  gouache: { bg: '#0f1230', sky: 'linear-gradient(#1b2350,#0f1230)', outline: null, lw: 0, ink: '#cacde6', alpha: 0.88, tails: true,
+    rainbow: ['#d9b8a4','#e9d29c','#9fc7c2','#a9b4e4','#d69bb6','#c3d39c'], players: PL_GOU, code: '#fcde9c', win: '#fcde9c', ui: '#e8e2ff' }
+};
+let themeName = Q.get('theme') === 'gouache' ? 'gouache' : 'pop';
+let T = THEMES[themeName];
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches && Q.get('motion') !== '1';
+if (Q.has('kiosk')) document.documentElement.classList.add('kiosk');
+
+function prng(seed){ let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const seed = parseInt(Q.get('seed') || '20260928', 10);
+const rnd = prng(seed), rnd2 = prng(seed ^ 0x9e3779b9), rnd3 = prng(seed ^ 0x51ed270b);
+
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const cap = document.getElementById('cap'), moon = document.getElementById('moon');
+let W = 0, H = 0, S = 1, DPR = 1, started = false;
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const sstep = k => { k = clamp(k, 0, 1); return k * k * (3 - 2 * k); };
+function hex(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+for (const k in THEMES) { THEMES[k].rgb = THEMES[k].rainbow.map(hex); THEMES[k].prgb = THEMES[k].players.map(hex); THEMES[k].white = hex(k === 'pop' ? '#ffffff' : '#fff2d2'); }
+const _c = [0, 0, 0];
+function palAt(p, u){ const n = p.length, f = (u - Math.floor(u)) * n, i = Math.floor(f) % n, j = (i + 1) % n, k = sstep(f - Math.floor(f)); for (let c = 0; c < 3; c++) _c[c] = p[i][c] + (p[j][c] - p[i][c]) * k; return _c; }
+let plc = [], plcKey = '';
+
+const DT = 1 / 60, LOCK = 1.6;
+let simT = 0, stepN = 0;
+let cur = null;
+const players = [];   // {name, seat}
+const birds = [];
+for (let i = 0; i < N; i++) {
+  birds.push({ x: 0, y: 0, vx: 0, vy: 0, ph: rnd() * 6.283, sz: 0.85 + rnd() * 0.35, ci: i % 6, own: -1,
+    col: [0,0,0], home: [0,0,0], cF: [0,0,0], cT: [0,0,0], cS: 0, cD: 1,
+    role: 'free', pend: null, tgt: null, fm: 0, pulse: 0, boost: 1, turnT: 0, turnA: 0, wv: -1, d: 0,
+    ts: 0, D: 1, p0x: 0, p0y: 0, v0x: 0, v0y: 0, p1x: 0, p1y: 0, v1x: 0, v1y: 0, uE: 0, om: 0, lane: 0, f: 0, leave: 0, lb: 1,
+    hx: [0,0,0], hy: [0,0,0], amp: 0, fq: 1, bp: 0,
+    rw: 0, sh: 0, dc: [0,0,0], rth: 0, uS: 0, wA: 0, wF: 3, psi: 0, ws: 0, dl: 0, n0: 0, ex: 1, ey: 0, tw: rnd() * 6.283 });
+}
+function homeCol(b){
+  if (b.own >= 0) return hex(T.players[players[b.own].seat % 8]);
+  return hex(INK ? T.ink : T.rainbow[b.ci]);
+}
+function setCol(b, to, delay, dur){ b.cF = b.col.slice(); b.cT = to; b.cS = simT + delay; b.cD = Math.max(1e-3, dur); }
+function updCol(b){ const k = sstep((simT - b.cS) / b.cD); for (let c = 0; c < 3; c++) b.col[c] = b.cF[c] + (b.cT[c] - b.cF[c]) * k; }
+function recolor(){
+  for (const b of birds) {
+    b.home = homeCol(b);
+    const w = cur && (b.role === 'word' || b.pend === 'word'); const to = w ? hex(evColor(cur.ev)) : b.home;
+    b.cF = to.slice(); b.cT = to.slice(); b.col = to.slice(); b.cS = simT - 10;
+  }
+}
+
+function resize(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = innerWidth; H = innerHeight;
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  S = Math.max(Math.min(W / 1920, H / 1080) * (H > W ? 1.9 : 1), 0.6);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  applyBg();
+  if (started && reduced) draw();
+}
+function applyBg(){
+  document.body.style.background = T.sky || T.bg; document.documentElement.style.background = T.bg;
+  if (themeName === 'gouache') {
+    const r = Math.min(W, H) * 0.08, x = W * 0.82, y = H * 0.2;
+    moon.style.display = 'block';
+    moon.style.background = 'radial-gradient(circle at ' + x + 'px ' + y + 'px, rgba(240,226,180,.75) 0, rgba(240,226,180,.75) ' + r + 'px, rgba(240,226,180,.28) ' + r * 1.08 + 'px, rgba(240,226,180,.12) ' + r * 1.6 + 'px, rgba(240,226,180,0) ' + r * 2.6 + 'px)';
+  } else moon.style.display = 'none';
+}
+
+// ---------- text formation ----------
+const off = document.createElement('canvas'), octx = off.getContext('2d', { willReadFrequently: true });
+let formS = 6, box = { x0: 0, x1: 1, y0: 0, y1: 1 };
+function textPoints(lines){
+  const maxW = W * (H > W ? 0.72 : 0.8), maxH = H * 0.5;
+  let fs = 300 * (H / 1080);
+  const font = f => '900 ' + f + 'px "Arial Black", Impact, system-ui, sans-serif';
+  octx.font = font(fs);
+  const SP = 0.13;
+  const lw = (l, f) => { octx.font = font(f); let t = 0; for (const ch of l) t += octx.measureText(ch).width + SP * f; return t - SP * f; };
+  const w = Math.max(...lines.map(l => lw(l, fs)));
+  fs = Math.min(fs, fs * maxW / w, maxH / (lines.length * 1.25));
+  const lh = fs * 1.2, tw = Math.ceil(maxW + 20), th = Math.ceil(lines.length * lh + 20);
+  off.width = tw; off.height = th; octx.font = font(fs); octx.textAlign = 'left'; octx.textBaseline = 'middle'; octx.fillStyle = '#fff';
+  lines.forEach((l, i) => { let x = (tw - lw(l, fs)) / 2; for (const ch of l) { octx.fillText(ch, x, 10 + lh * (i + 0.5)); x += octx.measureText(ch).width + SP * fs; } });
+  const data = octx.getImageData(0, 0, tw, th).data;
+  let step = Math.max(4, Math.floor(fs / 26)), pts;
+  for (;;) {
+    pts = [];
+    for (let y = step / 2; y < th; y += step) for (let x = step / 2; x < tw; x += step) if (data[((y | 0) * tw + (x | 0)) * 4 + 3] > 128) pts.push([x, y]);
+    if (pts.length <= CAPW || step > 80) break; step += 1;
+  }
+  const ox = (W - tw) / 2, oy = H * (H > W ? 0.42 : 0.47) - th / 2;
+  formS = step * 0.52;
+  const out = pts.map(p => [p[0] + ox, p[1] + oy]);
+  box = { x0: Math.min(...out.map(p => p[0])) - step, x1: Math.max(...out.map(p => p[0])) + step, y0: Math.min(...out.map(p => p[1])) - step, y1: Math.max(...out.map(p => p[1])) + step };
+  return out.slice(0, CAPW);
+}
+
+// ---------- halo path (superellipse, exponent 4, arc-length table, clockwise on screen) ----------
+let halo = null;
+function buildHalo(){
+  const cx = (box.x0 + box.x1) / 2, cy = (box.y0 + box.y1) / 2;
+  const port = H > W, m = port ? 26 * (W / 390) : 90 * S, lane = port ? 5.5 : 12 * S, nL = port ? 3 : 4, edge = 12 + 3 * lane;
+  const A = (box.x1 - box.x0) / 2, B = (box.y1 - box.y0) / 2;
+  const a = clamp(Math.max(A + m, A * 1.22), 20, Math.max(20, Math.min(cx, W - cx) - edge));
+  const b = clamp(B + m, 20, Math.max(20, Math.min(cy, H - cy) - edge));
+  let SE = 2.6; while (SE < 4.6 && Math.pow(A / a, SE) + Math.pow(B / b, SE) > 0.8) SE += 0.1;
+  const pw = 2 / SE;
+  const M = 4096, xs = new Float64Array(M + 1), ys = new Float64Array(M + 1), cum = new Float64Array(M + 1);
+  for (let i = 0; i <= M; i++) {
+    const th = TAU * i / M, c = Math.cos(th), s = Math.sin(th);
+    xs[i] = cx + a * Math.sign(c) * Math.pow(Math.abs(c), pw); ys[i] = cy + b * Math.sign(s) * Math.pow(Math.abs(s), pw);
+    if (i) cum[i] = cum[i - 1] + Math.hypot(xs[i] - xs[i - 1], ys[i] - ys[i - 1]);
+  }
+  const L = cum[M], K = 1024, tab = new Float64Array(K * 2); let j = 0;
+  for (let k = 0; k < K; k++) {
+    const d = L * k / K; while (j < M - 1 && cum[j + 1] < d) j++;
+    const q = (d - cum[j]) / ((cum[j + 1] - cum[j]) || 1);
+    tab[k * 2] = xs[j] + (xs[j + 1] - xs[j]) * q; tab[k * 2 + 1] = ys[j] + (ys[j + 1] - ys[j]) * q;
+  }
+  halo = { cx, cy, a, b, n: 0, L, tab, lane, K, nL, SE, m };
+}
+const _lp = { x: 0, y: 0, tx: 1, ty: 0 };
+function lanePos(u, offs){
+  const K = halo.K, t = halo.tab; u = u - Math.floor(u);
+  const f = u * K, i = Math.floor(f) % K, q = f - Math.floor(f), i2 = (i + 1) % K, i0 = (i + K - 1) % K, i3 = (i + 2) % K;
+  const x = t[i * 2] + (t[i2 * 2] - t[i * 2]) * q, y = t[i * 2 + 1] + (t[i2 * 2 + 1] - t[i * 2 + 1]) * q;
+  let tx = t[i3 * 2] - t[i0 * 2], ty = t[i3 * 2 + 1] - t[i0 * 2 + 1]; const l = Math.hypot(tx, ty) || 1; tx /= l; ty /= l;
+  _lp.x = x + ty * offs; _lp.y = y - tx * offs; _lp.tx = tx; _lp.ty = ty; return _lp;
+}
+const DA = 0.3, dens = u => 1 + DA * Math.cos(12.566370614 * u), cdfD = u => u + DA * Math.sin(12.566370614 * u) / 12.566370614;
+function densInv(q){ let u = q; for (let i = 0; i < 6; i++) u -= (cdfD(u) - q) / dens(u); return u; }
+
+// ---------- events ----------
+const MH = 1.3;           // ring speed as a multiple of cruise (mean of the lane speeds)
+const KV = +(Q.get('kv') || 1.8), DMAX = +(Q.get('dmax') || 2.6), VCAP = +(Q.get('vcap') || 7) * 3.4;   // entry pace: average path speed as a multiple of cruise, longest entry, top speed (px per step at S=1)
+const LANE_SP = { 3: [1.1, 1, 0.9], 4: [1.12, 1.03, 0.95, 0.88] };   // innermost lane fastest
+// entry styles: xt = extra swirl (fraction of cruise x entry time), pt/pn = how late the swirl and the radial drop finish, fill = seconds the ring takes to start filling
+const STYLES = [
+  { name: 'wind',  xt: 0.55, pt: 1.5, pn: 1.6, fill: 0.0, dmin: 1.6, exit: 'unwind' },
+  { name: 'dive',  xt: 0.18, pt: 1.4, pn: 1.3, fill: 0.0, dmin: 1.4, exit: 'burst' },
+  { name: 'orbit', xt: 0.95, pt: 2.0, pn: 2.2, fill: 0.5, dmin: 2.0, exit: 'stream' },
+  { name: 'sweep', xt: 0.35, pt: 1.6, pn: 1.5, fill: 1.0, dmin: 1.5, exit: 'peel' }
+];
+let RS = { dir: 1, wa: 0.01, wk: 2, ww: 0.08, ba: 10, bk: 2, bw: 0.5, bp: 0, pt: 1.5, pn: 1.5, rot: 0.09, st: STYLES[0] }, styleI = -1;
+const wrap1 = u => u - Math.floor(u + 0.5);
+const _rp = { x: 0, y: 0, th: 0, tt: 0, n: 0 };
+// a bird's place on the ring at event time e: base phase + travelling density wave, braided lane offset, rotating breathing; k > 0 adds the entry spiral
+function ringXY(b, e, k){
+  const u0 = b.uS + RS.dir * b.om * e / halo.L;
+  const th = u0 + RS.wa * Math.sin(TAU * (RS.wk * u0 - RS.ww * e));
+  let n = b.lo + b.wA * Math.sin(TAU * b.wF * u0 + b.psi + b.ws * e) + RS.ba * Math.cos(TAU * RS.bk * u0 - RS.bw * e + RS.bp), tt = th;
+  if (k > 0) { tt -= RS.dir * b.dl * Math.pow(k, RS.pt); n += b.n0 * Math.pow(k, b.pn); }
+  const p = lanePos(tt, n); _rp.x = p.x; _rp.y = p.y; _rp.th = th; _rp.tt = tt; _rp.n = n; return _rp;
+}
+const _pj = { u: 0, n: 0 };
+function projectRing(x, y){
+  const K = halo.K, t = halo.tab; let bi = 0, bd = 1e18;
+  for (let i = 0; i < K; i++) { const dx = t[i * 2] - x, dy = t[i * 2 + 1] - y, d = dx * dx + dy * dy; if (d < bd) { bd = d; bi = i; } }
+  const i0 = (bi + K - 1) % K, i2 = (bi + 1) % K; let tx = t[i2 * 2] - t[i0 * 2], ty = t[i2 * 2 + 1] - t[i0 * 2 + 1]; const l = Math.hypot(tx, ty) || 1; tx /= l; ty /= l;
+  _pj.u = bi / K; _pj.n = (x - t[bi * 2]) * ty - (y - t[bi * 2 + 1]) * tx; return _pj;
+}
+// a halo bird's entry, worked out in ring space (u along the ring, n across it) from where the bird really is when it joins:
+// straight flight and the spiral blend in (u, n), so no bird ever cuts a chord across the word
+function enterRing(b, e){
+  const CRs = 3.4 * S * 60, L = halo.L, pj = projectRing(b.x, b.y); b.pu = pj.u; b.pn0 = pj.n;
+  const d = 0.002, q0 = lanePos(b.pu - d, b.pn0), x0 = q0.x, y0 = q0.y, q1 = lanePos(b.pu + d, b.pn0), h = Math.max(Math.hypot(q1.x - x0, q1.y - y0) / (2 * d), 0.4 * L);
+  const c = lanePos(b.pu, b.pn0), vx = b.vx * 60, vy = b.vy * 60;
+  b.vt = (vx * c.tx + vy * c.ty) / h; b.vn = vx * c.ty - vy * c.tx; b.ex = b.x - c.x; b.ey = b.y - c.y;
+  b.pn = b.pn0 < -24 * S ? 3 : RS.pn;
+  const thE = ringXY(b, e, 0).th;
+  b.dl = RS.dir * wrap1(thE - b.pu) + RS.st.xt * (CRs * 2.2 / L) * (0.6 + 0.8 * b.xr); b.n0 = b.pn0 - b.lo;
+  b.wM = Math.round(thE - RS.dir * b.dl - b.pu);
+  const g0 = wrap1(thE - b.pu) * L, no = Math.abs(b.n0); let D = RS.st.dmin;
+  for (let i = 0; i < 4; i++) D = clamp(Math.hypot(Math.abs(g0 + RS.dir * b.om * D), no) / (KV * CRs), RS.st.dmin, DMAX);
+  b.ts = e - DT; b.D = D;
+  return b.ts + D;
+}
+let queue = [], lastWord = -1e9, lastCode = 0;
+function evColor(ev){ return ev.kind === 'join' ? T.players[ev.seat % 8] : ev.kind === 'code' ? T.code : T.win; }
+function codeEvent(){ return { kind: 'code', lines: [(Q.get('code') || 'ERVY').toUpperCase()] }; }
+function joinEvent(name){
+  name = (name || 'Player').trim().slice(0, 12) || 'Player';
+  let idx = players.findIndex(p => p.name === name), fresh = false;
+  if (idx < 0) { idx = players.length; players.push({ name, seat: idx }); fresh = true; }
+  const ev = { kind: 'join', name, idx, seat: players[idx].seat, lines: [name.toUpperCase()] };
+  if (fresh) ev.onStart = () => {
+    const pool = birds.filter(b => b.own < 0); let n = 28;
+    while (n-- && pool.length) { const b = pool.splice(Math.floor(rnd() * pool.length), 1)[0]; b.own = idx; b.home = homeCol(b); if (b.role === 'free') setCol(b, b.home, 0, 0.5); }
+  };
+  return ev;
+}
+function winEvent(name){
+  name = (name || (players.length ? players[players.length - 1].name : 'Cleo')).toUpperCase();
+  return { kind: 'win', name, lines: H > W ? [name, 'WINS'] : [name + ' WINS'] };
+}
+const NAMES = ['Ana','Ben','Cleo','Dev','Eli','Fay','Gus','Hana'];
+let joinI = 0;
+const evLog = [];
+
+function startEvent(ev){
+  if (ev.onStart) ev.onStart();
+  const pts = textPoints(ev.lines);
+  const bcx = (box.x0 + box.x1) / 2, bcy = (box.y0 + box.y1) / 2;
+  buildHalo();
+  const CRs = 3.4 * S * 60, rgb = hex(evColor(ev));
+  const excl = b => ev.kind === 'win' ? b.own >= 0 : (ev.kind === 'join' && b.own === ev.idx);
+  const cand = birds.filter(b => !excl(b));
+  for (const b of cand) b.d = Math.hypot(b.x - bcx, b.y - bcy);
+  cand.sort((p, q) => p.d - q.d);
+  const word = cand.slice(0, pts.length), wset = new Set(word), hal = birds.filter(b => !wset.has(b));
+  pts.sort((p, q) => p[0] - q[0]); word.sort((p, q) => p.x - q.x);
+  const amp = H > W ? 1.2 : 1.6;
+  const begin = (b, role, ts, D) => {
+    b.ts = ts; b.D = D; b.trav = true; b.leaveAt = Infinity; b.boost = 1; b.turnT = 0;
+    b.p0x = b.x; b.p0y = b.y; b.v0x = b.vx * 60; b.v0y = b.vy * 60;
+    if (ts <= 0) { b.role = role; b.pend = null; } else b.pend = role;
+  };
+  word.forEach((b, i) => {
+    const f = i / Math.max(1, word.length - 1), end = 1.15 + 0.45 * f, ts = b.role === 'free' ? 0.3 : 0;
+    begin(b, 'word', ts, end - ts);
+    b.tgt = pts[i]; b.p1x = pts[i][0]; b.p1y = pts[i][1]; b.v1x = 0; b.v1y = 0; b.amp = amp; b.fq = 0.7 + rnd3() * 0.4; b.bp = rnd3() * 6.283; b.f = f;
+    setCol(b, rgb, 0.3, 0.7);
+  });
+  halo.n = hal.length;
+  // this event's ring: a style that differs from the last one, its own direction, density wave, breathing and braid
+  const fixed = Q.get('style'); styleI = fixed !== null ? ((parseInt(fixed, 10) || 0) % 4 + 4) % 4 : styleI < 0 ? Math.floor(rnd2() * 4) : (styleI + 1 + Math.floor(rnd2() * 3)) % 4;
+  const st = STYLES[styleI], sgn = () => rnd2() < 0.5 ? -1 : 1;
+  RS = { dir: rnd2() < 0.65 ? 1 : -1, wa: 0.006 + rnd2() * 0.005, wk: 2 + Math.floor(rnd2() * 2), ww: (0.05 + rnd2() * 0.09) * sgn(), wf: 2 + Math.floor(rnd2() * 3),
+    ba: halo.m * (0.14 + rnd2() * 0.1), bk: 1 + Math.floor(rnd2() * 2), bw: (0.35 + rnd2() * 0.45) * sgn(), bp: rnd2() * TAU, pt: st.pt, pn: st.pn, rot: 0.07 + rnd2() * 0.06, s0: rnd2(), st };
+  const nL = halo.nL, lsp = LANE_SP[nL], tRef = 1.5; let ringEnd = 0;
+  for (const b of hal) { const pj = projectRing(b.x, b.y); b.pu = pj.u; b.pn0 = pj.n; }
+  hal.sort((p, q) => p.pu - q.pu);
+  hal.forEach((b, r) => {
+    const lane = r % nL, fr = r / Math.max(1, hal.length - 1), fr2 = (fr + RS.s0) % 1;
+    const ts = (b.role === 'free' ? 0.15 + 0.3 * rnd3() : 0) + st.fill * (RS.dir > 0 ? fr2 : 1 - fr2);
+    b.lane = lane; b.lo = (lane - (nL - 1) / 2) * halo.lane; b.om = lsp[lane] * CRs * (1 + (rnd3() - 0.5) * 0.02); b.tgt = null;
+    b.wA = halo.lane * (0.4 + 0.3 * rnd3()); b.wF = RS.wf; b.psi = lane * TAU / nL + (rnd3() - 0.5) * 0.5; b.ws = (lane % 2 ? 1 : -1) * (0.6 + 0.5 * rnd3());
+    b.uS = densInv((r + 0.5) / hal.length) - RS.dir * (b.om / halo.L) * tRef; b.xr = rnd3();
+    begin(b, 'halo', ts, 1); b.rw = 0;
+    if (ts <= 0) ringEnd = Math.max(ringEnd, enterRing(b, 0));
+    if (b.cT !== b.home) setCol(b, b.home, 0.3, 0.7);
+  });
+  cur = { ev, t0: simT, releasing: false, rel: 0, relEnd: 0, ringEnd };
+  evLog.push({ kind: ev.kind, lines: ev.lines.join(' '), t0: +simT.toFixed(3), lock: +(simT + LOCK).toFixed(3), words: word.length, halo: hal.length, style: st.name, dir: RS.dir, ringEnd: +ringEnd.toFixed(2), SE: +halo.SE.toFixed(1) });
+  if (reduced) { cap.textContent = ev.lines.join(' '); cap.style.opacity = 1; }
+}
+// exits, one per ring style: kt/kr/kg = tangent / outward / common-heading mix, span = seconds the ring takes to let go, lb = launch boost
+const EXITS = {
+  unwind: { kt: 1, kr: 0.55, kg: 0, span: 1.15, wspan: 0.9, lb: 1.8 },
+  burst:  { kt: 0.35, kr: 1, kg: 0, span: 0.25, wspan: 0.15, lb: 2.4 },
+  stream: { kt: 0.4, kr: 0.1, kg: 1, span: 0.6, wspan: 0.5, lb: 2.0 },
+  peel:   { kt: 1, kr: 0, kg: 0, span: 0.3, wspan: 0.3, lb: 1.9 }
+};
+let XT = EXITS.peel, xg = [1, 0];
+function releaseEvent(){
+  XT = EXITS[RS.st.exit]; const ga = rnd2() * TAU, th0 = rnd2(); xg = [Math.cos(ga), Math.sin(ga)];
+  cur.releasing = true; cur.rel = simT;
+  let last = 0;
+  for (const b of birds) {
+    if (b.role === 'free') continue;
+    if (b.role === 'word') { b.leaveAt = simT + XT.wspan * b.f; b.lb = XT.lb * 1.15; }
+    else {
+      const fr = ((RS.dir * (b.rth - th0)) % 1 + 1) % 1;
+      b.leaveAt = simT + (halo.nL - 1 - b.lane) * 0.03 + XT.span * fr; b.lb = XT.lb;
+    }
+    last = Math.max(last, b.leaveAt - simT);
+    setCol(b, b.home, b.leaveAt - simT, 1.2);
+  }
+  cur.relEnd = simT + last + 0.15;
+}
+function toFree(b, e){
+  const rx = b.x - halo.cx, ry = b.y - halo.cy, rl = Math.hypot(rx, ry) || 1;
+  let tx, ty;
+  if (b.role === 'word') { tx = -ry / rl * RS.dir; ty = rx / rl * RS.dir; }
+  else { tx = b.vx; ty = b.vy; const l = Math.hypot(tx, ty) || 1; tx /= l; ty /= l; }
+  let dx = tx * XT.kt + rx / rl * XT.kr + xg[0] * XT.kg, dy = ty * XT.kt + ry / rl * XT.kr + xg[1] * XT.kg; const dl = Math.hypot(dx, dy) || 1; dx /= dl; dy /= dl;
+  b.role = 'free'; b.trav = false; b.pend = null; b.tgt = null; b.boost = b.lb; b.leaveAt = Infinity;
+  const v = 3.4 * S * b.lb; b.vx = dx * v; b.vy = dy * v; b.pulse = 0;
+}
+function updateEvent(){
+  if (!cur) {
+    if (queue.length) startEvent(queue.shift());
+    else if (!reduced && simT - lastWord > 12 && simT - lastCode > 30) { lastCode = simT; startEvent(codeEvent()); }
+    return;
+  }
+  const e = simT - cur.t0;
+  if (cur.releasing) { if (simT >= cur.relEnd) { cur = null; lastWord = simT; if (reduced) cap.style.opacity = 0; } return; }
+  if (e >= LOCK) {
+    const q = queue.length, hold = q >= 3 ? 1.3 : q === 2 ? 1.5 : q === 1 ? 2.2 : Math.min(4.6, Math.max(2.8, cur.ringEnd - LOCK + 1.6));
+    if (e >= LOCK + hold) { lastWord = simT; if (queue.length) startEvent(queue.shift()); else releaseEvent(); }
+  }
+}
+
+// ---------- flock (free birds) ----------
+let gHead = new Int32Array(1); const gNext = new Int32Array(N);
+let wave = null, waveId = 0, nextWave = 7, falcon = null, nextFalcon = 14;
+const wrapA = a => Math.atan2(Math.sin(a), Math.cos(a));
+function stepFlock(){
+  const R = 110 * S, R2 = R * R, SEP = 26 * S, SEP2 = SEP * SEP, C = 3.4 * S, minV = 1.7 * S;
+  const gc = Math.ceil(W / R) + 1, gr = Math.ceil(H / R) + 1;
+  if (gHead.length < gc * gr) gHead = new Int32Array(gc * gr);
+  gHead.fill(-1, 0, gc * gr);
+  let nf = 0, sx0 = 0, sy0 = 0, mvx = 0, mvy = 0;
+  for (let i = 0; i < N; i++) {
+    const b = birds[i]; if (b.role !== 'free') continue;
+    const g = clamp(Math.floor(b.x / R), 0, gc - 1) + clamp(Math.floor(b.y / R), 0, gr - 1) * gc;
+    gNext[i] = gHead[g]; gHead[g] = i; nf++; sx0 += b.x; sy0 += b.y; mvx += b.vx; mvy += b.vy;
+  }
+  if (!nf) return;
+  const t = simT, port = H > W;
+  const Lx = W * (0.5 + (port ? 0.34 : 0.36) * Math.sin(6.283185 * t / 23 + 1.3) + 0.06 * Math.sin(6.283185 * t / 7.1));
+  const Ly = H * (0.5 + (port ? 0.34 : 0.30) * Math.sin(6.283185 * t / 17 + 0.4) + 0.05 * Math.sin(6.283185 * t / 5.3));
+  if (t >= nextWave && nf > 20) {
+    let best = -1e9, ox = 0, oy = 0; const ha = Math.atan2(mvy, mvx), hx = Math.cos(ha), hy = Math.sin(ha);
+    for (let i = 0; i < N; i++) { const b = birds[i]; if (b.role !== 'free') continue; const pr = b.x * hx + b.y * hy; if (pr > best) { best = pr; ox = b.x; oy = b.y; } }
+    wave = { t0: t, ox, oy, ang: ha + (100 + rnd2() * 60) * 0.0174533 * (rnd2() < 0.5 ? -1 : 1), id: ++waveId };
+    nextWave = t + 6 + rnd2() * 4;
+  }
+  let wrad = -1; if (wave) { wrad = (t - wave.t0) * 0.47 * W; if (wrad > Math.hypot(W, H) * 1.1) wave = null; }
+  if (t >= nextFalcon && !falcon && nf > 20) {
+    const cx = sx0 / nf, cy = sy0 / nf, a = rnd2() * 6.283, d0 = 0.75 * Math.max(W, H) + 200, v = 2.5 * C;
+    falcon = { x: cx - Math.cos(a) * d0, y: cy - Math.sin(a) * d0, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 2 * d0 / v };
+    nextFalcon = t + 12 + rnd2() * 6;
+  }
+  if (falcon) { falcon.x += falcon.vx; falcon.y += falcon.vy; if (--falcon.life <= 0) falcon = null; }
+  const FR = 160 * S, mx = 0.06 * W, my = 0.06 * H;
+  for (let i = 0; i < N; i++) {
+    const b = birds[i]; if (b.role !== 'free') continue;
+    let ax = 0, ay = 0, sx = 0, sy = 0, cx = 0, cy = 0, n = 0;
+    const gx = clamp(Math.floor(b.x / R), 0, gc - 1), gy = clamp(Math.floor(b.y / R), 0, gr - 1);
+    for (let yy = Math.max(0, gy - 1); yy <= Math.min(gr - 1, gy + 1); yy++) for (let xx = Math.max(0, gx - 1); xx <= Math.min(gc - 1, gx + 1); xx++) {
+      for (let j = gHead[xx + yy * gc]; j >= 0; j = gNext[j]) {
+        if (j === i) continue; const o = birds[j], dx = o.x - b.x, dy = o.y - b.y, d2 = dx * dx + dy * dy;
+        if (d2 < R2) { n++; ax += o.vx; ay += o.vy; cx += o.x; cy += o.y; if (d2 < SEP2) { sx -= dx; sy -= dy; } }
+      }
+    }
+    if (n) { b.vx += (ax / n - b.vx) * 0.06 + (cx / n - b.x) * 0.0009 + sx * 0.012; b.vy += (ay / n - b.vy) * 0.06 + (cy / n - b.y) * 0.0009 + sy * 0.012; }
+    const ldx = Lx - b.x, ldy = Ly - b.y, ld = Math.hypot(ldx, ldy) || 1, lk = Math.min(0.05 * S, ld * 0.0007 * S);
+    b.vx += ldx / ld * lk; b.vy += ldy / ld * lk;
+    if (wave && b.wv !== wave.id && Math.hypot(b.x - wave.ox, b.y - wave.oy) <= wrad) { b.wv = wave.id; b.turnT = 1.0; b.turnA = wave.ang; }
+    if (b.turnT > 0) { b.turnT -= DT; const a = Math.atan2(b.vy, b.vx), d = clamp(wrapA(b.turnA - a), -0.105, 0.105), c = Math.cos(d), s = Math.sin(d); const nx = b.vx * c - b.vy * s; b.vy = b.vx * s + b.vy * c; b.vx = nx; }
+    if (falcon) { const dx = b.x - falcon.x, dy = b.y - falcon.y, d = Math.hypot(dx, dy); if (d < FR) { const k = 0.8 * S * (0.4 + 0.6 * (1 - d / FR)) / (d || 1); b.vx += dx * k; b.vy += dy * k; } }
+    if (b.boost > 1.001) b.boost = 1 + (b.boost - 1) * 0.9535; else b.boost = 1;
+    const cap2 = C * b.boost, sp = Math.hypot(b.vx, b.vy) || 1;
+    if (sp > cap2) { b.vx *= cap2 / sp; b.vy *= cap2 / sp; } else if (sp < minV) { b.vx *= minV / sp; b.vy *= minV / sp; }
+    if (b.x < mx) b.vx += 0.25 * S; else if (b.x > W - mx) b.vx -= 0.25 * S;
+    if (b.y < my) b.vy += 0.25 * S; else if (b.y > H - my) b.vy -= 0.25 * S;
+    b.x += b.vx; b.y += b.vy; b.ph += 0.16 + Math.hypot(b.vx, b.vy) / S * 0.03;
+    if (b.fm > 0) b.fm = Math.max(0, b.fm - 0.1);
+    if (b.rw > 0) b.rw = Math.max(0, b.rw - 0.02);
+    b.pulse = 0;
+  }
+}
+
+// ---------- word and halo birds on rails ----------
+function stepRails(){
+  if (!cur) return;
+  const e = simT - cur.t0;
+  for (let i = 0; i < N; i++) {
+    const b = birds[i];
+    if (b.pend && e >= b.ts) {
+      b.role = b.pend; b.pend = null; b.p0x = b.x; b.p0y = b.y; b.v0x = b.vx * 60; b.v0y = b.vy * 60;
+      if (b.role === 'halo') cur.ringEnd = Math.max(cur.ringEnd, enterRing(b, e));
+    }
+    if (b.role === 'free') continue;
+    if (simT >= b.leaveAt) { toFree(b, e); continue; }
+    let nx, ny;
+    const end = b.ts + b.D;
+    if (b.role === 'halo') {
+      const s = (e - b.ts) / b.D;
+      if (s < 1) {
+        const w = s * s * s * (s * (6 * s - 15) + 10), lf = 0.9 * (1 - Math.exp(-(e - b.ts) / 0.9)), r = ringXY(b, e, 1 - s);
+        const ul = b.pu + b.vt * lf, nl = b.pn0 + b.vn * lf, wn = b.pn > 2.5 ? sstep(s / 0.5) : w;
+        const p = lanePos(ul + w * (r.tt - b.wM - ul), nl + wn * (r.n - nl)), ew = 1 - w;
+        nx = p.x + b.ex * ew; ny = p.y + b.ey * ew; b.rw = sstep((s - 0.3) / 0.7);
+      } else { const r = ringXY(b, e, 0); nx = r.x; ny = r.y; b.rw = 1; }
+      b.rth = _rp.th;
+      const lx = nx - b.x, ly = ny - b.y, ll = Math.hypot(lx, ly), lc = VCAP * S;
+      if (ll > lc) { nx = b.x + lx / ll * lc; ny = b.y + ly / ll * lc; }
+    } else if (e < end) {
+      const s = clamp((e - b.ts) / b.D, 0, 1), s2 = s * s, s3 = s2 * s;
+      const h00 = 2 * s3 - 3 * s2 + 1, h10 = s3 - 2 * s2 + s, h01 = -2 * s3 + 3 * s2, h11 = s3 - s2;
+      nx = h00 * b.p0x + h10 * b.D * b.v0x + h01 * b.p1x + h11 * b.D * b.v1x;
+      ny = h00 * b.p0y + h10 * b.D * b.v0y + h01 * b.p1y + h11 * b.D * b.v1y;
+    } else {
+      const ramp = Math.min(1, (e - end) / 0.3), w = 6.283185 * b.fq * (e - end) + b.bp;
+      nx = b.p1x + b.amp * ramp * Math.sin(w); ny = b.p1y + b.amp * ramp * Math.cos(w);
+    }
+    if (b.role === 'word') b.rw = Math.max(0, b.rw - 0.06);
+    b.vx = nx - b.x; b.vy = ny - b.y; b.x = nx; b.y = ny;
+    const sp = Math.hypot(b.vx, b.vy);
+    b.ph += 0.16 + sp / S * 0.03;
+    const ft = b.role === 'word' ? sstep((e - (end - 0.2)) / 0.2) : 0;
+    b.fm += clamp(ft - b.fm, -0.1, 0.1);
+    const tau = e - LOCK, pa = cur.ev.kind === 'win' ? 0.35 : 0.25;
+    b.pulse = b.role === 'word' && tau > 0 && tau < 0.3 ? pa * Math.sin(Math.PI * tau / 0.3) : 0;
+  }
+}
+
+function step(){
+  simT += DT; stepN++;
+  updateEvent(); stepFlock(); stepRails();
+  if (stepN % 3 === 0) for (const b of birds) { b.hx[2] = b.hx[1]; b.hy[2] = b.hy[1]; b.hx[1] = b.hx[0]; b.hy[1] = b.hy[0]; b.hx[0] = b.x; b.hy[0] = b.y; }
+}
+
+// ---------- drawing ----------
+const SHA = Math.cos(0.5), SHB = Math.sin(0.5);
+// colour looks: 1 rainbow = hue by position on the ring, 2 players = the ring wears the room's seat colours, 3 shimmer = a light band sweeps the flock + twinkles
+function tint(b){
+  const d = b.dc, c = b.col; d[0] = c[0]; d[1] = c[1]; d[2] = c[2];
+  if (look === 1 || look === 2) {
+    const w = b.rw; if (w < 0.002) return;
+    let q;
+    if (look === 1) q = palAt(T.rgb, b.rth - RS.dir * RS.rot * simT);
+    else if (players.length) {
+      const key = themeName + players.length; if (key !== plcKey) { plcKey = key; plc = players.map(p => T.prgb[p.seat % 8]); }
+      q = palAt(plc, b.rth - RS.dir * RS.rot * 0.6 * simT);
+    } else return;
+    d[0] += (q[0] - d[0]) * w; d[1] += (q[1] - d[1]) * w; d[2] += (q[2] - d[2]) * w;
+  } else if (look === 3) {
+    const band = Math.sin(TAU * ((b.x * SHA + b.y * SHB) / (0.85 * Math.max(W, H)) - simT * 0.3)), tw = Math.sin(b.ph * 0.3 + b.tw * 3), wh = T.white;
+    const k = 0.7 * Math.max(band > 0.55 ? (band - 0.55) / 0.45 : 0, tw > 0.95 ? (tw - 0.95) / 0.05 : 0) * (b.role === 'word' ? 0.5 : 1);
+    d[0] += (wh[0] - d[0]) * k; d[1] += (wh[1] - d[1]) * k; d[2] += (wh[2] - d[2]) * k;
+  }
+}
+function drawBird(b){
+  const fm = b.fm; let ang = Math.atan2(b.vy, b.vx);
+  if (fm > 0.001) { let d = -0.35 - ang; d = Math.atan2(Math.sin(d), Math.cos(d)); ang += d * fm; }
+  const s = ((10 * S * b.sz) * (1 - fm) + formS * fm) * (1 + b.pulse), f = Math.sin(b.ph) * (1 - fm * 0.75);
+  const wing = s * (0.95 + 0.55 * f), back = s * (0.7 + 0.25 * f);
+  const cs = Math.cos(ang), sn = Math.sin(ang), bx = b.x, by = b.y;
+  const px = (x, y) => bx + x * cs - y * sn, py = (x, y) => by + x * sn + y * cs;
+  ctx.beginPath();
+  if (shape === 1) {
+    ctx.moveTo(px(s * 0.95, 0), py(s * 0.95, 0)); ctx.lineTo(px(-back, wing * 0.72), py(-back, wing * 0.72)); ctx.lineTo(px(-s * 0.3, 0), py(-s * 0.3, 0)); ctx.lineTo(px(-back, -wing * 0.72), py(-back, -wing * 0.72));
+  } else if (shape === 2) {
+    const hw = wing * 0.95; ctx.moveTo(px(s * 1.1, 0), py(s * 1.1, 0)); ctx.quadraticCurveTo(px(0, hw), py(0, hw), px(-s * 0.95, 0), py(-s * 0.95, 0)); ctx.quadraticCurveTo(px(0, -hw), py(0, -hw), px(s * 1.1, 0), py(s * 1.1, 0));
+  } else if (shape === 3) {
+    const r = s * 0.5, tl = s * (0.8 + 0.7 * Math.min(Math.hypot(b.vx, b.vy) / S, 6)) * (1 - fm);
+    ctx.moveTo(px(0, r), py(0, r)); ctx.lineTo(px(-r - tl, 0), py(-r - tl, 0)); ctx.lineTo(px(0, -r), py(0, -r)); ctx.arc(bx, by, r, ang - 1.5708, ang + 1.5708);
+  } else {
+  ctx.moveTo(px(-back, wing), py(-back, wing));
+  ctx.quadraticCurveTo(px(s * 0.4, wing * 0.6), py(s * 0.4, wing * 0.6), px(s * 0.85, 0), py(s * 0.85, 0));
+  ctx.quadraticCurveTo(px(s * 0.4, -wing * 0.6), py(s * 0.4, -wing * 0.6), px(-back, -wing), py(-back, -wing));
+  ctx.quadraticCurveTo(px(-s * 0.05, -wing * 0.3), py(-s * 0.05, -wing * 0.3), px(-s * 0.2, 0), py(-s * 0.2, 0));
+  ctx.quadraticCurveTo(px(-s * 0.05, wing * 0.3), py(-s * 0.05, wing * 0.3), px(-back, wing), py(-back, wing));
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgb(' + (b.dc[0] | 0) + ',' + (b.dc[1] | 0) + ',' + (b.dc[2] | 0) + ')';
+  ctx.fill();
+  if (T.outline) {
+    const lw = fm < 0.5 ? T.lw * Math.max(S, 0.6) * (1 - fm * 2) : (b.role === 'word' && !b.trav ? 1 : 0);
+    if (lw > 0.05) { ctx.lineWidth = lw; ctx.stroke(); }
+  }
+}
+function drawTail(b){
+  const dx = b.x - b.hx[2], dy = b.y - b.hy[2]; if (dx * dx + dy * dy < 9) return;
+  ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(b.hx[0], b.hy[0]); ctx.lineTo(b.hx[1], b.hy[1]); ctx.lineTo(b.hx[2], b.hy[2]);
+  ctx.strokeStyle = 'rgba(' + (b.dc[0] | 0) + ',' + (b.dc[1] | 0) + ',' + (b.dc[2] | 0) + ',0.28)'; ctx.lineWidth = Math.max(1.5, 4 * S); ctx.stroke();
+}
+function draw(){
+  ctx.clearRect(0, 0, W, H);
+  ctx.globalAlpha = T.alpha; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  if (T.outline) ctx.strokeStyle = T.outline;
+  for (const b of birds) { updCol(b); tint(b); }
+  if (T.tails) for (const b of birds) if (b.fm < 0.5 && !(b.role === 'word' && !b.trav)) drawTail(b);
+  for (const b of birds) if (b.role !== 'word') drawBird(b);
+  for (const b of birds) if (b.role === 'word') drawBird(b);
+  ctx.globalAlpha = 1;
+}
+
+// ---------- boot ----------
+let last = 0, acc = 0, fpsN = 0, fpsT = 0;
+function setTheme(name){
+  themeName = name; T = THEMES[name]; recolor(); applyBg();
+  document.documentElement.style.setProperty('--ui', T.ui);
+  const u = new URL(location.href); u.searchParams.set('theme', name); history.replaceState(null, '', u);
+  if (reduced) draw();
+}
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.1, (now - last) / 1000 || DT); last = now; acc += dt;
+  let n = 0; while (acc >= DT - 1e-9 && n < 12) { step(); acc -= DT; n++; }
+  if (acc < 0) acc = 0;
+  draw();
+  fpsN++; if (now - fpsT > 1000) { window.__fps = fpsN * 1000 / (now - fpsT); fpsN = 0; fpsT = now; }
+}
+const enq = ev => {
+  if (reduced) { if (ev.onStart) ev.onStart(); recolor(); cap.textContent = ev.lines.join(' '); cap.style.opacity = 1; setTimeout(() => { cap.style.opacity = 0; }, 3400); }
+  else queue.push(ev);
+};
+function state(){
+  const CR = 3.4 * S * 60;
+  return {
+    t: simT, e: cur ? simT - cur.t0 : null, cruise: CR, W, H, S, theme: themeName,
+    phase: !cur ? 'idle' : cur.releasing ? 'release' : (simT - cur.t0 < LOCK ? 'form' : 'hold'),
+    queue: queue.length, box: cur ? { ...box } : null, ringEnd: cur ? cur.ringEnd : null,
+    halo: cur && halo ? { cx: halo.cx, cy: halo.cy, a: halo.a, b: halo.b, n: halo.n, L: halo.L, lane: halo.lane } : null,
+    ev: cur ? { kind: cur.ev.kind, lines: cur.ev.lines.slice(), t0: cur.t0, color: evColor(cur.ev) } : null,
+    birds: birds.map(b => ({ x: b.x, y: b.y, vx: b.vx * 60, vy: b.vy * 60, role: b.role, tgt: b.tgt ? [b.tgt[0], b.tgt[1]] : null, own: b.own, col: b.col.map(Math.round) }))
+  };
+}
+addEventListener('resize', resize);
+document.getElementById('bJoin').onclick = () => enq(joinEvent(NAMES[joinI++ % NAMES.length]));
+document.getElementById('bCode').onclick = () => enq(codeEvent());
+document.getElementById('bWin').onclick = () => enq(winEvent());
+document.getElementById('bTheme').onclick = () => setTheme(themeName === 'pop' ? 'gouache' : 'pop');
+const bLook = document.getElementById('bLook'), bShape = document.getElementById('bShape');
+const labels = () => { bLook.textContent = 'look: ' + LOOKS[look]; bShape.textContent = 'shape: ' + SHAPES[shape]; if (reduced) draw(); };
+const setLook = i => { look = ((i | 0) % LOOKS.length + LOOKS.length) % LOOKS.length; labels(); }, setShape = i => { shape = ((i | 0) % SHAPES.length + SHAPES.length) % SHAPES.length; labels(); };
+bLook.onclick = () => setLook(look + 1); bShape.onclick = () => setShape(shape + 1);
+labels();
+document.documentElement.style.setProperty('--ui', T.ui);
+resize();
+for (const b of birds) { const a = rnd() * 6.283, v = (1.7 + rnd() * 1.7) * S; b.x = rnd() * W; b.y = rnd() * H; b.vx = Math.cos(a) * v; b.vy = Math.sin(a) * v; b.home = homeCol(b); b.col = b.home.slice(); b.cF = b.home.slice(); b.cT = b.home.slice(); b.cS = -10; b.leaveAt = Infinity; }
+for (let i = 0; i < 150; i++) stepFlock();
+started = true;
+for (const n of Q.getAll('join')) if (n) enq(joinEvent(n));
+window.__murm = { join: n => enq(joinEvent(n)), code: () => enq(codeEvent()), win: n => enq(winEvent(n)), theme: setTheme, look: setLook, shape: setShape, fps: () => window.__fps, state, log: evLog, cruise: () => 3.4 * S * 60 };
+if (reduced) draw(); else requestAnimationFrame(frame);
+})();
+</script></body></html>

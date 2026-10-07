@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Wind and Sand</title>
+<style>
+:root{--ui:#e9e6ff}
+html,body{margin:0;height:100%;background:#0f1020;overflow:hidden;font-family:system-ui,Segoe UI,Arial,sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+#hud{position:fixed;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:5px;flex-wrap:nowrap;justify-content:center;opacity:.6}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{font:700 12px system-ui,sans-serif;color:var(--ui);background:rgba(20,16,50,.72);border:1px solid rgba(233,230,255,.45);border-radius:999px;padding:5px 10px;min-height:28px;cursor:pointer;white-space:nowrap}
+#hud button:focus-visible{outline:3px solid #ffd166}
+#live{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.kiosk #hud{display:none}
+</style></head>
+<body>
+<canvas id="c" aria-label="A sand cast of a card that the wind blows away to reveal it"></canvas>
+<div id="live" role="status" aria-live="polite"></div>
+<div id="hud"><button data-k="truth">truth</button><button data-k="sh">hitler</button><button data-k="night">night</button><button data-k="imp">imposter</button><button data-k="door">door</button><button data-k="fakeout">fake-out</button><button data-k="round">round</button><button data-k="dawn">dawn</button><button id="bMat">sand</button><button id="bPaper">tear</button><button id="bTheme">theme</button></div>
+<script>
+(() => {
+'use strict';
+const Q = new URLSearchParams(location.search);
+const INK = '#1a0b12', LIGHT = '#fff7fb';
+const THEMES = {
+  pop: { flat: true, bg: '#0f1020', bg2: null, far: '#3b2d4f', mid: '#7a5140', near: '#d5963d', rim: null, outline: INK,
+    sand: ['#ffd166', '#e8a93e', '#b8742a'], speck: '#8f5720', card: LIGHT, card2: LIGHT, ink: INK,
+    paper: { face: '#e6b872', fib: '#c48f4e', panel: '#f8dea6', rim: '#fff4dc', back: '#f3e2bd', ink: INK },
+    accent: { truth: '#06d6a0', sh: '#ff5d8f', night: '#b388ff', imp: '#4cc9f0', door: '#ffd166' }, ui: '#f5f6ff' },
+  gouache: { flat: false, bg: '#0f1230', bg2: '#1b2350', far: '#2b2f57', mid: '#4a4668', near: '#af9b7c', rim: '#e9d29c', outline: null,
+    sand: ['#e9d7ad', '#cbb48c', '#8a7b86'], speck: '#8a7b86', card: '#e9dcc0', card2: '#d6c5a0', ink: '#2b2350',
+    paper: { face: '#d9c49c', fib: '#b09b78', panel: '#eadcba', rim: '#f6eed8', back: '#e6d8b8', ink: '#2b2350' },
+    accent: { truth: '#7fb8ad', sh: '#c9788f', night: '#8f8fd0', imp: '#7a9ad0', door: '#d9b46a' }, ui: '#e8e2ff' }
+};
+let themeName = Q.get('theme') === 'gouache' ? 'gouache' : 'pop';
+let T = THEMES[themeName];
+const reduced = Q.get('motion') === '0' || (matchMedia('(prefers-reduced-motion: reduce)').matches && Q.get('motion') !== '1');
+if (Q.has('kiosk')) document.documentElement.classList.add('kiosk');
+const DIR = Q.get('dir') === '-1' ? -1 : 1;
+const HOLDFLAG = Q.has('hold') && Q.get('hold') !== '0';
+let MAT = (Q.get('mat') === 'paper' || Q.has('paper')) ? 'paper' : 'sand', PAPER = Q.get('paper') === 'shred' ? 'shred' : 'tear';
+const ROLE = Q.get('role') === 'liberal' ? 'liberal' : 'fascist';
+
+// timeline (seconds after fire)
+const T_ANT = 0.15, T_RISE = 0.85, T_SET = 1.15, T_HOLD = 2.15, T_WIND = 2.35, T_THIN = 2.95, T_THICK = 3.40, T_PEAK = 3.50, T_SETTLE = 4.45, T_SHOWN = 7.35, T_END = 7.95;
+
+function prng(seed){ let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const seed = parseInt(Q.get('seed') || '20260928', 10);
+let rnd = prng(seed), rndG = prng(seed ^ 0x9e3779b9), rndD = prng(seed ^ 0x51ed270b), rndC = prng(seed ^ 0x2c1b3c6d);
+
+const NT = 64, nTab = Array.from({ length: NT * NT }, () => rnd());
+const sm = t => t * t * (3 - 2 * t);
+function vn(x, y){ const xi = Math.floor(x), yi = Math.floor(y), fx = sm(x - xi), fy = sm(y - yi);
+  const g = (a, b) => nTab[((b % NT + NT) % NT) * NT + ((a % NT + NT) % NT)];
+  return (g(xi, yi) * (1 - fx) + g(xi + 1, yi) * fx) * (1 - fy) + (g(xi, yi + 1) * (1 - fx) + g(xi + 1, yi + 1) * fx) * fy; }
+const fbm = (x, y) => vn(x, y) * 0.55 + vn(x * 2.1 + 7, y * 2.1 + 3) * 0.3 + vn(x * 4.3 + 1, y * 4.3 + 9) * 0.15;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = t => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+
+const cv = document.getElementById('c'), ctx = cv.getContext('2d', { alpha: false });
+const live = document.getElementById('live');
+let W = 0, H = 0, S = 1, DPR = 1, cs = 4, portrait = false;
+
+// ---------- state ----------
+let tt = -1;            // seconds since fire; -1 = idle
+let kind = null, held = HOLDFLAG, cast = null, clock = 0;
+let grains = [], wisps = [], dep = [], wispT = 0, windFired = false, poofDone = false;
+let peakBurst = false, RV = null, fireN = 0;
+const STREAKS = new Map();
+const MAXG = 1200;
+
+const KINDS = {
+  truth: { wide: true, title: 'THE TRUTH', big: ['Flamingos are', 'born grey.'], sub: [], tag: 'TRUE', say: 'The truth: flamingos are born grey.' },
+  sh: { title: 'SECRET ROLE', big: [ROLE === 'liberal' ? 'LIBERAL' : 'FASCIST'], sub: ROLE === 'liberal' ? ['You are on the good side.', 'Find the Fascists.'] : ['Your team: Ben, Cleo', 'Hitler: Dev'], say: ROLE === 'liberal' ? 'Your secret role: Liberal.' : 'Your secret role: Fascist.' },
+  night: { title: 'NIGHTFALL', big: ['WEREWOLF'], sub: ['Wake at night.', 'Pick a victim.'], say: 'Your secret role: Werewolf.' },
+  imp: { title: 'YOUR WORD', big: ['IMPOSTER'], sub: ['You do not know the word.', 'Blend in.'], say: 'You are the imposter.' },
+  door: { title: 'MYSTERY BOX', big: ['DOOR 3'], sub: ['Behind it waits', 'a golden key.'], say: 'Mystery Box: door 3. Behind it waits a golden key.' }
+};
+const FONT = '"Segoe UI",system-ui,Arial,sans-serif';
+
+function resize(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = innerWidth; H = innerHeight; portrait = H > W;
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  S = Math.max(Math.min(W / 1920, H / 1080) * (portrait ? 1.9 : 1), 0.6);
+  cs = Math.max(4, Math.round(Math.min(W, H) / 170));
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  bgGrad = null; stars = null; dep = new Array(Math.ceil(W / 16) + 3).fill(0);
+  if (cast) { const k = cast.kind, t = tt; layout(k); tt = t; renderAssets(); eraseAny(tt); }
+  if (scene) restoreScene();
+}
+let bgGrad = null, stars = null;
+const GMAX = () => (portrait ? 600 : 1600) * (scene ? 1.4 : 1);
+
+// ---------- near dune surface ----------
+const nearMean = () => H * (portrait ? 0.74 : 0.84);
+function depAt(x){ const f = clamp(x / 16, 0, dep.length - 2), i = Math.floor(f), a = f - i; return dep[i] * (1 - a) + dep[i + 1] * a; }
+function riseP(t){
+  if (t < T_ANT) return 0;
+  if (t < 0.75) { const q = (t - T_ANT) / 0.6; return 1.03 * (1 - Math.pow(1 - q, 1.3)); }
+  if (t < T_RISE) return 1.03 - 0.03 * sm((t - 0.75) / 0.1);
+  return 1;
+}
+function plateauG(){ if (tt < 0) return 0; if (tt < T_END) return clamp(riseP(tt), 0, 1); return 1 - clamp((tt - T_END) / 0.5, 0, 1); }
+function bodyDY(){
+  if (!cast || reduced) return 0;
+  const D = cast.h + cast.foot + 0.04 * H;
+  if (MAT === 'paper' && tt < T_RISE) return -(cast.Yf + 14) * (1 - sm(clamp((tt - T_ANT) / (T_RISE - T_ANT), 0, 1)));
+  if (tt < T_RISE) return (1 - riseP(tt)) * D;
+  if (tt >= T_SHOWN && !cast.noSink) { const k = clamp((tt - T_SHOWN) / (T_END - T_SHOWN), 0, 1); return k * k * D; }
+  return 0;
+}
+function plat(y, x, k, g, t){
+  const d = Math.max(0, Math.abs(x - (k.x + k.w / 2)) - k.w / 2), A = (portrait ? 24 : 40) * 2.2, w = 1 - sm(clamp(d / A, 0, 1));
+  y += w * (k.Yf - y) * g;
+  if (t >= 0 && t < T_RISE) y -= w * (portrait ? 4 : 6) * (t < T_ANT ? t / T_ANT : Math.max(0, 1 - g));
+  return y;
+}
+function surface(x){
+  let y = nearMean() + Math.sin(x * 0.0045 + clock * 0.12 + 1.3) * H * 0.012 + Math.sin(x * 0.013 - clock * 0.2) * H * 0.004;
+  if (scene) for (const c of scene.cards) y = plat(y, x, c, c.g, c.t);
+  else if (cast) y = plat(y, x, cast, plateauG(), tt);
+  return y - depAt(x);
+}
+
+// ---------- layout ----------
+function fitSize(text, maxW, size, weight, min){
+  const c = fitSize.c || (fitSize.c = document.createElement('canvas').getContext('2d'));
+  c.font = `${weight} ${size}px ${FONT}`;
+  while (c.measureText(text).width > maxW && size > min) { size -= 1; c.font = `${weight} ${size}px ${FONT}`; }
+  return size;
+}
+function layout(k){
+  kind = k; const spec = KINDS[k], wide = !!spec.wide, u = portrait ? 1 : H / 1080;
+  let cw, ch;
+  if (portrait) { cw = W * 0.84; ch = wide ? Math.min(H * 0.56, cw) : Math.min(H * 0.56, cw * 1.44); }
+  else if (wide) { cw = 1000 * u; ch = 670 * u; } else { cw = 540 * u; ch = 760 * u; }
+  cw = Math.round(cw); ch = Math.round(ch);
+  const Yf = Math.round(nearMean() - 0.02 * H), cx = Math.round((W - cw) / 2), cy = Yf - ch;
+  const ov = portrait ? 4 : 6, foot = Math.round(ch * 0.07);
+  const rimIn = 0.04 * cw, rimT = portrait ? 8 : Math.round(14 * u), inner = cw - 2 * (rimIn + rimT);
+  const tSize = portrait ? Math.max(14, ch * 0.045) : 36 * u, subSize = portrait ? 18 : 36 * u;
+  const plW = inner * (wide ? 0.92 : 0.8);
+  let bigSize = portrait ? (wide ? 40 : 36) : (wide ? 96 : 88) * u;
+  for (const l of spec.big) bigSize = fitSize(l, plW * 0.94, bigSize, 900, portrait ? 30 : 60 * u);
+  const nl = spec.big.length, plH = wide ? bigSize * (nl * 1.15 + 0.35) : bigSize * 1.5;
+  const L = { rimIn, rimT, inner, stripY: portrait ? 0.085 * ch : 0.085 * ch, stripH: Math.max(4, 0.012 * ch + 2), titleY: 0.155 * ch, tSize,
+    med: wide ? null : { x: cw / 2, y: 0.335 * ch, r: cw * 0.19 }, bigSize, subSize,
+    plaque: { x: cw / 2, y: (wide ? 0.46 : 0.635) * ch, w: plW, h: plH },
+    subs: wide ? [] : [{ y: 0.775 * ch, w: inner * 0.7 }, { y: 0.845 * ch, w: inner * 0.45 }],
+    stamp: wide ? { x: cw / 2, y: 0.815 * ch, w: cw * 0.34, h: ch * 0.15 } : null };
+  cast = { kind: k, x: cx, y: cy, w: cw, h: ch, ov, foot, bx: cx - ov, by: cy - ov, bw: cw + 2 * ov, bh: ch + 2 * ov + foot, Yf, L, u,
+    cells: [], ptr: 0, total: 0, eroded: 0 };
+  if (MAT === 'sand') buildCells(); else { cast.cells = []; cast.total = 0; cast.ptr = 0; }
+  buildRiver();
+  tt = 0; grains = grains.filter(g => g.amb); wisps = []; windFired = false; peakBurst = false; poofDone = false; wispT = 0;
+}
+function inCast(px, py, m){
+  const c = cast, ov = c.ov, r = Math.min(c.w, c.h) * 0.07, hw = c.w / 2, hh = c.h / 2, x = px - ov - hw, y = py - ov - hh;
+  const dx = Math.max(Math.abs(x) - (hw - r), 0), dy = Math.max(Math.abs(y) - (hh - r), 0);
+  return Math.hypot(dx, dy) <= r + ov * 0.8 + (m || 0);
+}
+function buildCells(){
+  const c = cast, L = c.L, ov = c.ov, cols = Math.ceil(c.bw / cs), rows = Math.ceil((c.h + 2 * ov) / cs), list = [];
+  const rq = prng((seed ^ 0x7f4a7c15) + (c.sid || 0) * 7789), sid = (c.sid || 0) * 11.3;
+  const pl = L.plaque, m = L.med, s0 = L.subs[0], s1 = L.subs[L.subs.length - 1];
+  for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) {
+    const px = q * cs + cs / 2, py = r * cs + cs / 2;
+    if (!inCast(px, py, cs * 0.9)) continue;
+    const x = px - ov, y = py - ov, u = clamp(DIR > 0 ? x / c.w : 1 - x / c.w, 0, 1), v = clamp(y / c.h, 0, 1);
+    // depth 0..1 = how far inside a thick region (plaque, medallion, subtitles) the cell sits; the region erodes from its rim inward
+    let depth = 0;
+    const dpl = Math.min(pl.w / 2 - Math.abs(x - pl.x), pl.h / 2 - Math.abs(y - pl.y)) + cs;
+    if (dpl > 0) depth = Math.max(depth, clamp(dpl / (pl.h * 0.5), 0, 1));
+    if (m) { const dm = m.r + cs - Math.hypot(x - m.x, y - m.y); if (dm > 0) depth = Math.max(depth, clamp(dm / m.r, 0, 1)); }
+    if (s0 && Math.abs(x - c.w / 2) <= L.inner / 2 && y >= s0.y - L.subSize && y <= s1.y + L.subSize) depth = Math.max(depth, 0.45);
+    const thick = depth > 0;
+    // one ragged front for the whole card: a diagonal sweep along the wind, torn by three scales of noise (fingers, lumps, single cells)
+    const fr = clamp(u * 0.84 + 0.12 * (v - 0.5) + 0.34 * (fbm(x * 0.011 + 3 + sid, y * 0.014 + 8) - 0.5) + 0.14 * (vn(x * 0.035 + 5, y * 0.05 + 1) - 0.5) + (rq() - 0.5) * 0.05, 0, 1);
+    const te = T_WIND + (T_THICK - 0.25 - T_WIND) * fr + depth * 0.15 * (0.4 + 0.9 * fbm(x * 0.03 + 9, y * 0.03 + 2));
+    list.push([px, py, te, thick ? 1 : 0]);
+  }
+  list.sort((a, b) => a[2] - b[2]);
+  c.cells = list; c.total = list.length; c.ptr = 0;
+}
+// The river is a channel: a centreline (y) and a half-width (w) through pivot gates, in "u" = distance along the wind.
+// A grain keeps its lane eta (= offset / width), so its path is centreline + eta * width: streamlines never cross, they squeeze
+// through the pinch gates and fan out between them. Smoothstep between gates = zero slope at every gate (a slalom).
+let rvY = 0, rvW = 1;
+function buildRiver(){
+  const fx = portrait ? [0.20, 0.42, 0.62, 0.78, 0.90, 1.02, 1.14] : [0.30, 0.52, 0.74, 0.83, 0.90, 0.97, 1.05, 1.14];
+  const fy = portrait ? [0.44, 0.38, 0.30, 0.22, 0.15, 0.09, 0.05] : [0.50, 0.47, 0.42, 0.34, 0.54, 0.38, 0.52, 0.40];
+  const fw = portrait ? [0.30, 0.26, 0.20, 0.09, 0.05, 0.07, 0.05] : [0.36, 0.34, 0.30, 0.13, 0.05, 0.12, 0.04, 0.10];
+  const q = prng((seed ^ 0x3c6ef372) + fireN * 7919), n0 = fx.length;
+  for (let i = 0; i < n0; i++) { fx[i] += i && i < n0 - 1 ? (q() - 0.5) * 0.03 : 0; fy[i] += (q() - 0.5) * (i < 2 ? 0.05 : 0.11); fw[i] *= 0.8 + q() * 0.45; if (MAT === 'paper') fw[i] = Math.max(fw[i] * 1.4, portrait ? 0.11 : 0.12); }
+  const gx = fx.map(f => f * W), gy = fy.map(f => f * H), gw = fw.map(f => f * H), N = 160, u1 = W * 1.3, du = u1 / N;
+  const tY = new Float32Array(N + 1), tW = new Float32Array(N + 1), n = gx.length;
+  for (let i = 0; i <= N; i++) {
+    const u = i * du; let k = 0; while (k < n - 1 && u >= gx[k + 1]) k++;
+    if (u <= gx[0]) { tY[i] = gy[0]; tW[i] = gw[0]; } else if (k >= n - 1) { tY[i] = gy[n - 1]; tW[i] = gw[n - 1]; }
+    else { const a = sm(clamp((u - gx[k]) / (gx[k + 1] - gx[k]), 0, 1)); tY[i] = gy[k] + (gy[k + 1] - gy[k]) * a; tW[i] = gw[k] + (gw[k + 1] - gw[k]) * a; }
+  }
+  RV = { N, du, tY, tW, gx, gy, gw, wRef: gw[0], wMin: H * 0.04 };
+}
+function riverAt(u){
+  const R = RV, f = clamp(u / R.du, 0, R.N - 1.001), i = f | 0, a = f - i;
+  rvY = R.tY[i] * (1 - a) + R.tY[i + 1] * a; rvW = R.tW[i] * (1 - a) + R.tW[i + 1] * a;
+}
+function riverTick(){}
+
+// ---------- assets: sand cast, relief, card ----------
+function mk(w, h){ const b = document.createElement('canvas'); b.width = Math.round(w * DPR); b.height = Math.round(h * DPR); const c = b.getContext('2d'); c.setTransform(DPR, 0, 0, DPR, 0, 0); return [b, c]; }
+function rr(c, x, y, w, h, r){ c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+function emb(c, fn, o, face, dark, lit, rule){
+  c.save(); c.fillStyle = lit; c.translate(o * 0.8, -o * 0.8); fn(c); c.fill(rule); c.restore();
+  c.save(); c.fillStyle = dark; c.translate(-o * 1.5, o * 1.5); fn(c); c.fill(rule); c.restore();
+  c.fillStyle = face; fn(c); c.fill(rule);
+}
+function embText(c, txt, x, y, size, wt, o, face, dark, lit){
+  c.font = `${wt} ${size}px ${FONT}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillStyle = lit; c.fillText(txt, x + o * 0.8, y - o * 0.8); c.fillStyle = dark; c.fillText(txt, x - o * 1.5, y + o * 1.5); c.fillStyle = face; c.fillText(txt, x, y);
+}
+function groove(c, x1, y1, x2, y2, lw, o, dark, lit){
+  c.lineCap = 'round'; c.lineWidth = lw;
+  c.strokeStyle = lit; c.beginPath(); c.moveTo(x1 - o * 0.8, y1 + o * 0.8); c.lineTo(x2 - o * 0.8, y2 + o * 0.8); c.stroke();
+  c.strokeStyle = dark; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+}
+function drawIcon(c, k, x, y, s, ac){
+  c.save(); c.translate(x, y); c.fillStyle = ac; c.strokeStyle = T.flat ? T.outline : 'rgba(30,20,50,.5)'; c.lineWidth = T.flat ? 3 * S + 1 : 2;
+  if (k === 'sh') { // hooded figure
+    c.beginPath(); c.moveTo(-s * 0.9, s * 0.9); c.quadraticCurveTo(-s * 0.95, -s * 0.1, 0, -s * 1.0); c.quadraticCurveTo(s * 0.95, -s * 0.1, s * 0.9, s * 0.9); c.closePath(); c.fill(); c.stroke();
+    c.fillStyle = T.ink; c.beginPath(); c.ellipse(0, -s * 0.05, s * 0.45, s * 0.5, 0, 0, 6.283); c.fill();
+    c.fillStyle = T.card; c.beginPath(); c.arc(-s * 0.17, -s * 0.1, s * 0.09, 0, 6.283); c.arc(s * 0.17, -s * 0.1, s * 0.09, 0, 6.283); c.fill();
+  } else if (k === 'night') { // crescent moon + stars
+    c.beginPath(); c.arc(0, 0, s * 0.85, 0, 6.283); c.fill(); c.stroke();
+    c.fillStyle = T.card; c.beginPath(); c.arc(s * 0.42, -s * 0.2, s * 0.72, 0, 6.283); c.fill();
+    c.fillStyle = T.ink; for (const [px, py, pr] of [[0.55, -0.6, 0.09], [0.85, 0.15, 0.07], [0.5, 0.65, 0.06]]) { c.beginPath(); c.arc(s * px, s * py, s * pr, 0, 6.283); c.fill(); }
+  } else if (k === 'imp') { // masked face
+    c.beginPath(); c.arc(0, 0, s * 0.85, 0, 6.283); c.fill(); c.stroke();
+    c.fillStyle = T.ink; c.beginPath(); c.ellipse(-s * 0.32, -s * 0.15, s * 0.22, s * 0.11, -0.2, 0, 6.283); c.ellipse(s * 0.32, -s * 0.15, s * 0.22, s * 0.11, 0.2, 0, 6.283); c.fill();
+    c.font = `900 ${s * 0.7}px system-ui,Arial,sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('?', 0, s * 0.42);
+  } else if (k === 'door') { // arched door
+    c.beginPath(); c.moveTo(-s * 0.6, s * 0.95); c.lineTo(-s * 0.6, -s * 0.2); c.arc(0, -s * 0.2, s * 0.6, Math.PI, 0); c.lineTo(s * 0.6, s * 0.95); c.closePath(); c.fill(); c.stroke();
+    c.fillStyle = T.ink; c.beginPath(); c.arc(s * 0.32, s * 0.4, s * 0.07, 0, 6.283); c.fill();
+    c.fillStyle = T.card; c.globalAlpha = 0.85; c.fillRect(-s * 0.5, s * 0.86, s * 1.0, s * 0.06); c.globalAlpha = 1;
+  }
+  c.restore();
+}
+
+
+function renderAssets(){
+  const k = cast, L = k.L, ov = k.ov, cw = k.w, ch = k.h, R = Math.min(cw, ch) * 0.07, sd = T.sand, o = portrait ? 1.5 : 2;
+  [k.base, k.bc] = mk(k.bw, k.bh); [k.rel, k.rc] = mk(k.bw, k.bh); [k.rev, k.vc] = mk(k.bw, k.bh); k.tmp = null; k.ptr = 0;
+  // --- base sand silhouette: card rectangle, grainy overfill, foot sunk into the dune
+  let p;
+  if (MAT === 'sand') {
+  const b = k.bc, sil = () => { b.beginPath(); rr(b, ov * 0.45, ov * 0.45, cw + ov * 1.1, ch + ov * 1.1, R + ov * 0.5); rr(b, ov * 0.45 + R * 0.5, ov + ch - 1, cw + ov * 1.1 - R, ov * 0.55 + k.foot + 1, 1); };
+  if (T.flat) b.fillStyle = sd[1]; else { const g = b.createLinearGradient(k.bw, 0, 0, k.bh); g.addColorStop(0, sd[0]); g.addColorStop(0.55, sd[1]); g.addColorStop(1, sd[1]); b.fillStyle = g; }
+  sil(); b.fill();
+  const sx0 = ov * 0.45, sw0 = cw + ov * 1.1, sh0 = ch + ov * 1.1, sr0 = R + ov * 0.5, fy0 = ov + ch - 1, fx0 = sx0 + R * 0.5;
+  const inSil = (x, y) => { // the silhouette as arithmetic: a path clip under thousands of specks costs the GPU ~250 ms at the fire
+    if (y >= fy0 && y <= fy0 + ov * 0.55 + k.foot + 1 && x >= fx0 && x <= fx0 + sw0 - R) return true;
+    const dx = Math.max(Math.abs(x - sx0 - sw0 / 2) - (sw0 / 2 - sr0), 0), dy = Math.max(Math.abs(y - sx0 - sh0 / 2) - (sh0 / 2 - sr0), 0);
+    return dx * dx + dy * dy <= sr0 * sr0;
+  };
+  const n = Math.round(cw * ch / (T.flat ? 1500 : 110));
+  for (let i = 0; i < n; i++) { const r = rndD(); b.fillStyle = T.flat ? T.speck : (i % 2 ? sd[2] : sd[0]); b.globalAlpha = T.flat ? 0.9 : 0.07; const z = T.flat ? 2 * Math.max(0.7, S) + 1 : 1, sxp = rndD() * k.bw, syp = rndD() * (ch + ov); if (inSil(sxp, syp)) b.fillRect(sxp, syp, z + (r > 0.9 ? 1 : 0), z); }
+  b.globalAlpha = 1;
+  for (let i = 0, m = Math.round((cw + ch) * 1.3); i < m; i++) { // grainy edge dust (never in the empty corners: those cells are not erased)
+    const side = rndD() * 4 | 0, t = rndD(), e = rndD() * ov * 0.7;
+    const x = side < 2 ? ov + t * cw : (side === 2 ? ov - e : ov + cw + e), y = side < 2 ? (side ? ov + ch + e : ov - e) : ov + t * ch;
+    if (!inCast(x, y)) continue;
+    b.fillStyle = sd[(rndD() * 2) | 0 ? 1 : 2]; b.globalAlpha = 0.9; const z = (1 + rndD()) * Math.max(0.8, S) + 0.4; b.fillRect(x, y, z, z);
+  }
+  b.globalAlpha = 1;
+  if (T.outline) { b.lineWidth = portrait ? 2.5 : 3.5; b.strokeStyle = T.outline; b.beginPath(); rr(b, ov * 0.45, ov * 0.45, cw + ov * 1.1, ch + ov * 1.1, R + ov * 0.5); b.stroke(); }
+  // --- relief (raised: lit face, shadow lower-left, lit sliver upper-right)
+  const c = k.rc, lit = sd[0], dark = sd[2]; c.save(); c.translate(ov, ov);
+  const rim = C => { C.beginPath(); rr(C, L.rimIn, L.rimIn, cw - 2 * L.rimIn, ch - 2 * L.rimIn, R * 0.7); rr(C, L.rimIn + L.rimT, L.rimIn + L.rimT, cw - 2 * (L.rimIn + L.rimT), ch - 2 * (L.rimIn + L.rimT), R * 0.4); };
+  emb(c, rim, o, lit, dark, lit, 'evenodd');
+  embText(c, KINDS[k.kind].title, cw / 2, L.titleY, L.tSize, 800, o, lit, dark, lit);
+  if (L.med) {
+    const m = L.med;
+    if (k.kind === 'door') { const s = m.r * 0.95; emb(c, C => { C.beginPath(); C.moveTo(m.x - s * 0.6, m.y + s * 0.95); C.lineTo(m.x - s * 0.6, m.y - s * 0.2); C.arc(m.x, m.y - s * 0.2, s * 0.6, Math.PI, 0); C.lineTo(m.x + s * 0.6, m.y + s * 0.95); C.closePath(); }, o, lit, dark, lit); c.fillStyle = dark; c.beginPath(); c.arc(m.x + s * 0.32, m.y + s * 0.4, s * 0.07, 0, 6.283); c.fill(); }
+    else { emb(c, C => { C.beginPath(); C.arc(m.x, m.y, m.r, 0, 6.283); }, o, lit, dark, lit); c.font = `900 ${m.r * 1.15}px ${FONT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = sd[1]; c.fillText('?', m.x - o * 0.8, m.y + m.r * 0.06 + o * 0.8); c.fillStyle = dark; c.fillText('?', m.x, m.y + m.r * 0.06); }
+  }
+  p = L.plaque;
+  emb(c, C => { C.beginPath(); rr(C, p.x - p.w / 2, p.y - p.h / 2, p.w, p.h, Math.min(12, p.h * 0.12)); }, o, lit, dark, lit);
+  if (k.ans) ansEngrave(c, k, o, lit, dark, sd[1]); else for (let i = 1; i <= 3; i++) { const yy = p.y - p.h / 2 + p.h * i / 4; groove(c, p.x - p.w * 0.42, yy, p.x + p.w * 0.42, yy, Math.max(2, p.h * 0.03), o * 0.6, dark, lit); }
+  for (const s of L.subs) groove(c, cw / 2 - s.w / 2 + L.subSize * 0.16, s.y, cw / 2 + s.w / 2 - L.subSize * 0.16, s.y, L.subSize * 0.32, o * 0.8, dark, lit);
+  if (L.stamp) { const s = L.stamp; c.save(); c.translate(s.x, s.y); c.rotate(-5 * Math.PI / 180); c.lineJoin = 'round';
+    c.lineWidth = 3.5; c.strokeStyle = lit; c.beginPath(); rr(c, -s.w / 2 - o * 0.8, -s.h / 2 + o * 0.8, s.w, s.h, s.h * 0.25); c.stroke();
+    c.strokeStyle = dark; c.beginPath(); rr(c, -s.w / 2, -s.h / 2, s.w, s.h, s.h * 0.25); c.stroke(); c.restore(); }
+  c.restore();
+  } else { p = L.plaque; paperCover(k); }
+  if (k.ans) return;
+  // --- the card that lies under the sand
+  const [bm, d] = mk(cw, ch); k.bmp = bm; const ac = T.accent[k.kind], sp = KINDS[k.kind];
+  const g = d.createLinearGradient(0, 0, 0, ch); g.addColorStop(0, T.card); g.addColorStop(1, T.card2);
+  d.fillStyle = g; d.beginPath(); rr(d, 0, 0, cw, ch, R); d.fill();
+  if (T.outline) { d.lineWidth = portrait ? 2.5 : 4; d.strokeStyle = T.outline; d.beginPath(); rr(d, d.lineWidth / 2, d.lineWidth / 2, cw - d.lineWidth, ch - d.lineWidth, R); d.stroke(); }
+  d.strokeStyle = T.ink; d.globalAlpha = 0.35; d.lineWidth = portrait ? 1.5 : 2.5; d.beginPath(); rr(d, L.rimIn + L.rimT * 0.5, L.rimIn + L.rimT * 0.5, cw - 2 * (L.rimIn + L.rimT * 0.5), ch - 2 * (L.rimIn + L.rimT * 0.5), R * 0.5); d.stroke(); d.globalAlpha = 1;
+  d.fillStyle = ac; d.fillRect(L.rimIn + L.rimT + 4, L.stripY, cw - 2 * (L.rimIn + L.rimT + 4), L.stripH);
+  d.textAlign = 'center'; d.textBaseline = 'middle'; d.fillStyle = T.ink;
+  d.font = `800 ${L.tSize}px ${FONT}`; d.globalAlpha = 0.8; d.fillText(sp.title, cw / 2, L.titleY); d.globalAlpha = 1;
+  if (L.med) drawIcon(d, k.kind, L.med.x, L.med.y, L.med.r * 0.95, ac);
+  const nl = sp.big.length; d.fillStyle = T.ink;
+  sp.big.forEach((ln, i) => { d.font = `900 ${L.bigSize}px ${FONT}`; d.fillText(ln, cw / 2, p.y + (i - (nl - 1) / 2) * L.bigSize * 1.15); });
+  sp.sub.forEach((ln, i) => { const z = fitSize(ln, L.inner * 0.96, L.subSize, 600, 12); d.font = `600 ${z}px ${FONT}`; d.globalAlpha = 0.85; d.fillText(ln, cw / 2, L.subs[i].y); d.globalAlpha = 1; });
+}
+
+// ---------- paper: a printed cover sheet, and the pieces it tears into ----------
+function pathPts(c, pts, close){ c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]); if (close) c.closePath(); }
+function paperCover(k){
+  const P = T.paper, L = k.L, ov = k.ov, cw = k.w, ch = k.h, R = Math.min(cw, ch) * 0.07, sp = KINDS[k.kind], ac = T.accent[k.kind], c = k.bc, ink = P.ink, p = L.plaque;
+  c.save(); c.translate(ov, ov);
+  c.fillStyle = P.face; c.beginPath(); rr(c, 0, 0, cw, ch, R); c.fill();
+  c.save(); c.beginPath(); rr(c, 0, 0, cw, ch, R); c.clip();
+  if (!T.flat) { const g = c.createLinearGradient(0, 0, cw, ch); g.addColorStop(0, 'rgba(255,255,255,.16)'); g.addColorStop(1, 'rgba(60,40,20,.14)'); c.fillStyle = g; c.fillRect(0, 0, cw, ch); }
+  for (let i = 0, n = Math.round(cw * ch / (T.flat ? 700 : 260)); i < n; i++) { // paper fibres
+    const x = rndD() * cw, y = rndD() * ch, a = rndD() * 6.283, l = 3 + rndD() * (T.flat ? 5 : 9);
+    c.strokeStyle = rndD() < 0.5 ? P.fib : P.rim; c.globalAlpha = T.flat ? 0.5 : 0.3; c.lineWidth = 1; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); c.stroke();
+  }
+  c.globalAlpha = 1; c.restore();
+  const inset = L.rimIn + L.rimT + 4, lw = portrait ? 2 : 3;
+  if (T.flat) { c.lineWidth = portrait ? 2.5 : 4; c.strokeStyle = ink; c.beginPath(); rr(c, c.lineWidth / 2, c.lineWidth / 2, cw - c.lineWidth, ch - c.lineWidth, R); c.stroke(); }
+  c.fillStyle = ac; c.fillRect(inset, L.stripY, cw - 2 * inset, L.stripH);
+  if (T.flat) { c.lineWidth = lw; c.strokeStyle = ink; c.strokeRect(inset, L.stripY, cw - 2 * inset, L.stripH); }
+  c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = ink; c.font = `800 ${L.tSize}px ${FONT}`; c.globalAlpha = 0.85; c.fillText(sp.title, cw / 2, L.titleY); c.globalAlpha = 1;
+  if (L.med) { const m = L.med; c.fillStyle = P.panel; c.beginPath(); c.arc(m.x, m.y, m.r, 0, 6.283); c.fill(); if (T.flat) { c.lineWidth = lw; c.strokeStyle = ink; c.stroke(); } c.fillStyle = ink; c.font = `900 ${m.r * 1.15}px ${FONT}`; c.fillText('?', m.x, m.y + m.r * 0.06); }
+  c.fillStyle = P.panel; c.beginPath(); rr(c, p.x - p.w / 2, p.y - p.h / 2, p.w, p.h, Math.min(12, p.h * 0.12)); c.fill();
+  if (T.flat) { c.lineWidth = lw; c.strokeStyle = ink; c.stroke(); }
+  c.fillStyle = ink; c.globalAlpha = T.flat ? 1 : 0.8;
+  const nb = k.kind === 'truth' ? 3 : 2;
+  if (k.ans) ansPrint(c, k, ink);
+  else for (let i = 1; i <= nb; i++) { const yy = p.y - p.h / 2 + p.h * i / (nb + 1), bw = p.w * (i === nb ? 0.5 : 0.84), bh = Math.max(6, p.h * (nb === 3 ? 0.10 : 0.16)); c.beginPath(); rr(c, p.x - bw / 2, yy - bh / 2, bw, bh, 3); c.fill(); }
+  for (const s of L.subs) { c.beginPath(); rr(c, cw / 2 - s.w / 2, s.y - L.subSize * 0.15, s.w, L.subSize * 0.3, 3); c.fill(); }
+  c.globalAlpha = 1;
+  if (L.stamp) { const s = L.stamp; c.save(); c.translate(s.x, s.y); c.rotate(-5 * Math.PI / 180); c.setLineDash([12, 9]); c.lineWidth = lw; c.strokeStyle = ink; c.globalAlpha = 0.5; c.beginPath(); rr(c, -s.w / 2, -s.h / 2, s.w, s.h, s.h * 0.25); c.stroke(); c.restore(); }
+  c.restore();
+  const pp = mk(k.bw, k.bh); pp[1].setTransform(1, 0, 0, 1, 0, 0); pp[1].drawImage(k.base, 0, 0); k.pp = pp[0];
+  k.swept = false; buildShards(k); bakeAtlas(k);
+}
+function edgeLine(a, b, rough, lv, q){
+  let pts = [a, b], amp = rough;
+  for (let l = 0; l < lv && amp > 0; l++) {
+    const out = [pts[0]];
+    for (let i = 0; i + 1 < pts.length; i++) {
+      const p0 = pts[i], p1 = pts[i + 1], dx = p1[0] - p0[0], dy = p1[1] - p0[1], len = Math.hypot(dx, dy) || 1, d = (q() - 0.5) * 2 * amp * len;
+      out.push([(p0[0] + p1[0]) / 2 - dy / len * d, (p0[1] + p1[1]) / 2 + dx / len * d], p1);
+    }
+    pts = out; amp *= 0.62;
+  }
+  return pts;
+}
+function buildShards(k){
+  const cw = k.w, ch = k.h, ov = k.ov, shred = PAPER === 'shred', q = prng((seed ^ 0x51f15e) + fireN * 104729 + (k.sid || 0) * 7789), sid = (k.sid || 0) * 11.3;
+  const nx = shred ? Math.max(2, Math.round(cw / (portrait ? 165 : 250))) : Math.max(3, Math.round(cw / (portrait ? 88 : 150)));
+  const ny = shred ? Math.max(10, Math.round(ch / (portrait ? 10 : 15))) : Math.max(3, Math.round(ch / (portrait ? 80 : 130)));
+  const dx = cw / nx, dy = ch / ny, jx = shred ? 0.28 : 0.33, jy = shred ? 0.06 : 0.33, vt = [];
+  for (let j = 0; j <= ny; j++) { vt.push([]); for (let i = 0; i <= nx; i++) {
+    const inX = i > 0 && i < nx, inY = j > 0 && j < ny;
+    vt[j].push([ov + i * dx + (inX ? (q() - 0.5) * 2 * jx * dx : 0), ov + j * dy + (inY ? (q() - 0.5) * 2 * jy * dy : 0)]); } }
+  const rH = shred ? 0.025 : 0.11, rV = shred ? 0.4 : 0.11, H = [], Vv = [];
+  for (let j = 0; j <= ny; j++) { H.push([]); for (let i = 0; i < nx; i++) H[j].push(edgeLine(vt[j][i], vt[j][i + 1], j === 0 || j === ny ? 0 : rH, shred ? 1 : 3, q)); }
+  for (let j = 0; j < ny; j++) { Vv.push([]); for (let i = 0; i <= nx; i++) Vv[j].push(edgeLine(vt[j][i], vt[j + 1][i], i === 0 || i === nx ? 0 : rV, 3, q)); }
+  const P = [], id = (i, j) => j * nx + i;
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    const top = H[j][i], right = Vv[j][i + 1], bot = H[j + 1][i], left = Vv[j][i];
+    const poly = top.concat(right.slice(1), bot.slice().reverse().slice(1), left.slice().reverse().slice(1, -1));
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, sx = 0, sy = 0;
+    for (const [x, y] of poly) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); sx += x; sy += y; }
+    const cx = sx / poly.length, cy = sy / poly.length, rx = cx - ov, ry = cy - ov, u = clamp(DIR > 0 ? rx / cw : 1 - rx / cw, 0, 1), v = clamp(ry / ch, 0, 1);
+    const fr = clamp(u * 0.84 + 0.12 * (v - 0.5) + 0.34 * (fbm(rx * 0.011 + 3 + sid, ry * 0.014 + 8) - 0.5) + 0.14 * (vn(rx * 0.035 + 5, ry * 0.05 + 1) - 0.5) + (q() - 0.5) * 0.06, 0, 1);
+    P.push({ i, j, poly, x0, y0, x1, y1, cx, cy, te: T_WIND + (T_THICK - 0.35 - T_WIND) * fr, gone: false, edges: [
+      { pts: top, nb: j > 0 ? id(i, j - 1) : -1 }, { pts: right, nb: i < nx - 1 ? id(i + 1, j) : -1 }, { pts: bot, nb: j < ny - 1 ? id(i, j + 1) : -1 }, { pts: left, nb: i > 0 ? id(i - 1, j) : -1 }] });
+  }
+  k.pieces = P; k.total = P.length; k.ptr = 0; k.order = P.map((_, n) => n).sort((a, b) => P[a].te - P[b].te);
+}
+function tearTo(t, spawn){
+  const k = cast; if (!k || !k.pieces) return;
+  while (k.ptr < k.total && k.pieces[k.order[k.ptr]].te <= t) {
+    const p = k.pieces[k.order[k.ptr++]]; p.gone = true;
+    const c = k.bc; c.globalCompositeOperation = 'destination-out'; pathPts(c, p.poly, true); c.fill(); c.lineWidth = 3; c.lineJoin = 'round'; c.stroke(); c.globalCompositeOperation = 'source-over';
+    k.vc.fillStyle = k.vc.strokeStyle = '#000'; pathPts(k.vc, p.poly, true); k.vc.fill(); k.vc.lineWidth = 2; k.vc.lineJoin = 'round'; k.vc.stroke();
+    for (const e of p.edges) if (e.nb >= 0 && !k.pieces[e.nb].gone) rimEdge(c, k.pieces[e.nb], e.pts);
+    if (spawn && !reduced) flyPiece(k, p, t);
+  }
+  if (k.ptr >= k.total && !k.swept) { k.swept = true; const c = k.bc; c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, c.canvas.width, c.canvas.height); c.restore(); }
+}
+function rimEdge(c, nb, pts){
+  const P = T.paper, w = portrait ? 2.2 : 3.4;
+  c.save(); pathPts(c, nb.poly, true); c.clip(); c.lineJoin = 'round'; pathPts(c, pts);
+  if (!T.flat) { c.strokeStyle = P.rim; c.globalAlpha = 0.4; c.lineWidth = 2 * (w + 1.5); c.stroke(); c.globalAlpha = 1; }
+  c.strokeStyle = P.rim; c.lineWidth = 2 * w; c.stroke();
+  if (T.flat) { c.strokeStyle = P.ink; c.lineWidth = portrait ? 2 : 2.8; c.stroke(); }
+  c.restore();
+}
+// ---------- paper: sprites and flying pieces ----------
+function bakeAtlas(k){
+  const P = T.paper, ps = k.pieces, m = 3, AW = 1800, ink = P.ink, bl = portrait ? 2 : 2.8; let x = 0, y = 0, rowH = 0;
+  for (const p of ps) {
+    const w = Math.ceil(p.x1 - p.x0) + 2 * m, h = Math.ceil(p.y1 - p.y0) + 2 * m;
+    if (x + w > AW) { x = 0; y += rowH; rowH = 0; }
+    p.sx = x; p.sy = y; p.sw = w; p.sh = h; p.bx = (p.x0 + p.x1) / 2; p.by = (p.y0 + p.y1) / 2; x += w; rowH = Math.max(rowH, h);
+  }
+  const [af, fc] = mk(AW, y + rowH), [ab, bc] = mk(AW, y + rowH), fq = prng(seed ^ 0x2545f491);
+  for (const p of ps) for (const front of [true, false]) {
+    const c = front ? fc : bc;
+    c.save(); c.translate(p.sx - p.x0 + m, p.sy - p.y0 + m); pathPts(c, p.poly, true);
+    if (front) c.clip(), c.drawImage(k.pp, (p.x0 - m) * DPR, (p.y0 - m) * DPR, p.sw * DPR, p.sh * DPR, p.x0 - m, p.y0 - m, p.sw, p.sh);
+    else {
+      c.fillStyle = P.back; c.fill(); c.save(); c.clip(); c.strokeStyle = P.fib; c.globalAlpha = T.flat ? 0.35 : 0.22; c.lineWidth = 1;
+      for (let i = 0, n = Math.round((p.x1 - p.x0) * (p.y1 - p.y0) / 700); i < n; i++) { const fx = p.x0 + fq() * (p.x1 - p.x0), fy = p.y0 + fq() * (p.y1 - p.y0), a = fq() * 6.283, l = 3 + fq() * 6; c.beginPath(); c.moveTo(fx, fy); c.lineTo(fx + Math.cos(a) * l, fy + Math.sin(a) * l); c.stroke(); }
+      c.restore();
+    }
+    for (const e of p.edges) if (e.nb >= 0) rimEdge(c, p, e.pts);
+    c.lineJoin = 'round'; c.lineWidth = T.flat ? bl : 1.2; c.strokeStyle = T.flat ? ink : 'rgba(43,35,80,.4)';
+    if (front) { for (const e of p.edges) if (e.nb >= 0) { pathPts(c, e.pts); c.stroke(); } } else { pathPts(c, p.poly, true); c.stroke(); }
+    c.restore();
+  }
+  k.atF = af; k.atB = ab;
+}
+function flyPiece(k, p, t){
+  const shred = PAPER === 'shred', sp = SPD(), w = p.x1 - p.x0, h = p.y1 - p.y0, age = Math.max(0, t - p.te);
+  const ns = shred ? clamp(Math.round((p.sw - 6) / (portrait ? 22 : 30)), 1, portrait ? 5 : 8) : 1;
+  grain(k.bx + p.bx, k.by + p.by, { flake: true, p, ns, at: k, mg: Math.hypot(w, h), v0: (480 + rndG() * 260) * sp, v1: (1250 + rndG() * 700) * sp, lift: 30 + rndG() * 90, ramp: 0.3, size: 4, catchUp: age,
+    fl0: 0, flr: (shred ? 3 : 5) + rndG() * (shred ? 4 : 7), spin: (rndG() - 0.5) * (shred ? 0.5 : 3.2), tw: 0.35 + rndG() * 0.3 });
+  for (let i = 0, n = shred ? 1 : 4; i < n; i++) {
+    const v = p.poly[(rndG() * p.poly.length) | 0];
+    grain(k.bx + v[0], k.by + v[1], { scrap: true, col: dustCol(), size: gsz() * 0.9, v0: (250 + rndG() * 250) * sp, v1: (800 + rndG() * 500) * sp, lift: 10 + rndG() * 40, catchUp: age, rot0: rndG() * 6.283, spin: (rndG() - 0.5) * 14, fl0: rndG() * 6.283, flr: 8 + rndG() * 10 });
+  }
+}
+const FL = [], SC = [];
+function drawScrap(g){
+  const D = DPR, a = g.age, cr = Math.cos(g.rot0 + g.spin * a), sr = Math.sin(g.rot0 + g.spin * a), f = Math.max(0.15, Math.abs(Math.cos(g.fl0 + g.flr * a))), w = g.size * 1.7, h = g.size * 1.2;
+  ctx.globalAlpha = clamp((g.life - a) / 0.3, 0, 1); ctx.fillStyle = g.col;
+  ctx.setTransform(D * cr, D * sr, -D * sr * f, D * cr * f, D * g.x, D * g.y); ctx.fillRect(-w / 2, -h / 2, w, h);
+}
+function drawFlake(g){
+  const D = DPR, p = g.p, a = g.age, ns = g.ns, k = g.at, b = sm(clamp(a / 0.45, 0, 1)), sw = p.sw, oy = p.by - p.y0 + 3, ox = p.bx - p.x0 + 3, cell = sw / ns;
+  ctx.globalAlpha = clamp((g.life - a) / 0.3, 0, 1);
+  if (ns === 1) {
+    const r = g.spin * a * b, cf = Math.cos(g.fl0 + g.flr * a * (0.4 + 0.6 * b)), f = Math.max(0.07, Math.abs(cf)), cr = Math.cos(r), sr = Math.sin(r);
+    ctx.setTransform(D * cr, D * sr, -D * sr * f, D * cr * f, D * g.x, D * g.y);
+    ctx.drawImage(cf >= 0 ? k.atF : k.atB, p.sx * D, p.sy * D, sw * D, p.sh * D, -ox, -oy, sw, p.sh);
+    return;
+  }
+  const xs = [], ys = [];
+  for (let i = 0; i < ns; i++) {
+    const dx = (i + 0.5 - ns / 2) * cell, ui = g.u + DIR * dx;
+    xs.push(DIR > 0 ? ui : W - ui);
+    ys.push(g.y + (laneY({ u: ui, eta: g.eta, lift: g.lift, ph: g.ph, age: a }) - g.y) * b + Math.sin(g.ph + a * 9 - i * 0.9) * (portrait ? 3 : 6) * b);
+  }
+  for (let i = 0; i < ns; i++) {
+    const i0 = Math.max(0, i - 1), i1 = Math.min(ns - 1, i + 1), th = Math.atan2(ys[i1] - ys[i0], xs[i1] - xs[i0]);
+    const cf = Math.cos(g.fl0 + g.flr * a * (0.4 + 0.6 * b) + i * g.tw * b), f = Math.max(0.07, Math.abs(cf)), cr = Math.cos(th), sr = Math.sin(th);
+    const sxs = Math.floor(i * cell * D), sws = Math.ceil(cell * D) + 1;
+    ctx.setTransform(D * cr, D * sr, -D * sr * f, D * cr * f, D * xs[i], D * ys[i]);
+    ctx.drawImage(cf >= 0 ? k.atF : k.atB, p.sx * D + sxs, p.sy * D, sws, p.sh * D, -cell / 2 - 0.5, -oy, sws / D, p.sh);
+  }
+}
+function drawPaperBits(){
+  for (const g of SC) drawScrap(g);
+  for (const g of FL) drawFlake(g);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.globalAlpha = 1; SC.length = FL.length = 0;
+}
+
+// ---------- grains ----------
+const gsz = () => portrait ? 2 + rndG() * 2 : (3 + rndG() * 3) * clamp(H / 1080, 0.7, 1.4);
+const sandCol = () => T.sand[(rndG() * 3) | 0];
+const dustCol = () => { if (MAT === 'sand') return sandCol(); const P = T.paper, a = [P.face, P.rim, P.back, P.fib, P.panel]; return a[(rndG() * a.length) | 0]; };
+const SPD = () => portrait ? 0.7 : 1;
+function addGrain(g){ if (grains.length < GMAX()) { g.age = g.age || 0; grains.push(g); } }
+function addDep(x, a){
+  if (cast && Math.abs(x - (cast.x + cast.w / 2)) < cast.w / 2 + 70) return;
+  const f = clamp(x / 16, 0, dep.length - 2), i = Math.floor(f), cap = portrait ? 6 : 10;
+  dep[i] = Math.min(cap, dep[i] + a * (1 - (f - i))); dep[i + 1] = Math.min(cap, dep[i + 1] + a * (f - i));
+}
+function stepGrains(dt){
+  for (let i = grains.length - 1; i >= 0; i--) {
+    const g = grains[i];
+    if (g.amb) {
+      g.x += g.vx * dt; if (DIR > 0 ? g.x > W + 10 : g.x < -10) g.x = DIR > 0 ? -10 : W + 10;
+      g.y = surface(g.x) - 3 - g.off - Math.sin(clock * 2.1 + g.ph) * 2; continue;
+    }
+    g.age += dt;
+    if (g.age >= g.life) { grains[i] = grains[grains.length - 1]; grains.pop(); continue; }
+    if (g.riv) {
+      flowStep(g, dt);
+      const mg = 60 + (g.mg || 0);
+      if ((DIR > 0 ? g.x > W + mg : g.x < -mg) || g.y < -mg || g.y > H + mg) { grains[i] = grains[grains.length - 1]; grains.pop(); }
+      continue;
+    }
+    g.vx = DIR * (g.v0 + (g.v1 - g.v0) * clamp(g.age / 0.5, 0, 1));
+    g.vy += g.grav * dt; g.x += g.vx * dt; g.y += g.vy * dt;
+    if (!g.hit && g.age > 0.05 && g.vy > 0 && g.y >= surface(g.x) - 1) { g.hit = true; g.life = Math.min(g.life, g.age + (g.pour ? 0.08 : 0.14)); if (g.dep) addDep(g.x, 0.12); }
+  }
+}
+function initAmbient(){
+  grains = grains.filter(g => !g.amb);
+  const n = Math.max(14, Math.round(W / 64));
+  for (let i = 0; i < n; i++) { const x = (i + rndG()) / n * W;
+    grains.push({ amb: true, x, y: 0, off: rndG() * 20, vx: DIR * (60 + rndG() * 60) * SPD(), size: gsz(), col: sandCol(), ph: rndG() * 6.283, age: 0 }); }
+}
+function laneY(g){ // where a grain of lane eta sits on the river now
+  riverAt(g.u);
+  const wob = Math.sin(clock * 2.3 + g.u * 0.007) * H * 0.02 * clamp(g.u / (W * 0.6), 0, 1);
+  return rvY + wob + g.eta * rvW - Math.min(1, g.age / 0.4) * g.lift + Math.sin(g.ph + g.age * 8) * 3;
+}
+function flowStep(g, dt){
+  const R = RV; riverAt(g.u);
+  const V = (g.v0 + (g.v1 - g.v0) * ease(g.age / (g.ramp || 0.5))) * g.sf * Math.pow(R.wRef / Math.max(rvW, R.wMin), 0.32);
+  g.u += V * dt;
+  const nx = DIR > 0 ? g.u : W - g.u, ny = laneY(g);
+  g.vx = (nx - g.x) / dt; g.vy = (ny - g.y) / dt; g.x = nx; g.y = ny;
+}
+function grain(x, y, o){
+  const g = Object.assign({ x, y, v0: 300 + rndG() * 200, v1: 900 + rndG() * 400, vy: -(100 + rndG() * 150), grav: 500, life: 0.5 + rndG() * 0.6, size: gsz(), col: dustCol() }, o);
+  if (!g.bal && !g.pour && RV) {
+    g.riv = true; g.sf = 0.86 + rndG() * 0.3; g.ph = rndG() * 6.283; g.lift = (g.lift || 18 + rndG() * 40) * (portrait ? 0.6 : 1); g.life = g.flake ? 5 : 3.2; g.age = 0; g.u = DIR > 0 ? x : W - x;
+    riverAt(g.u); const wob = Math.sin(clock * 2.3 + g.u * 0.007) * H * 0.02 * clamp(g.u / (W * 0.6), 0, 1);
+    g.eta = (y - rvY - wob - Math.sin(g.ph) * 3) / rvW; g.vx = DIR * g.v0 * 0.5; g.vy = 0;
+    for (let a = 0; a < (g.catchUp || 0); a += 1 / 60) { g.age += 1 / 60; flowStep(g, 1 / 60); }
+  }
+  addGrain(g);
+}
+function eraseTo(t, spawn){
+  const k = cast; if (!k) return;
+  const cs2 = cs * 0.75, sp = SPD();
+  while (k.ptr < k.total && k.cells[k.ptr][2] <= t) {
+    const cl = k.cells[k.ptr++];
+    for (const c of [k.bc, k.rc]) { c.globalCompositeOperation = 'destination-out'; c.beginPath(); c.arc(cl[0], cl[1], cs2, 0, 6.283); c.fill(); c.globalCompositeOperation = 'source-over'; }
+    k.vc.fillStyle = '#000'; k.vc.beginPath(); k.vc.arc(cl[0], cl[1], cs2 + 0.4, 0, 6.283); k.vc.fill();
+    if (spawn && !reduced && rndG() < (cl[3] ? 0.10 : 0.06)) {
+      const age = Math.max(0, t - cl[2]), big = cl[3] ? 1.4 : 1, v0 = (300 + rndG() * 200) * sp, v1 = (900 + rndG() * 400) * sp;
+      grain(k.bx + cl[0], k.by + cl[1], { v0, v1, vy: -(100 + rndG() * 150) * sp, size: gsz() * big, catchUp: age, lift: cl[3] ? 30 + rndG() * 60 : 0 });
+    }
+  }
+}
+function eraseAny(t, spawn){ if (MAT === 'paper') tearTo(t, spawn); else eraseTo(t, spawn); }
+function burst(x, y, n, o){ for (let i = 0; i < n; i++) { const a = rndG() * 6.283, sp = (600 + rndG() * 300) * SPD(); grain(x, y, Object.assign({ v0: sp * (0.4 + 0.6 * Math.max(0, Math.cos(a) * DIR)) , v1: 500 * SPD(), vy: Math.sin(a) * sp * 0.6, life: 0.5, size: gsz() * 1.2, dep: true }, o)); } }
+function addWisp(y, dist, dur, alpha){
+  const len = (portrait ? 110 : 220), vx = dist ? dist / dur : W * 0.9;
+  wisps.push({ x: DIR > 0 ? -len * 0.2 : W + len * 0.2, y, vx: DIR * vx, len, age: 0, life: 2.4, a: alpha });
+}
+
+// ---------- background ----------
+function drawBg(){
+  if (T.bg2) { if (!bgGrad) { bgGrad = ctx.createLinearGradient(0, 0, 0, H); bgGrad.addColorStop(0, T.bg2); bgGrad.addColorStop(1, T.bg); } ctx.fillStyle = bgGrad; } else ctx.fillStyle = T.bg;
+  ctx.fillRect(0, 0, W, H);
+  if (!stars) { stars = []; for (let i = 0; i < 25; i++) stars.push({ x: rndC() * W, y: rndC() * H * 0.5, s: 2 + rndC(), a: 0.4 + rndC() * 0.3, tw: i % 4 === 0, ph: rndC() * 6.283 }); }
+  ctx.fillStyle = '#f5f6ff';
+  for (const s of stars) { let a = s.a; if (s.tw && !reduced) a *= 0.65 + 0.35 * Math.sin(clock * 6.283 / 4 + s.ph);
+    ctx.globalAlpha = T.flat ? a : a * 0.75; if (T.flat) ctx.fillRect(Math.round(s.x), Math.round(s.y), s.s, s.s); else { ctx.beginPath(); ctx.arc(s.x, s.y, s.s * 0.6, 0, 6.283); ctx.fill(); } }
+  ctx.globalAlpha = 1;
+  if (!T.flat) { const r = Math.min(W, H) * 0.08, x = portrait ? W * 0.84 : W * 0.82, y = portrait ? H * 0.10 : H * 0.16;
+    const g = ctx.createRadialGradient(x, y, r * 0.2, x, y, r * 2.6); g.addColorStop(0, 'rgba(239,227,191,.4)'); g.addColorStop(0.4, 'rgba(239,227,191,.1)'); g.addColorStop(1, 'rgba(239,227,191,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - r * 3, y - r * 3, r * 6, r * 6); ctx.fillStyle = '#efe3bf'; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill(); }
+  const t = reduced ? 0 : clock, cols = [T.far, T.mid];
+  for (let L = 0; L < 2; L++) {
+    const base = H * (portrait ? 0.6 + L * 0.075 : 0.62 + L * 0.1), amp = H * (0.035 + L * 0.012), sp = (0.04 + L * 0.03) * (L ? -1 : 1);
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W + 12; x += 12) ctx.lineTo(x, base + Math.sin(x * 0.004 * (1 + L * 0.4) + t * sp * 3 + L * 2) * amp + Math.sin(x * 0.011 + t * sp * 5 + L) * amp * 0.35);
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fillStyle = cols[L]; ctx.fill();
+    if (T.flat) { ctx.lineWidth = portrait ? 2 : 3; ctx.strokeStyle = T.outline; ctx.stroke(); } else { ctx.lineWidth = 1.5; ctx.strokeStyle = T.rim; ctx.globalAlpha = 0.22; ctx.stroke(); ctx.globalAlpha = 1; }
+  }
+}
+function drawNear(){
+  ctx.beginPath(); ctx.moveTo(0, H + 4);
+  for (let x = 0; x <= W + 8; x += 8) ctx.lineTo(x, surface(x));
+  ctx.lineTo(W + 8, H + 4); ctx.closePath(); ctx.fillStyle = T.near; ctx.fill();
+  ctx.beginPath(); for (let x = 0; x <= W + 8; x += 8) x ? ctx.lineTo(x, surface(x)) : ctx.moveTo(x, surface(x));
+  if (T.flat) { ctx.lineWidth = portrait ? 2.5 : 3.5; ctx.strokeStyle = T.outline; ctx.stroke(); } else { ctx.lineWidth = 2; ctx.strokeStyle = T.rim; ctx.globalAlpha = 0.35; ctx.stroke(); ctx.globalAlpha = 1; }
+}
+
+// ---------- sequence ----------
+let antDone = false, stampDone = false, exitDone = false, landDone = false, accP = 0, accH = 0;
+function announce(msg){ live.textContent = ''; setTimeout(() => { live.textContent = msg; }, 30); }
+function fire(k, auto){
+  if (SCENES[k]) { fireScene(k); return; }
+  scene = null; fireN++; layout(k); renderAssets();
+  held = HOLDFLAG || auto === false; antDone = stampDone = exitDone = landDone = false; accP = accH = 0;
+  if (reduced) tt = T_SET;
+}
+function reveal(){ if (cast) held = false; }
+function pulse(){
+  if (reduced || tt < T_THICK) return 1;
+  if (tt < T_PEAK) return 1 + 0.06 * ease((tt - T_THICK) / (T_PEAK - T_THICK));
+  return 1 + 0.06 * (1 - sm(clamp((tt - T_PEAK) / 0.25, 0, 1)));
+}
+function update(dt){
+  clock += dt; riverTick();
+  if (!reduced) { let r = dt; while (r > 1e-6) { const h = Math.min(1 / 60, r); stepGrains(h); r -= h; } }
+  if (!cast) for (let i = 0; i < dep.length; i++) dep[i] *= Math.exp(-dt / 8);
+  for (let i = wisps.length - 1; i >= 0; i--) { const w = wisps[i]; w.age += dt; w.x += w.vx * dt; if (w.age > w.life) wisps.splice(i, 1); }
+  if (scene) { sceneUpdate(dt); return; }
+  if (!cast) return;
+  const prev = tt; tt += dt; if (held && tt >= T_HOLD) tt = T_HOLD - 0.001;
+  const k = cast, L = k.L, sp = SPD();
+  if (reduced) { if (prev < T_HOLD && tt >= T_HOLD) announce(KINDS[k.kind].say); if (tt >= T_SHOWN + 0.3) { cast = null; tt = -1; } return; }
+  if (!antDone) { antDone = true; if (MAT === 'sand') for (let i = 0; i < 20; i++) { const x = DIR > 0 ? k.x - 20 - rndG() * 320 : k.x + k.w + 20 + rndG() * 320; grain(x, surface(x) - 3, { v0: 260 * sp, v1: 520 * sp, vy: -15, grav: 0, life: 0.55, bal: true }); } }
+  if (MAT === 'paper' && !landDone && tt >= T_RISE) { landDone = true; for (let i = 0; i < (portrait ? 14 : 24); i++) { const x = k.x + rndG() * k.w, v = (rndG() - 0.5) * 520 * sp; grain(x, surface(x) - 3, { v0: v, v1: v * 0.3, vy: -(120 + rndG() * 240) * sp, grav: 900, life: 0.6, pour: true, col: sandCol() }); } }
+  if (MAT === 'sand' && tt >= T_ANT && tt < T_RISE) { accP += 500 * dt; while (accP >= 1) { accP--; const sh = rndG() < 0.3, x = sh ? k.x + (rndG() < 0.5 ? rndG() * 0.1 : 1 - rndG() * 0.1) * k.w : k.x + rndG() * k.w;
+    grain(x, k.y + bodyDY() + (sh ? rndG() * 0.06 * k.h : rndG() * 4), { v0: (rndG() - 0.5) * 60, v1: (rndG() - 0.5) * 60, vy: 0, grav: portrait ? 800 : 1400, life: 1.6, pour: true }); } }
+  if (tt >= T_SET && tt < T_HOLD) {
+    if (MAT === 'sand') accH += 80 * dt; while (accH >= 1) { accH--; grain(DIR > 0 ? k.x + 4 : k.x + k.w - 4, k.y + rndG() * 10, { v0: 260 * sp, v1: 760 * sp, lift: 24 + rndG() * 34 }); }
+    wispT += dt; if (wispT >= 0.5) { wispT = 0; addWisp(k.y - 30 + rndG() * k.h * 0.5, 0, 0, 0.15); }
+  }
+  if (!windFired && tt >= T_HOLD) { windFired = true; announce(KINDS[k.kind].say); const dist = DIR > 0 ? k.x : W - (k.x + k.w); for (let i = 0; i < 5; i++) addWisp(k.y + (i + 0.5) / 5 * k.h, dist, 0.2, 0.3); }
+  if (tt >= T_HOLD) eraseAny(tt, true);
+  peakBurst = true;
+  if (!stampDone && L.stamp && tt >= T_THICK + 0.02) { stampDone = true; for (let i = 0; i < 12; i++) grain(k.x + L.stamp.x + (rndG() - 0.5) * L.stamp.w, k.y + L.stamp.y, { v0: 300 * sp, v1: 400 * sp, vy: -(80 + rndG() * 150) * sp, life: 0.45 }); }
+  if (!exitDone && tt >= T_SHOWN) { exitDone = true; if (MAT === 'sand') for (let i = 0; i < 20; i++) { const x = k.x + rndG() * k.w; grain(x, surface(x) - 2, { v0: 60, v1: 60, vy: -(150 + rndG() * 150), grav: 900, life: 0.5, pour: true }); } }
+  if (tt >= T_END + 0.5) { cast = null; tt = -1; }
+}
+
+// ---------- render ----------
+function paperPose(x){ // the paper card: a pendulum fall, a landing wobble, then wind flutter that dies as the tear starts
+  if (MAT !== 'paper' || reduced || !cast || tt < 0) return null;
+  const k = cast, t = tt, cxm = k.x + k.w / 2;
+  if (t < T_RISE) { const q = clamp((t - T_ANT) / (T_RISE - T_ANT), 0, 1), s = 1 - q;
+    return { px: cxm, py: k.y + bodyDY(), dx: (k.swing !== undefined ? k.swing : portrait ? 26 : 90 * k.u) * Math.sin(8.2 * q) * s, ang: 0.14 * Math.cos(8.2 * q) * s }; }
+  const a = t - T_RISE, e = x && x.e !== undefined ? x.e : ease((t - T_SET) / 0.9) * (1 - sm(clamp((t - (T_WIND - 0.1)) / 0.4, 0, 1)));
+  return { px: cxm, py: k.Yf + bodyDY(), dx: e * (portrait ? 1.2 : 2.4) * Math.sin(t * 27), ang: Math.exp(-a * 9) * Math.sin(a * 26) * 0.03 + e * 0.011 * (Math.sin(t * 19) + 0.6 * Math.sin(t * 31 + 1)) + (x && x.lean || 0) };
+}
+function cardShadow(dy, a){
+  const k = cast;
+  ctx.save(); ctx.globalAlpha = a;
+  if (T.flat) { const o = portrait ? 4 : 6 * k.u; ctx.fillStyle = INK; ctx.beginPath(); rr(ctx, k.x + o, k.y + dy + o, k.w, k.h, Math.min(k.w, k.h) * 0.07); ctx.fill(); }
+  else { ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 24 * DPR; ctx.shadowOffsetY = 8 * DPR; ctx.fillStyle = MAT === 'paper' ? T.paper.face : T.card; ctx.beginPath(); rr(ctx, k.x, k.y + dy, k.w, k.h, Math.min(k.w, k.h) * 0.07); ctx.fill(); }
+  ctx.restore();
+}
+function drawCard(dy, alpha){
+  const k = cast, L = k.L, cxm = k.x + k.w / 2, cym = k.y + k.h / 2 + dy, sc = pulse(), sh = MAT === 'paper' ? 1 : ease((tt - T_THICK) / 0.3), ac = T.accent[k.kind];
+  cardShadow(dy, alpha * sh);
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(cxm, cym); ctx.scale(sc, sc); ctx.drawImage(k.bmp, -k.w / 2, -k.h / 2, k.w, k.h); ctx.translate(-k.w / 2, -k.h / 2);
+  const ta = tt - T_THICK;
+  if (!reduced && ta >= 0) {
+    const p = L.plaque, q = clamp(ta / 0.2, 0, 1), uy = p.y + p.h / 2 + 0.014 * k.h, uh = portrait ? 5 : 8 * k.u, uw = p.w * 0.6 * ease(q), ux = p.x - p.w * 0.3;
+    if (q > 0) {
+      if (T.flat) { ctx.fillStyle = ac; ctx.strokeStyle = INK; ctx.lineWidth = portrait ? 2 : 3; ctx.beginPath(); rr(ctx, ux, uy, uw, uh, uh / 2); ctx.fill(); ctx.stroke(); }
+      else { ctx.fillStyle = ac; ctx.globalAlpha = alpha * 0.85; ctx.beginPath(); ctx.moveTo(ux, uy + uh * 0.4);
+        for (let i = 0; i <= 12; i++) ctx.lineTo(ux + uw * i / 12, uy + uh * (0.1 + 0.15 * Math.sin(i * 1.7)));
+        for (let i = 12; i >= 0; i--) ctx.lineTo(ux + uw * i / 12, uy + uh * (0.95 + 0.12 * Math.sin(i * 2.3)));
+        ctx.closePath(); ctx.fill(); ctx.globalAlpha = alpha; }
+    }
+    if (L.stamp) {
+      const s = L.stamp, a = clamp((tt - (T_THICK + 0.02)) / 0.15, 0, 1);
+      if (a > 0) { const z = 1 + 0.6 * (1 - ease(a)), rot = (-9 + 4 * ease(a)) * Math.PI / 180;
+        ctx.save(); ctx.translate(s.x, s.y); ctx.rotate(rot); ctx.scale(z, z); ctx.globalAlpha = alpha * Math.min(1, a * 3); ctx.fillStyle = ac; ctx.beginPath(); rr(ctx, -s.w / 2, -s.h / 2, s.w, s.h, s.h * 0.25); ctx.fill();
+        if (T.flat) { ctx.lineWidth = portrait ? 2.5 : 4; ctx.strokeStyle = INK; ctx.stroke(); }
+        ctx.fillStyle = T.flat ? INK : '#1d2a33'; ctx.font = `900 ${s.h * 0.55}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(KINDS.truth.tag, 0, 0); ctx.restore(); }
+    }
+    if (L.med && k.kind === 'door') {
+      const m = L.med, s = m.r * 0.95, a = clamp(ta / 0.25, 0, 1), ang = 25 * ease(a) * Math.PI / 180, hx = m.x - s * 0.6;
+      const arch = () => { ctx.beginPath(); ctx.moveTo(m.x - s * 0.6, m.y + s * 0.95); ctx.lineTo(m.x - s * 0.6, m.y - s * 0.2); ctx.arc(m.x, m.y - s * 0.2, s * 0.6, Math.PI, 0); ctx.lineTo(m.x + s * 0.6, m.y + s * 0.95); ctx.closePath(); };
+      ctx.save(); arch(); ctx.clip(); ctx.fillStyle = T.card; ctx.fillRect(m.x - s, m.y - s, 2 * s, 2.2 * s);
+      const g = ctx.createRadialGradient(m.x, m.y + s * 0.2, s * 0.05, m.x, m.y + s * 0.2, s * 0.9); g.addColorStop(0, ac); g.addColorStop(1, T.card); ctx.globalAlpha = alpha * ease(a); ctx.fillStyle = g; ctx.fillRect(m.x - s, m.y - s, 2 * s, 2.2 * s); ctx.restore();
+      ctx.save(); ctx.translate(hx, 0); ctx.scale(Math.cos(ang), 1); ctx.translate(-hx, 0); arch(); ctx.fillStyle = ac; ctx.fill(); ctx.lineWidth = T.flat ? (portrait ? 2 : 3) : 2; ctx.strokeStyle = T.flat ? INK : 'rgba(30,20,50,.5)'; ctx.stroke();
+      ctx.fillStyle = T.ink; ctx.beginPath(); ctx.arc(m.x + s * 0.32, m.y + s * 0.4, s * 0.07, 0, 6.283); ctx.fill(); ctx.restore();
+    }
+  }
+  ctx.restore(); ctx.globalAlpha = 1;
+}
+function drawCast(dy){
+  const k = cast, ov = k.ov, alpha = reduced ? 1 - clamp((tt - T_HOLD) / 0.3, 0, 1) : 1;
+  if (alpha <= 0) return;
+  const relA = reduced ? 1 : clamp(0.35 + 0.65 * (tt - 0.85) / 0.3, 0.35, 1), th = (MAT === 'sand' && !reduced && tt >= 0.85 && tt < T_SET) ? 1 - 0.01 * Math.sin(Math.PI * (tt - 0.85) / 0.3) : 1;
+  ctx.save(); ctx.translate(k.x + k.w / 2, k.Yf + dy); ctx.scale(th, th); ctx.translate(-(k.x + k.w / 2), -(k.Yf + dy));
+  ctx.globalAlpha = alpha; ctx.drawImage(k.base, k.bx, k.by + dy, k.bw, k.bh);
+  if (MAT === 'sand') { ctx.globalAlpha = alpha * relA; ctx.drawImage(k.rel, k.bx, k.by + dy, k.bw, k.bh); }
+  if (MAT === 'sand' && !reduced && tt >= 0.85 && tt < T_SET) {
+    const s = (tt - 0.85) / 0.3, sw = k.sw || (k.sw = mk(k.bw, k.bh)), c = sw[1];
+    c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'source-over'; c.clearRect(0, 0, sw[0].width, sw[0].height); c.setTransform(DPR, 0, 0, DPR, 0, 0);
+    const mx = k.bw * (1 - s), my = k.bh * s, b = k.bw * 0.18, g = c.createLinearGradient(mx + b, my - b, mx - b, my + b);
+    g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(255,255,255,.55)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = g; c.fillRect(0, 0, k.bw, k.bh); c.globalCompositeOperation = 'destination-in'; c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(k.base, 0, 0); c.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = Math.sin(Math.PI * s); ctx.drawImage(sw[0], k.bx, k.by + dy, k.bw, k.bh);
+  }
+  ctx.restore(); ctx.globalAlpha = 1;
+}
+function drawBody(){
+  const k = cast, dy = bodyDY(), full = reduced ? tt >= T_HOLD : (k.ptr >= k.total && tt >= T_THICK), pz = paperPose();
+  if (pz) { ctx.save(); ctx.translate(pz.px + pz.dx, pz.py); ctx.rotate(pz.ang); ctx.translate(-pz.px, -pz.py); }
+  if (MAT === 'paper' && !reduced && !full) cardShadow(dy, 1);
+  if (full) { let a = 1; if (reduced) { a = clamp((tt - T_HOLD) / 0.3, 0, 1) * (tt >= T_SHOWN ? 1 - clamp((tt - T_SHOWN) / 0.3, 0, 1) : 1); } drawCard(dy, a); }
+  else if (!reduced && k.ptr > 0) {
+    const t = k.tmp || (k.tmp = mk(k.bw, k.bh)[0]), tc = t.getContext('2d');
+    tc.setTransform(1, 0, 0, 1, 0, 0); tc.globalCompositeOperation = 'source-over'; tc.clearRect(0, 0, t.width, t.height); tc.setTransform(DPR, 0, 0, DPR, 0, 0); tc.drawImage(k.bmp, k.ov, k.ov, k.w, k.h);
+    tc.setTransform(1, 0, 0, 1, 0, 0); tc.globalCompositeOperation = 'destination-in'; tc.drawImage(k.rev, 0, 0); tc.globalCompositeOperation = 'source-over';
+    ctx.drawImage(t, k.bx, k.by + dy, k.bw, k.bh);
+  }
+  if (!full || (reduced && tt < T_HOLD + 0.3) || (!reduced && k.ptr < k.total)) drawCast(dy);
+  if (pz) ctx.restore();
+}
+function render(){
+  drawBg();
+  if (scene) sceneDraw(); else if (cast) drawBody();
+  drawNear();
+  ctx.lineCap = 'round'; ctx.strokeStyle = T.ui; ctx.lineWidth = 2;
+  for (const w of wisps) { ctx.globalAlpha = w.a * (1 - clamp((w.age / w.life - 0.75) / 0.25, 0, 1)); const x2 = w.x - DIR * w.len; ctx.beginPath(); ctx.moveTo(w.x, w.y); ctx.quadraticCurveTo((w.x + x2) / 2, w.y + 6, x2, w.y - 2); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  if (!reduced) {
+    const cap = portrait ? 12 : 18;
+    for (const g of grains) {
+      if (g.flake) { FL.push(g); continue; }
+      if (g.scrap) { SC.push(g); continue; }
+      if (g.riv) { // river grains: a streak along the local flow, so the trail bends with the river
+        const sp = Math.hypot(g.vx, g.vy) || 1, len = clamp(sp * 0.024, g.size, Math.min(3.2 * g.size, cap)), ci = g.col, key = ci + '|' + (g.size < 4 ? 0 : g.size < 6 ? 1 : 2);
+        let b = STREAKS.get(key); if (!b) { b = { col: ci, w: g.size < 4 ? 3 : g.size < 6 ? 5 : 7, p: [] }; STREAKS.set(key, b); }
+        const fd = g.life - g.age < 0.3 ? clamp((g.life - g.age) / 0.3, 0, 1) : 1;
+        b.p.push(g.x, g.y, g.x - g.vx / sp * len * fd, g.y - g.vy / sp * len * fd);
+        continue;
+      }
+      const f = g.amb ? 0 : g.age / g.life, a = g.amb ? 0.9 : 1 - clamp((f - 0.7) / 0.3, 0, 1), len = clamp(Math.abs(g.vx) * 0.02, g.size, Math.min(3 * g.size, cap));
+      ctx.globalAlpha = a; ctx.fillStyle = g.col; ctx.fillRect(DIR > 0 ? g.x - len : g.x, g.y, len, g.size);
+    }
+    ctx.globalAlpha = 1; ctx.lineCap = T.flat ? 'butt' : 'round'; if (!T.flat) ctx.globalAlpha = 0.94;
+    for (const b of STREAKS.values()) {
+      if (!b.p.length) continue;
+      ctx.strokeStyle = b.col; ctx.lineWidth = b.w * (portrait ? 0.55 : Math.max(0.7, H / 1080)); ctx.beginPath();
+      for (let i = 0; i < b.p.length; i += 4) { ctx.moveTo(b.p[i], b.p[i + 1]); ctx.lineTo(b.p[i + 2], b.p[i + 3]); }
+      ctx.stroke(); b.p.length = 0;
+    }
+    ctx.globalAlpha = 1; ctx.lineCap = 'round';
+    if (FL.length || SC.length) drawPaperBits();
+  }
+}
+
+// ---------- scene: several cards at once (Fake-Out answers, a round change) ----------
+let scene = null;
+Object.assign(KINDS, {
+  ansA: { title: 'A', big: ['Pink'], sub: [] }, ansB: { title: 'B', big: ['Orange'], sub: [] }, ansC: { title: 'C', big: ['Grey'], sub: [] }, ansD: { title: 'D', big: ['White'], sub: [] },
+  rndOld: { title: 'ROUND 3', big: ['Which animal', 'sleeps standing up?'], sub: [] }, rndNew: { title: 'ROUND 4', big: ['Baby flamingos', 'are born…?'], sub: [] },
+  ansN1: { title: 'A', big: ['Ana'], sub: [] }, ansN2: { title: 'B', big: ['Ben'], sub: [] }, ansN3: { title: 'C', big: ['Cleo'], sub: [] }, ansN4: { title: 'D', big: ['Dev'], sub: [] } });
+Object.assign(THEMES.pop.accent, { ansA: '#ff5d8f', ansB: '#4cc9f0', ansC: '#ffd166', ansD: '#b388ff', rndOld: '#4cc9f0', rndNew: '#ff5d8f', ansN1: '#ff5d8f', ansN2: '#4cc9f0', ansN3: '#ffd166', ansN4: '#b388ff' });
+Object.assign(THEMES.gouache.accent, { ansA: '#c9788f', ansB: '#7a9ad0', ansC: '#d9b46a', ansD: '#8f8fd0', rndOld: '#7a9ad0', rndNew: '#c9788f', ansN1: '#c9788f', ansN2: '#7a9ad0', ansN3: '#d9b46a', ansN4: '#8f8fd0' });
+const SCENES = {
+  fakeout: { row: ['ansA', 'ansB', 'ansC', 'ansD'], s0: [0, 0.14, 0.28, 0.42], stay: 2, order: [0, 1, 3], ws: [2.3, 2.55, 2.85], stamp: true,
+    q: ['Baby flamingos', 'are born…?'], q2: ['Baby flamingos', 'are born grey.'], say: 'The truth: grey. The other answers blow away.' },
+  dawn: { row: ['ansN1', 'ansN2', 'ansN3', 'ansN4'], s0: [0, 0.14, 0.28, 0.42], stay: -1, order: [2], ws: [2.4], stamp: false,
+    q: ['Night falls…'], q2: ['Cleo did not', 'wake up.'], say: 'Dawn: Cleo did not wake up. Her card crumbles.' },
+  round: { row: ['rndOld', 'rndNew'], s0: [0, 2.75], stay: 1, order: [0], ws: [2.35], same: true, stamp: false, q: null, q2: null, say: 'Next round: the old question shreds as the new one arrives.' }
+};
+function withCard(c, fn){ const sc = cast, st = tt; cast = c; tt = c.t; try { return fn(); } finally { cast = sc; tt = st; } }
+function makeCard(kd, cx, cw, ch, Yf, u, sid){
+  const ov = portrait ? 4 : 6, foot = Math.round(ch * 0.07), rimIn = 0.04 * cw, rimT = portrait ? 5 : Math.round(12 * u), inner = cw - 2 * (rimIn + rimT), spec = KINDS[kd], cy = Yf - ch;
+  const isAns = kd.startsWith('ans'), tSize = isAns ? (portrait ? Math.max(20, cw * 0.5) : 150 * u) : portrait ? Math.max(11, ch * 0.055) : 40 * u;
+  let bigSize = portrait ? 22 : 64 * u; for (const l of spec.big) bigSize = fitSize(l, inner * 0.86, bigSize, 900, portrait ? 11 : 28 * u);
+  const L = { rimIn, rimT, inner, stripY: 0.085 * ch, stripH: Math.max(4, 0.012 * ch + 2), titleY: (isAns ? 0.29 : 0.17) * ch, tSize, med: null, bigSize, subSize: 18,
+    plaque: { x: cw / 2, y: 0.56 * ch, w: inner * 0.9, h: bigSize * (spec.big.length * 1.15 + 0.5) }, subs: [], stamp: null };
+  return { kind: kd, ans: true, sid, x: cx, y: cy, w: cw, h: ch, ov, foot, bx: cx - ov, by: cy - ov, bw: cw + 2 * ov, bh: ch + 2 * ov + foot, Yf, L, u,
+    cells: [], ptr: 0, total: 0, eroded: 0, noSink: true, swing: portrait ? 6 : 22 * u, t: -1, g: 0, alpha: 1, ws: NaN, s0: 0, gone: -1, landed: false, acc: 0 };
+}
+function buildScene(type){
+  const sc = SCENES[type], n = sc.row.length, u = portrait ? 1 : H / 1080, Yf = Math.round(nearMean() - 0.02 * H), cards = [];
+  let cw, ch, gap;
+  if (sc.same) { cw = Math.round(portrait ? W * 0.84 : 900 * u); ch = Math.round(portrait ? Math.min(H * 0.5, cw * 0.95) : 600 * u); gap = 0; }
+  else if (portrait) { gap = 10; cw = Math.floor((W * 0.94 - 3 * gap) / 4); ch = Math.round(Math.min(cw * 2.05, H * 0.5)); }
+  else { cw = Math.round(380 * u); ch = Math.round(520 * u); gap = Math.round(44 * u); }
+  const xs = Math.round((W - (sc.same ? cw : n * cw + (n - 1) * gap)) / 2);
+  sc.row.forEach((kd, i) => { const c = makeCard(kd, sc.same ? xs : xs + i * (cw + gap), cw, ch, Yf, u, i + 1); c.s0 = sc.s0[i]; cards.push(c); });
+  (DIR > 0 ? sc.order : sc.order.slice().reverse()).forEach((ci, j) => { cards[ci].ws = sc.ws[j]; });
+  scene = { type, sc, cards, S: 0, Yf, cw, ch, u, wisps: false, sT: -1, allGone: -1, acc: 0 };
+  for (const c of cards) withCard(c, () => { if (MAT === 'sand') buildCells(); renderAssets(); });
+}
+function ansEngrave(c, k, o, lit, dark, face){
+  const L = k.L, p = L.plaque, big = KINDS[k.kind].big, nl = big.length; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `900 ${L.bigSize}px ${FONT}`;
+  big.forEach((ln, i) => { const y = p.y + (i - (nl - 1) / 2) * L.bigSize * 1.15; c.fillStyle = lit; c.fillText(ln, p.x + o * 0.7, y + o * 0.7); c.fillStyle = dark; c.fillText(ln, p.x - o * 0.6, y - o * 0.6); c.fillStyle = face; c.fillText(ln, p.x, y); });
+}
+function ansPrint(c, k, ink){
+  const L = k.L, p = L.plaque, big = KINDS[k.kind].big, nl = big.length; c.fillStyle = ink; c.globalAlpha = 1; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `900 ${L.bigSize}px ${FONT}`;
+  big.forEach((ln, i) => c.fillText(ln, p.x, p.y + (i - (nl - 1) / 2) * L.bigSize * 1.15));
+}
+function fireScene(type){
+  fireN++; cast = null; tt = -1; grains = grains.filter(g => g.amb); wisps = []; wispT = 0; buildRiver(); buildScene(type);
+  if (reduced) { scene.S = 0.3; scene.cards.forEach(c => { c.t = T_SET; c.g = 1; }); }
+}
+function restoreScene(){ // after a resize or a theme change: rebuild the cards and replay what is already gone
+  const S0 = scene.S, ty = scene.type, keep = { wisps: scene.wisps, sT: scene.sT, allGone: scene.allGone }, old = scene.cards;
+  buildScene(ty); Object.assign(scene, keep); scene.S = S0;
+  scene.cards.forEach((c, i) => { c.gone = old[i].gone; c.landed = old[i].landed; if (!reduced && isFinite(c.ws) && S0 > c.ws) withCard(c, () => eraseAny(T_WIND + (S0 - c.ws) * 1.15, false)); });
+  sceneClock(0);
+}
+const S_WIND = 2.15, S_SINK = 7.0, S_END = 7.6;
+function sceneClock(dt){
+  const s = scene, S = (s.S += dt), sk = 1 - clamp((S - S_SINK) / 0.5, 0, 1);
+  for (const c of s.cards) {
+    c.t = reduced ? T_SET : S - c.s0;
+    let g = c.t < 0 ? 0 : reduced ? 1 : clamp(riseP(c.t), 0, 1);
+    if (reduced) { c.alpha = clamp((S - c.s0) / 0.3, 0, 1) * (isFinite(c.ws) ? 1 - clamp((S - S_WIND) / 0.4, 0, 1) : 1); if (isFinite(c.ws) && S > S_WIND && c.alpha <= 0 && c.gone < 0) c.gone = S; }
+    if (c.gone >= 0) g *= 1 - clamp((S - c.gone) / 0.6, 0, 1);
+    c.g = g * sk;
+  }
+}
+function sceneUpdate(dt){
+  const s = scene, sc = s.sc, sp = SPD(), tr = s.cards[sc.stay]; sceneClock(dt); const S = s.S;
+  if (S >= S_END) { scene = null; return; }
+  if (!s.wisps && S >= S_WIND) { s.wisps = true; announce(sc.say); if (!reduced) { const c0 = s.cards[0], dist = DIR > 0 ? c0.x : W - (c0.x + c0.w); for (let i = 0; i < 5; i++) addWisp(s.Yf - s.ch + (i + 0.5) / 5 * s.ch, dist, 0.2, 0.3); } }
+  if (!reduced && S > 1.2 && S < S_WIND) { wispT += dt; if (wispT >= 0.5) { wispT = 0; addWisp(s.Yf - s.ch + rndG() * s.ch * 0.5, 0, 0, 0.15); } }
+  let lies = 0, gone = 0;
+  for (const c of s.cards) {
+    if (isFinite(c.ws)) { lies++; if (c.gone >= 0) gone++; }
+    if (reduced) continue;
+    withCard(c, () => {
+      if (MAT === 'sand' && c.t >= T_ANT && c.t < T_RISE) { c.acc += 170 * dt * (portrait ? 0.6 : 1); while (c.acc >= 1) { c.acc--; const sd = rndG() < 0.3, x = sd ? c.x + (rndG() < 0.5 ? rndG() * 0.1 : 1 - rndG() * 0.1) * c.w : c.x + rndG() * c.w;
+        grain(x, c.y + bodyDY() + (sd ? rndG() * 0.06 * c.h : rndG() * 4), { v0: (rndG() - 0.5) * 60, v1: (rndG() - 0.5) * 60, vy: 0, grav: portrait ? 800 : 1400, life: 1.2, pour: true }); } }
+      if (MAT === 'paper' && !c.landed && c.t >= T_RISE) { c.landed = true; for (let i = 0; i < (portrait ? 5 : 10); i++) { const x = c.x + rndG() * c.w, v = (rndG() - 0.5) * 420 * sp; grain(x, surface(x) - 3, { v0: v, v1: v * 0.3, vy: -(120 + rndG() * 240) * sp, grav: 900, life: 0.6, pour: true, col: sandCol() }); } }
+      if (isFinite(c.ws) && S >= c.ws && c.gone < 0) { eraseAny(T_WIND + (S - c.ws) * 1.15, true); if (c.ptr >= c.total) c.gone = S; }
+    });
+  }
+  if (gone === lies && s.allGone < 0) s.allGone = S;
+  if (!reduced && sc.stamp && MAT === 'sand' && S >= 2.25 && S < 3.7) { s.acc = (s.acc || 0) + 70 * dt; while (s.acc >= 1) { s.acc--; grain(tr.x + rndG() * tr.w, tr.y + rndG() * 8, { v0: 300 * sp, v1: 900 * sp, vy: -(60 + rndG() * 80) * sp, lift: 20 + rndG() * 40 }); } }
+  if ((sc.stamp || sc.q2) && s.sT < 0 && s.allGone >= 0 && S >= s.allGone + 0.12) { s.sT = S;
+    if (sc.stamp && !reduced) for (let i = 0; i < 12; i++) grain(tr.x + tr.w / 2 + (rndG() - 0.5) * tr.w * 0.7, tr.y + tr.h * 0.86, { v0: 300 * sp, v1: 400 * sp, vy: -(80 + rndG() * 150) * sp, life: 0.45 }); }
+}
+function drawBanner(s){
+  const S = s.S, sc = s.sc, u = s.u, a0 = ease((S - 0.15) / 0.4) * (1 - clamp((S - S_SINK) / 0.4, 0, 1)), mix = s.sT >= 0 ? clamp((S - s.sT) / 0.3, 0, 1) : 0;
+  const fs = portrait ? Math.max(20, Math.min(30, W * 0.065)) : 58 * u, y0 = portrait ? H * 0.16 : H * 0.15;
+  const put = (lines, a, dy) => { if (a <= 0.01) return; const ln = portrait ? lines : [lines.join(' ')];
+    ctx.save(); ctx.globalAlpha = a; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `900 ${fs}px ${FONT}`; ctx.lineJoin = 'round';
+    ln.forEach((t, i) => { const y = y0 + dy + (i - (ln.length - 1) / 2) * fs * 1.2;
+      if (T.flat) { ctx.lineWidth = fs * 0.16; ctx.strokeStyle = INK; ctx.strokeText(t, W / 2, y); } else { ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 12 * DPR; }
+      ctx.fillStyle = T.flat ? LIGHT : T.card; ctx.fillText(t, W / 2, y); });
+    ctx.restore(); };
+  const mx = ease(mix), sl = reduced ? 0 : fs * 0.8, ao = clamp(1 - 2 * mx, 0, 1), an = clamp(2 * mx - 1, 0, 1); put(sc.q, a0 * ao, -mx * sl); if (sc.q2) put(sc.q2, a0 * an, (1 - mx) * sl);
+}
+function drawStamp(c, dy, a, mul){
+  if (a <= 0) return; const w = c.w * 0.84, h = Math.max(16, c.h * 0.13), z = 1 + 0.6 * (1 - ease(a)), rot = (-9 + 4 * ease(a)) * Math.PI / 180;
+  ctx.save(); ctx.translate(c.x + c.w / 2, c.y + c.h * 0.86 + dy); ctx.rotate(rot); ctx.scale(z, z); ctx.globalAlpha = mul * Math.min(1, a * 3); ctx.fillStyle = T.accent.truth; ctx.beginPath(); rr(ctx, -w / 2, -h / 2, w, h, h * 0.25); ctx.fill();
+  if (T.flat) { ctx.lineWidth = portrait ? 2.5 : 4; ctx.strokeStyle = INK; ctx.stroke(); }
+  ctx.fillStyle = T.flat ? INK : '#1d2a33'; ctx.font = `900 ${h * 0.6}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(KINDS.truth.tag, 0, 0); ctx.restore();
+}
+function drawSceneCard(c, S, sink){
+  const s = scene, isT = c === s.cards[s.sc.stay], lie = isFinite(c.ws), dy = bodyDY() + sink, wind = sm(clamp((S - S_WIND) / 0.4, 0, 1)), brace = wind * (1 - sm(clamp((S - 3.8) / 0.5, 0, 1)));
+  const fl = ease((c.t - T_SET) / 0.9), pz = paperPose(lie ? { e: fl * (1 + 3 * wind) } : { e: fl * (1 + 2.5 * brace), lean: DIR * 0.03 * brace });
+  ctx.save();
+  if (isT && s.sT >= 0) { const z = 1 + 0.06 * Math.sin(Math.PI * clamp((S - s.sT) / 0.5, 0, 1)), cx = c.x + c.w / 2, cy = c.y + c.h / 2 + dy; ctx.translate(cx, cy); ctx.scale(z, z); ctx.translate(-cx, -cy); }
+  if (pz) { ctx.translate(pz.px + pz.dx, pz.py); ctx.rotate(pz.ang); ctx.translate(-pz.px, -pz.py); }
+  if (MAT === 'paper') { if (T.flat) { ctx.shadowColor = INK; ctx.shadowBlur = 0; ctx.shadowOffsetX = ctx.shadowOffsetY = (portrait ? 4 : 6 * c.u) * DPR; } else { ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 24 * DPR; ctx.shadowOffsetY = 8 * DPR; } }
+  drawCast(dy);
+  ctx.shadowColor = 'rgba(0,0,0,0)'; ctx.shadowBlur = 0; ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+  if (isT && s.sc.stamp && s.sT >= 0) drawStamp(c, dy, (S - s.sT) / 0.15, 1);
+  ctx.restore();
+}
+function sceneDraw(){
+  const s = scene, S = s.S, sc = s.sc, tr = s.cards[sc.stay] || s.cards[0], sk = clamp((S - S_SINK) / (S_END - S_SINK), 0, 1), sink = reduced ? 0 : sk * sk * (s.ch + tr.foot + 0.04 * H), fade = reduced ? 1 - sk : 1;
+  if (sc.q) drawBanner(s);
+  if (sc.stamp && s.sT >= 0) { const a = ease((S - s.sT) / 0.4) * (1 - sk), cx = tr.x + tr.w / 2, cy = tr.y + tr.h / 2 + sink, r = tr.h * 0.85, g = ctx.createRadialGradient(cx, cy, r * 0.2, cx, cy, r);
+    g.addColorStop(0, T.accent.truth); g.addColorStop(1, T.accent.truth + '00'); ctx.save(); ctx.globalAlpha = a * (reduced ? 0.5 : 0.46 + 0.06 * Math.sin(S * 3.2)); ctx.fillStyle = g; ctx.fillRect(cx - r, cy - r, 2 * r, 2 * r); ctx.restore(); }
+  for (const c of s.cards) {
+    if (c.t < 0 || c.gone >= 0 || c.alpha <= 0) continue;
+    if (!reduced) { withCard(c, () => drawSceneCard(c, S, sink)); continue; }
+    ctx.save(); ctx.globalAlpha = c.alpha * fade; ctx.drawImage(c.base, c.bx, c.by, c.bw, c.bh); if (MAT === 'sand') ctx.drawImage(c.rel, c.bx, c.by, c.bw, c.bh);
+    if (c === tr && sc.stamp && s.sT >= 0) drawStamp(c, 0, (S - s.sT) / 0.15, c.alpha * fade);
+    ctx.restore();
+  }
+}
+function sceneLeft(){
+  const out = scene.cards.filter(c => isFinite(c.ws) && c.gone >= 0).map(c => { const lim = Math.round((c.ov + c.h - 1) * DPR), cnt = k => { const d = k.getContext('2d').getImageData(0, 0, k.width, lim).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 8) n++; return n; }; return { kind: c.kind, base: cnt(c.base), rel: cnt(c.rel) }; });
+  return { scene: scene.type, S: +scene.S.toFixed(2), gone: out };
+}
+
+
+// ---------- boot ----------
+let last = 0, fpsN = 0, fpsT = 0;
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.5, (now - last) / 1000 || 0.016); last = now;
+  update(dt); render();
+  fpsN++; if (now - fpsT > 1000) { window.__fps = fpsN * 1000 / (now - fpsT); fpsN = 0; fpsT = now; }
+}
+function setTheme(name){
+  themeName = name; T = THEMES[name]; bgGrad = null; document.documentElement.style.setProperty('--ui', T.ui);
+  const u = new URL(location.href); u.searchParams.set('theme', name); history.replaceState(null, '', u);
+  if (cast) {
+    const t = tt, g = grains, w = wisps, wf = windFired, pb = peakBurst, ad = antDone, sd = stampDone, ed = exitDone;
+    layout(cast.kind); grains = g; wisps = w; windFired = wf; peakBurst = pb; antDone = ad; stampDone = sd; exitDone = ed;
+    tt = t; renderAssets(); eraseAny(tt);
+  }
+  if (scene) restoreScene();
+  initAmbient();
+}
+function coverage(){
+  const k = cast; if (!k) return null;
+  return { ptr: k.ptr, total: k.total, eroded: +(k.ptr / k.total).toFixed(4), cardDrawn: k.ptr >= k.total && tt >= T_THICK };
+}
+addEventListener('resize', () => { resize(); initAmbient(); });
+document.querySelectorAll('#hud [data-k]').forEach(b => b.onclick = () => fire(b.dataset.k));
+document.getElementById('bTheme').onclick = () => setTheme(themeName === 'pop' ? 'gouache' : 'pop');
+const bMat = document.getElementById('bMat'), bPaper = document.getElementById('bPaper');
+function syncHud(){ bMat.textContent = MAT; bPaper.textContent = PAPER; bPaper.style.display = MAT === 'paper' ? '' : 'none'; }
+function again(){ syncHud(); fire(scene ? scene.type : cast ? cast.kind : (kind || 'truth')); }
+bMat.onclick = () => { MAT = MAT === 'sand' ? 'paper' : 'sand'; again(); };
+bPaper.onclick = () => { PAPER = PAPER === 'tear' ? 'shred' : 'tear'; again(); };
+syncHud();
+document.documentElement.style.setProperty('--ui', T.ui);
+resize(); initAmbient();
+for (let i = 0; i < 40; i++) stepGrains(0.016);
+if (Q.get('fire')) setTimeout(() => fire(Q.get('fire'), Q.get('hold') ? false : true), 300);
+// The first fire on a cold page makes the GPU compile its shaders and rasterise the new canvases: 60 to 180 ms of frozen frames.
+// Pay that now, while nobody is watching: one throw-away card per material, then every piece of state goes back (own RNGs, so real fires are unchanged).
+function warmOne(mat, paper){
+  if (cast || scene || fireN) return;
+  const keep = [scene, fireN, kind, cast, tt, grains, wisps, windFired, peakBurst, poofDone, wispT, RV, held, antDone, stampDone, exitDone, landDone, accP, accH, MAT, PAPER, rnd, rndG, rndD, rndC];
+  rnd = prng(11); rndG = prng(12); rndD = prng(13); rndC = prng(14); MAT = mat; PAPER = paper;
+  try {
+    fire('truth', true);
+    for (const v of Object.values(cast)) if (v instanceof HTMLCanvasElement) v.getContext('2d').getImageData(0, 0, 1, 1);
+  } finally {
+    [scene, fireN, kind, cast, tt, grains, wisps, windFired, peakBurst, poofDone, wispT, RV, held, antDone, stampDone, exitDone, landDone, accP, accH, MAT, PAPER, rnd, rndG, rndD, rndC] = keep;
+  }
+}
+if (!reduced && Q.get('warm') !== '0') [MAT + ':' + PAPER, 'sand:tear', 'paper:tear', 'paper:shred'].filter((v, i, a) => a.indexOf(v) === i).forEach((v, i) => setTimeout(() => warmOne(...v.split(':')), 600 + 450 * i));
+window.__sand = {
+  fire, reveal, theme: setTheme, coverage, fps: () => window.__fps, grains: () => grains.length,
+  material: (m, p) => { if (m) MAT = m === 'paper' ? 'paper' : 'sand'; if (p) PAPER = p === 'shred' ? 'shred' : 'tear'; syncHud(); },
+  cardDrawn: () => scene ? scene.sT >= 0 : !!cast && cast.ptr >= cast.total && tt >= T_THICK,
+  baseURL: () => cast ? cast.base.toDataURL('image/png') : null,
+  leftover: () => { if (scene) return sceneLeft(); const k = cast; if (!k) return null; const lim = Math.round((k.ov + k.h - 1) * DPR); const cnt = c => { const w = c.canvas.width, d = c.getImageData(0, 0, w, lim).data; let n = 0; const pts = []; for (let i = 3; i < d.length; i += 4) if (d[i] > 8) { n++; if (n % 7 === 1 && pts.length < 12) { const p = (i - 3) / 4; pts.push([Math.round(p % w / DPR), Math.round(((p / w) | 0) / DPR)]); } } return { n, pts }; }; return { base: cnt(k.bc), rel: cnt(k.rc), ptr: k.ptr, total: k.total, tt: +tt.toFixed(2) }; },
+  phase: () => scene ? 'scene' : !cast ? 'idle' : tt < T_RISE ? 'rise' : tt < T_HOLD ? 'cast' : tt < T_THICK ? 'wind' : tt < T_SHOWN ? 'shown' : 'sink',
+  state: () => ({ scene: scene && { type: scene.type, S: +scene.S.toFixed(3), sT: scene.sT, allGone: scene.allGone, cards: scene.cards.map(c => ({ kind: c.kind, t: +c.t.toFixed(2), g: +c.g.toFixed(2), ptr: c.ptr, total: c.total, gone: c.gone, alpha: +c.alpha.toFixed(2) })) }, tt: +tt.toFixed(3), mat: MAT, paper: PAPER, kind: cast && cast.kind, held, ptr: cast ? cast.ptr : 0, total: cast ? cast.total : 0, grains: grains.length, dep: Math.max(0, ...dep), portrait, reduced, dir: DIR, cell: cs,
+    cast: cast && { x: cast.x, y: cast.y, w: cast.w, h: cast.h, Yf: cast.Yf, foot: cast.foot }, L: cast && cast.L, surfaceAtCast: cast ? surface(cast.x + cast.w / 2) : null, dy: cast ? bodyDY() : 0 })
+};
+if (reduced) { render(); let lt = performance.now(); setInterval(() => { const n = performance.now(); update(Math.min(0.5, (n - lt) / 1000)); lt = n; render(); }, 100); }
+else requestAnimationFrame(frame);
+})();
+</script></body></html>
