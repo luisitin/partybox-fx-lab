@@ -1,57 +1,60 @@
 # F01 handoff
 
-Status: resumed under updated main RULES.md research fallback. GPU implementation and independent browser checks are in progress. Research-only blocking has been removed.
-Read `SOURCES.md`, root `RULES.md`, `JOBS.md` and
-`start/murmuration/REPORT.md` before resuming. Use the existing isolated checkout;
-do not create a worktree unless explicitly requested.
+Branch: job/F01-murmuration. Nickname: codex-flock. Status: active functional
+milestone; mandatory performance has failed on the available SwiftShader backend.
+No PR, green CI or KEEP GOING rounds are claimed.
 
-1. Retrieve and read two independent authoritative scientific sources for the
-   topological-neighbour model and watch actual starling film. Record precise
-   observations, limitations, URLs and any disagreements. Sources currently
-   failed with proxy HTTP 403; do not claim their content has been read.
-2. Fix the inherited ranked leftovers in this order: release clump; distinct
-   entry shapes; clean word-to-word peeling; saturated Gouache ring; dynamic
-   holds; phone crossbar legibility; render interpolation; unused fields;
-   one-player colour variation; winner lap; win-only shimmer; Gouache hold trails.
-   Preserve leashed entries, matched exits, event variation and reduced motion.
-3. Deliver a self-contained offline HTML file with `?view=tv|phone` and
-   `?event=idle|tick|win`. Implement actual GPU state computation for 20k+ TV birds
-   and graceful 3k phone birds. A shader that only draws CPU state does not meet
-   GPU-compute delivery. Verify selected neighbours rather than assuming a
-   bounded random sample is the true nearest-seven set.
-4. Use GPU double buffering and research spatial indexing before choosing the
-   neighbour algorithm. The retrieved official three.js and WebGPU demos are
-   all-pairs at 1,024/1,500 particles; they do not prove 20k at 60 fps.
-5. Run the binding checks, record exact commands/results in `VERIFY.md`, and
-   measure TV 1920x1080 plus phone 390x844 with Chrome 4x CPU throttle. Record
-   real frame times and under-10-MB milestone captures. Check offline disk
-   loading, zero runtime network, event recovery and reduced motion.
-6. Complete the README (under 60 lines), assumptions, source/licence ledger,
-   checksums for every data/media file, job CI and current handoff notes. Push
-   milestones, refresh the claim, open a PR after checks pass, verify CI, then
-   run KEEP GOING until three consecutive rounds have no player-visible gain.
+Use the existing isolated checkout; do not create a Git worktree unless explicitly
+requested. Read root README.md, RULES.md, JOBS.md and current main CLAIMS.md.
+Preserve other chats' claims and refresh this claim on main at every push.
 
-Implementation and validation will be logged below when actually run. No physical-device measurement, green CI or KEEP GOING result is claimed.
+## Checked revision
+
+index.html SHA-256: c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc.
+The dynamic six shader strings and compute/step functions are unchanged from
+revision e27caf2c; its full seven-group suite passed. The affected six groups
+passed on c289 after Unicode fixes, including twelve TV/phone multilingual cases.
+Reports identify each tested revision; do not merge their provenance silently.
+
+Dynamic GPU counts: 20,736 TV and 3,136 phone. Seven nearest among 32 candidates
+in a fixed initially local graph is an approximation, with artistic guidance and
+metric short-range separation. It is not global kNN or calibrated flight physics.
+Reduced-motion interaction snapshots use analytic CPU initialization once;
+normal-motion state evolves through GPU computation. Canvas fallback is separate.
+
+## Outstanding work
+
+1. A nonsemantic shader optimization is being investigated outside the checkout:
+   /workspace/.partybox-tools/fx_tools/F01-optimization/index.html. It stores
+   nearest-neighbour IDs/distances rather than copying temporary vector arrays.
+   Promote it only after measured gains and relevant functional revalidation.
+2. Required 60 fps failed: TV 0.74–1.17 fps; phone with CPU4x 5.40–6.41 fps.
+   All six modes, raw frame arrivals, captures and source provenance are in
+   validation/. The host has no GPU device and uses ANGLE SwiftShader. Investigate
+   optimization and repeat on a GPU-capable browser; do not imply hardware passes.
+3. Direct file:// navigation is blocked by managed Chromium policy. Functional
+   checks use a single local-byte document fulfillment and block every application
+   network request. CI is strict-file by default; direct disk validation is unrun.
+4. Re-read all twelve ranked baseline leftovers in start/murmuration/REPORT.md.
+   Their new mechanics are implemented, but visual quality and exit paths still
+   need review at real-time speed; low-throughput captures cannot sign them off.
+5. Run the job workflow, open a PR only after required checks pass, confirm green
+   CI, then perform KEEP GOING until three consecutive rounds yield no noticeable
+   gain. LOOP.md is empty because that gate has not been reached.
 
 ## Re-verify when web works
 
-The new `RULES.md` fallback supersedes the earlier research-blocked status above.
-GitHub, then the npm registry (`boids@2.0.0`, archive SHA-512 verified), were
-consulted; knowledge-based physics and film-inspired choices are marked
-"from knowledge, unverified" in `SOURCES.md`. Continue implementation and checks;
-this research limitation alone does not block F01.
+Ballerini and Young primary papers and the current RSPB article were retrieved
+and read on retry. Their method/data limitations and a secondary-source conflict
+are in SOURCES.md and CONFLICTS.md. Vimeo public metadata loaded, but the public
+player/config at player.vimeo.com returned proxy HTTP403. No film was watched,
+extracted or copied. Film-inspired choices remain marked knowledge/unverified;
+watch genuine footage and revisit those choices when playback works.
 
-- Read Ballerini et al. (2008), DOI 10.1073/pnas.0711437105, and Young et al.
-  (2013), DOI 10.1371/journal.pcbi.1002894. Confirm approximate neighbour count,
-  the definitions of topological interaction, and the limitations of the
-  empirical and theoretical results using the two independent papers.
-- Watch actual real-bird film, beginning with https://vimeo.com/31158841 or an
-  accessible natural-history alternative. Record timestamped observations of
-  sheets, turning propagation, lobes, density/contrast and split/rejoin behaviour.
-  No footage has been watched in this environment; do not report timings as
-  observed before this check. Use film only as research unless its asset licence
-  separately permits redistribution.
-- Compare the implemented neighbour search with its description. If it uses
-  bounded candidates, preserve the explicit "seven nearest within candidates"
-  approximation and quantify representative candidate misses before claiming
-  exact spatial neighbours. Retest visual dynamics after any correction.
+## Reproduce
+
+From this folder, use README.md commands; full functional checks are check.py.
+Cloud browser needs --chromium /usr/bin/chromium --allow-policy-harness; that
+explicitly records disk navigation blocked. tools/measure.py separates measured
+frames from recorded video. All six original captures are under 10 MB; encoded
+25-fps clips do not establish scene frame rate. SHA256SUMS.txt covers data/media.

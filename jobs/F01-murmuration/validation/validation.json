@@ -1,0 +1,771 @@
+{
+  "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+  "chromium": "/usr/bin/chromium",
+  "flags": [
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+    "--autoplay-policy=no-user-gesture-required",
+    "--disable-background-networking",
+    "--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE localhost",
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader"
+  ],
+  "hardwareGpuNodes": [],
+  "transport": "routed",
+  "standaloneFileOpened": false,
+  "extraQuery": {},
+  "transportExplanation": "routed mode fulfills the top document from local disk bytes without any server or socket. This environment's Chromium enterprise URL policy blocks file://. Use --transport file in a browser with disk access.",
+  "method": "Actual performance.now arrival intervals sampled with native rAF; page rAF callback CPU time measured separately. CPU throttling via CDP. Performance without video recording. HTTP(S) and other nonlocal runtime requests blocked and logged.",
+  "cases": [
+    {
+      "view": "tv",
+      "event": "idle",
+      "motion": "no-preference",
+      "cpuThrottle": 1,
+      "performance": {
+        "elapsedMs": 8154.5,
+        "fps": 0.7357900545710958,
+        "arrivalIntervals": {
+          "count": 6,
+          "meanMs": 1359.0833333333333,
+          "p50Ms": 1351.1999999999534,
+          "p95Ms": 1974.5499999999302,
+          "p99Ms": 2017.149999999837,
+          "maxMs": 2027.7999999998137
+        },
+        "scheduledIntervals": {
+          "count": 6,
+          "meanMs": 1358.3000000000002,
+          "p50Ms": 1341.5999999999995,
+          "p95Ms": 1979.125000000001,
+          "p99Ms": 2022.465000000001,
+          "maxMs": 2033.300000000001
+        },
+        "callbackWork": {
+          "count": 7,
+          "meanMs": 0.4428571428704475,
+          "p50Ms": 0.2999999998137355,
+          "p95Ms": 1.0700000000186256,
+          "p99Ms": 1.333999999929219,
+          "maxMs": 1.3999999999068677
+        },
+        "missedRefreshes": 483,
+        "missedRefreshFraction": 0.9877300613496932,
+        "longTasks": [],
+        "meets60FpsTolerance": false,
+        "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+      },
+      "inspection": {
+        "title": "Murmuration \u00b7 Partybox",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "document": {
+          "scrollWidth": 1920,
+          "scrollHeight": 1080
+        },
+        "reducedMotion": false,
+        "canvases": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "clientWidth": 1920,
+            "clientHeight": 1080,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 1920,
+              "height": 1080,
+              "top": 0,
+              "right": 1920,
+              "bottom": 1080,
+              "left": 0
+            }
+          }
+        ],
+        "externalReferences": [],
+        "appDiagnostics": null
+      },
+      "errors": [],
+      "runtimeNetworkAttempts": [],
+      "harnessDocumentLoads": [
+        {
+          "url": "http://partybox.invalid/index.html?view=tv&event=idle",
+          "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+          "delivery": "route.fulfill local bytes; no socket"
+        }
+      ],
+      "capture": {
+        "path": "/workspace/.partybox-tools/fx-validation/F01/tv-idle-normal.webm",
+        "bytes": 1417856,
+        "under10MB": true,
+        "requestedSeconds": 6.0,
+        "recording": {
+          "encoder": "/usr/bin/ffmpeg",
+          "method": "CDP viewport JPEG frames, resampled at 25 fps; VP8 WebM",
+          "frames": 150,
+          "changedScreens": 1,
+          "captureWallSeconds": 9.727487822000057,
+          "note": "Capture frame rate is not used as performance evidence"
+        },
+        "errors": [],
+        "runtimeNetworkAttempts": [],
+        "harnessDocumentLoads": [
+          {
+            "url": "http://partybox.invalid/index.html?view=tv&event=idle",
+            "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+            "delivery": "route.fulfill local bytes; no socket"
+          }
+        ],
+        "metadata": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp8",
+              "width": 1920,
+              "height": 1080,
+              "r_frame_rate": "25/1"
+            }
+          ],
+          "format": {
+            "duration": "6.000000"
+          }
+        }
+      }
+    },
+    {
+      "view": "tv",
+      "event": "win",
+      "motion": "no-preference",
+      "cpuThrottle": 1,
+      "performance": {
+        "elapsedMs": 8013.899999999907,
+        "fps": 0.9982655136700099,
+        "arrivalIntervals": {
+          "count": 8,
+          "meanMs": 1001.7374999999884,
+          "p50Ms": 994.2000000001863,
+          "p95Ms": 1077.980000000121,
+          "p99Ms": 1102.9560000001732,
+          "maxMs": 1109.2000000001863
+        },
+        "scheduledIntervals": {
+          "count": 8,
+          "meanMs": 1002.0375000000001,
+          "p50Ms": 991.6000000000004,
+          "p95Ms": 1081.6649999999993,
+          "p99Ms": 1109.6929999999988,
+          "maxMs": 1116.699999999999
+        },
+        "callbackWork": {
+          "count": 9,
+          "meanMs": 0.3555555553175509,
+          "p50Ms": 0.2999999998137355,
+          "p95Ms": 0.599999999627471,
+          "p99Ms": 0.599999999627471,
+          "maxMs": 0.599999999627471
+        },
+        "missedRefreshes": 473,
+        "missedRefreshFraction": 0.9833679833679834,
+        "longTasks": [],
+        "meets60FpsTolerance": false,
+        "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+      },
+      "inspection": {
+        "title": "Murmuration \u00b7 Partybox",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "document": {
+          "scrollWidth": 1920,
+          "scrollHeight": 1080
+        },
+        "reducedMotion": false,
+        "canvases": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "clientWidth": 1920,
+            "clientHeight": 1080,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 1920,
+              "height": 1080,
+              "top": 0,
+              "right": 1920,
+              "bottom": 1080,
+              "left": 0
+            }
+          }
+        ],
+        "externalReferences": [],
+        "appDiagnostics": null
+      },
+      "errors": [],
+      "runtimeNetworkAttempts": [],
+      "harnessDocumentLoads": [
+        {
+          "url": "http://partybox.invalid/index.html?view=tv&event=win",
+          "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+          "delivery": "route.fulfill local bytes; no socket"
+        }
+      ],
+      "capture": {
+        "path": "/workspace/.partybox-tools/fx-validation/F01/tv-win-normal.webm",
+        "bytes": 1419369,
+        "under10MB": true,
+        "requestedSeconds": 6.0,
+        "recording": {
+          "encoder": "/usr/bin/ffmpeg",
+          "method": "CDP viewport JPEG frames, resampled at 25 fps; VP8 WebM",
+          "frames": 150,
+          "changedScreens": 2,
+          "captureWallSeconds": 8.634489505999682,
+          "note": "Capture frame rate is not used as performance evidence"
+        },
+        "errors": [],
+        "runtimeNetworkAttempts": [],
+        "harnessDocumentLoads": [
+          {
+            "url": "http://partybox.invalid/index.html?view=tv&event=win",
+            "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+            "delivery": "route.fulfill local bytes; no socket"
+          }
+        ],
+        "metadata": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp8",
+              "width": 1920,
+              "height": 1080,
+              "r_frame_rate": "25/1"
+            }
+          ],
+          "format": {
+            "duration": "6.000000"
+          }
+        }
+      }
+    },
+    {
+      "view": "tv",
+      "event": "tick",
+      "motion": "no-preference",
+      "cpuThrottle": 1,
+      "performance": {
+        "elapsedMs": 8512.700000000186,
+        "fps": 1.1747154251882224,
+        "arrivalIntervals": {
+          "count": 10,
+          "meanMs": 851.2700000000186,
+          "p50Ms": 840.8000000000466,
+          "p95Ms": 1202.404999999772,
+          "p99Ms": 1210.7209999998054,
+          "maxMs": 1212.7999999998137
+        },
+        "scheduledIntervals": {
+          "count": 10,
+          "meanMs": 851.6199999999999,
+          "p50Ms": 833.3499999999995,
+          "p95Ms": 1201.5700000000002,
+          "p99Ms": 1213.5939999999998,
+          "maxMs": 1216.6
+        },
+        "callbackWork": {
+          "count": 11,
+          "meanMs": 0.38181818183511496,
+          "p50Ms": 0.20000000018626451,
+          "p95Ms": 1.0000000002328306,
+          "p99Ms": 1.2400000002700837,
+          "maxMs": 1.3000000002793968
+        },
+        "missedRefreshes": 501,
+        "missedRefreshFraction": 0.9804305283757339,
+        "longTasks": [],
+        "meets60FpsTolerance": false,
+        "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+      },
+      "inspection": {
+        "title": "Murmuration \u00b7 Partybox",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "document": {
+          "scrollWidth": 1920,
+          "scrollHeight": 1080
+        },
+        "reducedMotion": false,
+        "canvases": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "clientWidth": 1920,
+            "clientHeight": 1080,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 1920,
+              "height": 1080,
+              "top": 0,
+              "right": 1920,
+              "bottom": 1080,
+              "left": 0
+            }
+          }
+        ],
+        "externalReferences": [],
+        "appDiagnostics": null
+      },
+      "errors": [],
+      "runtimeNetworkAttempts": [],
+      "harnessDocumentLoads": [
+        {
+          "url": "http://partybox.invalid/index.html?view=tv&event=tick",
+          "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+          "delivery": "route.fulfill local bytes; no socket"
+        }
+      ],
+      "capture": {
+        "path": "/workspace/.partybox-tools/fx-validation/F01/tv-tick-normal.webm",
+        "bytes": 1491470,
+        "under10MB": true,
+        "requestedSeconds": 6.0,
+        "recording": {
+          "encoder": "/usr/bin/ffmpeg",
+          "method": "CDP viewport JPEG frames, resampled at 25 fps; VP8 WebM",
+          "frames": 150,
+          "changedScreens": 3,
+          "captureWallSeconds": 6.031031571999847,
+          "note": "Capture frame rate is not used as performance evidence"
+        },
+        "errors": [],
+        "runtimeNetworkAttempts": [],
+        "harnessDocumentLoads": [
+          {
+            "url": "http://partybox.invalid/index.html?view=tv&event=tick",
+            "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+            "delivery": "route.fulfill local bytes; no socket"
+          }
+        ],
+        "metadata": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp8",
+              "width": 1920,
+              "height": 1080,
+              "r_frame_rate": "25/1"
+            }
+          ],
+          "format": {
+            "duration": "6.000000"
+          }
+        }
+      }
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "motion": "no-preference",
+      "cpuThrottle": 4,
+      "performance": {
+        "elapsedMs": 8106.700000000186,
+        "fps": 6.414447309015851,
+        "arrivalIntervals": {
+          "count": 52,
+          "meanMs": 155.8980769230805,
+          "p50Ms": 151.25,
+          "p95Ms": 301.87000000013506,
+          "p99Ms": 338.9219999999507,
+          "maxMs": 353.10000000009313
+        },
+        "scheduledIntervals": {
+          "count": 52,
+          "meanMs": 155.76153846153846,
+          "p50Ms": 150.10000000000036,
+          "p95Ms": 299.9999999999995,
+          "p99Ms": 333.2999999999997,
+          "maxMs": 333.3000000000002
+        },
+        "callbackWork": {
+          "count": 53,
+          "meanMs": 1.8358490565914731,
+          "p50Ms": 0.8999999999068677,
+          "p95Ms": 8.100000000093132,
+          "p99Ms": 11.152000000178806,
+          "maxMs": 12.400000000372529
+        },
+        "missedRefreshes": 434,
+        "missedRefreshFraction": 0.8930041152263375,
+        "longTasks": [],
+        "meets60FpsTolerance": false,
+        "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+      },
+      "inspection": {
+        "title": "Murmuration \u00b7 Partybox",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "document": {
+          "scrollWidth": 390,
+          "scrollHeight": 844
+        },
+        "reducedMotion": false,
+        "canvases": [
+          {
+            "width": 390,
+            "height": 844,
+            "clientWidth": 390,
+            "clientHeight": 844,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 844,
+              "top": 0,
+              "right": 390,
+              "bottom": 844,
+              "left": 0
+            }
+          }
+        ],
+        "externalReferences": [],
+        "appDiagnostics": null
+      },
+      "errors": [],
+      "runtimeNetworkAttempts": [],
+      "harnessDocumentLoads": [
+        {
+          "url": "http://partybox.invalid/index.html?view=phone&event=idle",
+          "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+          "delivery": "route.fulfill local bytes; no socket"
+        }
+      ],
+      "capture": {
+        "path": "/workspace/.partybox-tools/fx-validation/F01/phone-idle-normal.webm",
+        "bytes": 1094012,
+        "under10MB": true,
+        "requestedSeconds": 6.0,
+        "recording": {
+          "encoder": "/usr/bin/ffmpeg",
+          "method": "CDP viewport JPEG frames, resampled at 25 fps; VP8 WebM",
+          "frames": 150,
+          "changedScreens": 30,
+          "captureWallSeconds": 6.060098789999756,
+          "note": "Capture frame rate is not used as performance evidence"
+        },
+        "errors": [],
+        "runtimeNetworkAttempts": [],
+        "harnessDocumentLoads": [
+          {
+            "url": "http://partybox.invalid/index.html?view=phone&event=idle",
+            "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+            "delivery": "route.fulfill local bytes; no socket"
+          }
+        ],
+        "metadata": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp8",
+              "width": 390,
+              "height": 844,
+              "r_frame_rate": "25/1"
+            }
+          ],
+          "format": {
+            "duration": "6.000000"
+          }
+        }
+      }
+    },
+    {
+      "view": "phone",
+      "event": "win",
+      "motion": "no-preference",
+      "cpuThrottle": 4,
+      "performance": {
+        "elapsedMs": 8143,
+        "fps": 5.403413975193418,
+        "arrivalIntervals": {
+          "count": 44,
+          "meanMs": 185.0681818181818,
+          "p50Ms": 177.10000000009313,
+          "p95Ms": 376.03000000002805,
+          "p99Ms": 407.7880000002263,
+          "maxMs": 415.70000000018626
+        },
+        "scheduledIntervals": {
+          "count": 44,
+          "meanMs": 184.84318181818182,
+          "p50Ms": 183.2999999999995,
+          "p95Ms": 373.29499999999956,
+          "p99Ms": 409.4620000000002,
+          "maxMs": 416.60000000000036
+        },
+        "callbackWork": {
+          "count": 45,
+          "meanMs": 2.8533333333105677,
+          "p50Ms": 1.8999999999068677,
+          "p95Ms": 8.259999999962744,
+          "p99Ms": 11.812000000216077,
+          "maxMs": 14.100000000093132
+        },
+        "missedRefreshes": 444,
+        "missedRefreshFraction": 0.9079754601226994,
+        "longTasks": [
+          {
+            "start": 8653,
+            "duration": 52
+          }
+        ],
+        "meets60FpsTolerance": false,
+        "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+      },
+      "inspection": {
+        "title": "Murmuration \u00b7 Partybox",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "document": {
+          "scrollWidth": 390,
+          "scrollHeight": 844
+        },
+        "reducedMotion": false,
+        "canvases": [
+          {
+            "width": 390,
+            "height": 844,
+            "clientWidth": 390,
+            "clientHeight": 844,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 844,
+              "top": 0,
+              "right": 390,
+              "bottom": 844,
+              "left": 0
+            }
+          }
+        ],
+        "externalReferences": [],
+        "appDiagnostics": null
+      },
+      "errors": [],
+      "runtimeNetworkAttempts": [],
+      "harnessDocumentLoads": [
+        {
+          "url": "http://partybox.invalid/index.html?view=phone&event=win",
+          "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+          "delivery": "route.fulfill local bytes; no socket"
+        }
+      ],
+      "capture": {
+        "path": "/workspace/.partybox-tools/fx-validation/F01/phone-win-normal.webm",
+        "bytes": 1057431,
+        "under10MB": true,
+        "requestedSeconds": 6.0,
+        "recording": {
+          "encoder": "/usr/bin/ffmpeg",
+          "method": "CDP viewport JPEG frames, resampled at 25 fps; VP8 WebM",
+          "frames": 150,
+          "changedScreens": 30,
+          "captureWallSeconds": 6.150476058000095,
+          "note": "Capture frame rate is not used as performance evidence"
+        },
+        "errors": [],
+        "runtimeNetworkAttempts": [],
+        "harnessDocumentLoads": [
+          {
+            "url": "http://partybox.invalid/index.html?view=phone&event=win",
+            "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+            "delivery": "route.fulfill local bytes; no socket"
+          }
+        ],
+        "metadata": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp8",
+              "width": 390,
+              "height": 844,
+              "r_frame_rate": "25/1"
+            }
+          ],
+          "format": {
+            "duration": "6.000000"
+          }
+        }
+      }
+    },
+    {
+      "view": "phone",
+      "event": "tick",
+      "motion": "no-preference",
+      "cpuThrottle": 4,
+      "performance": {
+        "elapsedMs": 8149.399999999907,
+        "fps": 5.767295751834557,
+        "arrivalIntervals": {
+          "count": 47,
+          "meanMs": 173.39148936170014,
+          "p50Ms": 165.6999999997206,
+          "p95Ms": 238.9800000002142,
+          "p99Ms": 271.8800000000931,
+          "maxMs": 298.10000000009313
+        },
+        "scheduledIntervals": {
+          "count": 47,
+          "meanMs": 173.39787234042555,
+          "p50Ms": 166.69999999999982,
+          "p95Ms": 244.92000000000036,
+          "p99Ms": 276.95400000000063,
+          "maxMs": 300
+        },
+        "callbackWork": {
+          "count": 48,
+          "meanMs": 3.3020833333042297,
+          "p50Ms": 1.3999999999068677,
+          "p95Ms": 11.700000000023284,
+          "p99Ms": 20.311000000038195,
+          "maxMs": 24.399999999906868
+        },
+        "missedRefreshes": 442,
+        "missedRefreshFraction": 0.9038854805725971,
+        "longTasks": [],
+        "meets60FpsTolerance": false,
+        "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+      },
+      "inspection": {
+        "title": "Murmuration \u00b7 Partybox",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "document": {
+          "scrollWidth": 390,
+          "scrollHeight": 844
+        },
+        "reducedMotion": false,
+        "canvases": [
+          {
+            "width": 390,
+            "height": 844,
+            "clientWidth": 390,
+            "clientHeight": 844,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 844,
+              "top": 0,
+              "right": 390,
+              "bottom": 844,
+              "left": 0
+            }
+          }
+        ],
+        "externalReferences": [],
+        "appDiagnostics": null
+      },
+      "errors": [],
+      "runtimeNetworkAttempts": [],
+      "harnessDocumentLoads": [
+        {
+          "url": "http://partybox.invalid/index.html?view=phone&event=tick",
+          "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+          "delivery": "route.fulfill local bytes; no socket"
+        }
+      ],
+      "capture": {
+        "path": "/workspace/.partybox-tools/fx-validation/F01/phone-tick-normal.webm",
+        "bytes": 1210868,
+        "under10MB": true,
+        "requestedSeconds": 6.0,
+        "recording": {
+          "encoder": "/usr/bin/ffmpeg",
+          "method": "CDP viewport JPEG frames, resampled at 25 fps; VP8 WebM",
+          "frames": 150,
+          "changedScreens": 33,
+          "captureWallSeconds": 6.019606184999702,
+          "note": "Capture frame rate is not used as performance evidence"
+        },
+        "errors": [],
+        "runtimeNetworkAttempts": [],
+        "harnessDocumentLoads": [
+          {
+            "url": "http://partybox.invalid/index.html?view=phone&event=tick",
+            "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+            "delivery": "route.fulfill local bytes; no socket"
+          }
+        ],
+        "metadata": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp8",
+              "width": 390,
+              "height": 844,
+              "r_frame_rate": "25/1"
+            }
+          ],
+          "format": {
+            "duration": "6.000000"
+          }
+        }
+      }
+    }
+  ],
+  "gpu": {
+    "devices": [
+      {
+        "vendorId": 65535,
+        "deviceId": 65535,
+        "vendorString": "Google Inc. (Google)",
+        "deviceString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+        "driverVendor": "SwANGLE",
+        "driverVersion": "5.0.0"
+      }
+    ],
+    "featureStatus": {
+      "2d_canvas": "enabled",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "enabled",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "enabled_on",
+      "rasterization": "enabled_force",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "disabled_off",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "enabled",
+      "video_encode": "disabled_software",
+      "vulkan": "disabled_off",
+      "webgl": "enabled",
+      "webgpu": "unavailable_software",
+      "webgpu_on_vk_via_gl_interop": "disabled_off",
+      "webnn": "disabled_off"
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+    "vendor": "Google Inc. (Google)"
+  },
+  "allCasesMeetFrameTolerance": false,
+  "noRuntimeNetworkAttempts": true,
+  "noPageErrors": true,
+  "allCapturesUnder10MB": true
+}

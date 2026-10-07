@@ -1,0 +1,17 @@
+{
+  "sha256Before": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+  "expectedSha256": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+  "command": "python3 /workspace/.partybox-tools/fx_tools/validate_visual.py /workspace/partybox-fx-lab/jobs/F01-murmuration/index.html --output /workspace/.partybox-tools/fx-validation/F01 --views tv,phone --events idle,win,tick --motion no-preference --seconds 8 --warmup 2 --capture 6 --transport routed --require-performance",
+  "standaloneFileOpened": false,
+  "sha256After": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+  "exitCode": 1,
+  "frozenSourceConfirmed": true,
+  "captureSha256": {
+    "phone-idle-normal.webm": "ed0385c0f498c207ef87b6c48d7a76c604997e5a2638cd2cd7e5e9fc071f9e5e",
+    "phone-tick-normal.webm": "c1747a879587147dee2930c86d39895df27f7e625be1e335db9a965de93245c1",
+    "phone-win-normal.webm": "fcadc60a778994a9ee3ae680523af2686c2a77cabbcbe87b605cc7f7052b6515",
+    "tv-idle-normal.webm": "9c6b85efc6747c3c585b73437c69a13c9d9b27ea3b1cff3f35222ea788dd685f",
+    "tv-tick-normal.webm": "9cca2bff0e653d931ee6bb60da10f6880a75a2575a4a4ded46b033446f696490",
+    "tv-win-normal.webm": "871dfc3515a391593025615a0b0fdab30bf2c97cf0aed2afdf1e7a6d5015f016"
+  }
+}

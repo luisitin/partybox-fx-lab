@@ -1,0 +1,246 @@
+{
+  "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+  "htmlSha256": "e27caf2c775737af6dc367746cdff454cf1bb9420955ea3189867aa88d7ae742",
+  "functionalPassed": true,
+  "standaloneFileOpened": false,
+  "performanceAccepted": false,
+  "performanceNote": "Functional checks do not establish the mandatory 60 fps target. Measure actual frame arrivals separately on suitable hardware.",
+  "checks": {
+    "contextLoss": {
+      "renderer": "canvas2d-fallback",
+      "birds": 3025,
+      "wordBirds": 484,
+      "wordHeight": 0.13558128848671913,
+      "fontWorldHeight": 0.216
+    },
+    "tv": {
+      "view": "tv",
+      "birds": 20736,
+      "renderer": "webgl2-gpu",
+      "idleDisplacementRms": 0.0010629083564729616,
+      "deterministicReplayRms": 0.0,
+      "liveDisplacementRms": 0.00029177944729411883,
+      "tickDifferenceRms": 0.02119842189529699,
+      "idleGeometry": {
+        "insideFraction": 0.3939043209876543,
+        "leftLobe": 0.07445987654320987,
+        "rightLobe": 0.0,
+        "notch": 0.0,
+        "spread": 0.788988341204329
+      },
+      "heartGeometry": {
+        "insideFraction": 0.9996141975308642,
+        "leftLobe": 0.09915123456790123,
+        "rightLobe": 0.11496913580246913,
+        "notch": 0.0,
+        "spread": 0.39568298173480765
+      },
+      "reformedGeometry": {
+        "insideFraction": 0.3942901234567901,
+        "leftLobe": 0.06712962962962964,
+        "rightLobe": 0.03587962962962963,
+        "notch": 0.0,
+        "spread": 0.7772227728719305
+      },
+      "holdVisibleFraction": 1.0,
+      "controls": [
+        "bJoin",
+        "bCode",
+        "bWin",
+        "bTick",
+        "bTheme",
+        "bLook",
+        "bShape",
+        "bSkip"
+      ]
+    },
+    "phone": {
+      "view": "phone",
+      "birds": 3136,
+      "renderer": "webgl2-gpu",
+      "idleDisplacementRms": 0.001266792615465764,
+      "deterministicReplayRms": 0.0,
+      "liveDisplacementRms": 4.3084795706309385e-05,
+      "tickDifferenceRms": 0.042408103736196474,
+      "idleGeometry": {
+        "insideFraction": 0.7037627551020408,
+        "leftLobe": 0.19802295918367346,
+        "rightLobe": 0.0,
+        "notch": 0.0006377551020408163,
+        "spread": 0.2625829324448513
+      },
+      "heartGeometry": {
+        "insideFraction": 1.0,
+        "leftLobe": 0.09024234693877552,
+        "rightLobe": 0.0975765306122449,
+        "notch": 0.00031887755102040814,
+        "spread": 0.2257051460053712
+      },
+      "reformedGeometry": {
+        "insideFraction": 0.7206632653061225,
+        "leftLobe": 0.12213010204081633,
+        "rightLobe": 0.10044642857142858,
+        "notch": 0.0,
+        "spread": 0.2803215313666483
+      },
+      "holdVisibleFraction": 1.0,
+      "controls": [
+        "bJoin",
+        "bCode",
+        "bWin",
+        "bTick",
+        "bTheme",
+        "bLook",
+        "bShape",
+        "bSkip"
+      ]
+    },
+    "queryParameters": [
+      {
+        "event": "win",
+        "theme": "gouache",
+        "look": "ink",
+        "shape": "petal",
+        "kiosk": "pass"
+      },
+      {
+        "event": "tick",
+        "theme": "gouache",
+        "look": "ink",
+        "shape": "petal",
+        "kiosk": "pass"
+      }
+    ],
+    "reducedMotion": {
+      "initialPreference": "pass",
+      "livePreferenceChanges": "pass",
+      "staticGpuPositions": "pass",
+      "nameEscaping": "pass"
+    },
+    "fallbackForced": {
+      "forced": true,
+      "renderer": "canvas2d-fallback",
+      "birds": 3136,
+      "idleDisplacementRms": 0.004016263522096077
+    },
+    "fallbackNoWebGL": {
+      "forced": false,
+      "renderer": "canvas2d-fallback",
+      "birds": 3136,
+      "idleDisplacementRms": 0.004016263522096077
+    }
+  },
+  "checkWallSeconds": {
+    "contextLoss": 5.315193222000289,
+    "tv": 118.15449576600031,
+    "phone": 25.462353358999735,
+    "queryParameters": 3.642022506000103,
+    "reducedMotion": 3.220506290999765,
+    "fallbackForced": 3.024265932999697,
+    "fallbackNoWebGL": 3.312776189000033
+  },
+  "attemptedChecks": [
+    "contextLoss",
+    "tv",
+    "phone",
+    "queryParameters",
+    "reducedMotion",
+    "fallbackForced",
+    "fallbackNoWebGL"
+  ],
+  "completedChecks": [
+    "contextLoss",
+    "tv",
+    "phone",
+    "queryParameters",
+    "reducedMotion",
+    "fallbackForced",
+    "fallbackNoWebGL"
+  ],
+  "errors": [],
+  "transport": "policy-harness",
+  "standaloneFileBlocker": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///workspace/partybox-fx-lab/jobs/F01-murmuration/index.html?view=tv&event=win&seed=123456",
+  "pages": [
+    {
+      "view": "tv",
+      "event": "win",
+      "reducedMotion": false,
+      "htmlSha256": "e27caf2c775737af6dc367746cdff454cf1bb9420955ea3189867aa88d7ae742",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "tv",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "e27caf2c775737af6dc367746cdff454cf1bb9420955ea3189867aa88d7ae742",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "e27caf2c775737af6dc367746cdff454cf1bb9420955ea3189867aa88d7ae742",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "win",
+      "reducedMotion": false,
+      "htmlSha256": "e27caf2c775737af6dc367746cdff454cf1bb9420955ea3189867aa88d7ae742",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "tick",
+      "reducedMotion": false,
+      "htmlSha256": "e27caf2c775737af6dc367746cdff454cf1bb9420955ea3189867aa88d7ae742",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "win",
+      "reducedMotion": true,
+      "htmlSha256": "e27caf2c775737af6dc367746cdff454cf1bb9420955ea3189867aa88d7ae742",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "e27caf2c775737af6dc367746cdff454cf1bb9420955ea3189867aa88d7ae742",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "e27caf2c775737af6dc367746cdff454cf1bb9420955ea3189867aa88d7ae742",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    }
+  ],
+  "wallSeconds": 163.5857921060001
+}

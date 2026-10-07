@@ -1,0 +1,243 @@
+{
+  "source": "/workspace/partybox-fx-lab/jobs/F01-murmuration/index.html",
+  "htmlSha256": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+  "functionalPassed": true,
+  "standaloneFileOpened": false,
+  "performanceAccepted": false,
+  "performanceNote": "Functional checks do not establish the mandatory 60 fps target. Measure actual frame arrivals separately on suitable hardware.",
+  "checks": {
+    "contextLoss": {
+      "renderer": "canvas2d-fallback",
+      "birds": 3025,
+      "wordBirds": 484,
+      "wordHeight": 0.13543730974197388,
+      "fontWorldHeight": 0.216
+    },
+    "queryParameters": [
+      {
+        "event": "win",
+        "theme": "gouache",
+        "look": "ink",
+        "shape": "petal",
+        "kiosk": "pass"
+      },
+      {
+        "event": "tick",
+        "theme": "gouache",
+        "look": "ink",
+        "shape": "petal",
+        "kiosk": "pass"
+      }
+    ],
+    "words": [
+      {
+        "view": "tv",
+        "name": "\u0633\u0627\u0631\u0629",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      },
+      {
+        "view": "tv",
+        "name": "\u05de\u05d9\u05db\u05dc",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      },
+      {
+        "view": "tv",
+        "name": "ANA \ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      },
+      {
+        "view": "tv",
+        "name": "\u6771\u4eac",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      },
+      {
+        "view": "tv",
+        "name": "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      },
+      {
+        "view": "tv",
+        "name": "\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80X",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      },
+      {
+        "view": "phone",
+        "name": "\u0633\u0627\u0631\u0629",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      },
+      {
+        "view": "phone",
+        "name": "\u05de\u05d9\u05db\u05dc",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      },
+      {
+        "view": "phone",
+        "name": "ANA \ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      },
+      {
+        "view": "phone",
+        "name": "\u6771\u4eac",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      },
+      {
+        "view": "phone",
+        "name": "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      },
+      {
+        "view": "phone",
+        "name": "\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80X",
+        "maskCoverage": 1,
+        "visibleFraction": 1
+      }
+    ],
+    "reducedMotion": {
+      "initialPreference": "pass",
+      "livePreferenceChanges": "pass",
+      "staticGpuPositions": "pass",
+      "nameEscaping": "pass"
+    },
+    "fallbackForced": {
+      "forced": true,
+      "renderer": "canvas2d-fallback",
+      "birds": 3136,
+      "idleDisplacementRms": 0.004016263522096077
+    },
+    "fallbackNoWebGL": {
+      "forced": false,
+      "renderer": "canvas2d-fallback",
+      "birds": 3136,
+      "idleDisplacementRms": 0.004016263522096077
+    }
+  },
+  "checkWallSeconds": {
+    "contextLoss": 5.529614646000027,
+    "queryParameters": 3.7157423610001388,
+    "words": 15.448405945000104,
+    "reducedMotion": 3.495219577000171,
+    "fallbackForced": 3.5519504939998114,
+    "fallbackNoWebGL": 3.591060150999965
+  },
+  "attemptedChecks": [
+    "contextLoss",
+    "queryParameters",
+    "words",
+    "reducedMotion",
+    "fallbackForced",
+    "fallbackNoWebGL"
+  ],
+  "completedChecks": [
+    "contextLoss",
+    "queryParameters",
+    "words",
+    "reducedMotion",
+    "fallbackForced",
+    "fallbackNoWebGL"
+  ],
+  "errors": [],
+  "requestedChecks": [
+    "contextLoss",
+    "queryParameters",
+    "words",
+    "reducedMotion",
+    "fallbackForced",
+    "fallbackNoWebGL"
+  ],
+  "transport": "policy-harness",
+  "standaloneFileBlocker": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///workspace/partybox-fx-lab/jobs/F01-murmuration/index.html?view=tv&event=win&seed=123456",
+  "pages": [
+    {
+      "view": "tv",
+      "event": "win",
+      "reducedMotion": false,
+      "htmlSha256": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "win",
+      "reducedMotion": false,
+      "htmlSha256": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "tick",
+      "reducedMotion": false,
+      "htmlSha256": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "tv",
+      "event": "idle",
+      "reducedMotion": true,
+      "htmlSha256": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": true,
+      "htmlSha256": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "win",
+      "reducedMotion": true,
+      "htmlSha256": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "c2897277e34f8b30401880545f11545b6cc93a04652cf67ed63e3e85796ff2bc",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    }
+  ],
+  "wallSeconds": 36.95153434599979
+}
