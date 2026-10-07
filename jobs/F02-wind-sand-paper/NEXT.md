@@ -7,27 +7,29 @@ Read README.md, RULES.md, JOBS.md and all21 ranked baseline leftovers.
 
 ## Tested source and work remaining
 
-Frozen index.html SHA3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6.
-Actual startup uses20,736TV/3,136phone GPU grains. TVidle/win/tick6.79/4.33/5.94fps;
-phoneCPU4x25.49/24.50/27.24fps. All mandatory60-Hz cases fail on ANGLESwiftShader.
-Six original captures and raw arrivals/provenance are committed and hashed.
-Hardware throughput is unverified; this is not an accepted60-fps implementation.
+Latest frozen index SHA00230a9ba0f07630bae339c4f175870038acb5f8a1d626e499eb9f004ed8f4a5.
+Full ten-group run225.785s: six pass, four fail. Actual sand readback/sharedforce,
+wind divergence/tick, paper forces/tumble, reduced motion and fallback pass.
+60/120/144 model states and absolute clocks agree after resetRV fix.
+Configured216-scene matrix stops after23 cases: fakeout ansB leaves1basepixel.
+Canvas history changes warm/cold raster and later notebook holes despite identical
+model/debris/draw geometry. Source author will reset full pooled drawing context,
+remove the drawing's empty revealed-card shadow/body, and fix natural perpiece
+cleanup if context reset alone does not remove it. No terminal whole-cover sweep.
+Default TVauto DPR2 warm startup exceeds30s; warm0 starts0.67s. Isolate responsive
+preservation withwarm0 but keep default high-DPR startup unresolved and explicit.
+After fixes freeze again; rerun four failed groups, then complete the scene matrix.
 
-First full-page functional suite ran on3bbeffdb: four groups pass, five fail.
-Raw failures/diagnoses and matching cold/warm heavy measurements are preserved.
-Three page defects are being fixed: one cover pixel, no actual paper backs,
-and reset-history-dependent CPU PRNG state. The two harness issues are corrected
-(wait for resize; test static reduced pixels during idle, not manual repaint).
-The revised suite adds all216 TV/phone/theme/material/direction scene cases,
-absolute refresh-clock and responsive GPU-count/retained-atlas checks.
-The page author is applying grouped fixes; source is not currently frozen.
-After a new freeze the checker owns the sole browser lane for the full rerun.
-Freeze one source revision per check; preserve failures and rerun affected scope.
-The isolatedGPU module and mockedDOM checks passed within documented scopes;
-those do not establish page visuals or full integration. See VERIFY.md.
-Heavy-scene phone5.20/5.83fps is below starter7.57fps; cold/warm tails are mixed.
-No visible-hitch or overall phone-speed fix is established by these measurements.
+Source3bbeff mandatory measuredTVidle/win/tick6.79/4.33/5.94fps;
+phoneCPU4x25.49/24.50/27.24fps. All60-Hz cases fail on ANGLESwiftShader.
+00230a9b singlephoneidle26.44fps also fails; one new six-second original paper
+capture includes explicitstep2.7 before resume, not measuredpaperperformance.
+Heavyphone5.20/5.83fps is below starter7.57; cold/warm tails mixed, no hitchfix.
+Reports/captures retain exact source/helper hashes. No physicalGPU throughput proof.
 
+CI workflow now has strict functional, data-hash and performance/capture gates,
+using bundledPlaywright Chromium and FFmpeg. It has not run; noPR or greenCI.
+Source is frozen during tests; parent ownsGit/claims/docs, checker ownsbrowserlane.
 Direct file:// remains blocked by managed Chromium policy. Explicitly logged
 local-byte fulfillment can validate functions but cannot pass the disk rule.
 Resolve required performance/disk checks, review all21 fixes at real-time speed,

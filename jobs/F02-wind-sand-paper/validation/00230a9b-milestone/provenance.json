@@ -1,0 +1,40 @@
+{
+  "expectedSha256": "00230a9ba0f07630bae339c4f175870038acb5f8a1d626e499eb9f004ed8f4a5",
+  "sha256Before": "00230a9ba0f07630bae339c4f175870038acb5f8a1d626e499eb9f004ed8f4a5",
+  "helperSha256": "983c3252204e6f35cb2f67bf76b499a3f7b1bfe1a5a306521f78f4fc5eb82dd6",
+  "captureScriptSha256": "0f7d3ddda3796cb4747baee1f223c2dacf3578d96d8603012693d265ab311ef3",
+  "commandArgv": [
+    "python3",
+    "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py",
+    "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+    "--output",
+    "/workspace/.partybox-tools/fx-validation/F02/00230a9b-milestone",
+    "--views",
+    "phone",
+    "--events",
+    "idle",
+    "--motion",
+    "no-preference",
+    "--query",
+    "warm=0&mat=paper&paper=shred",
+    "--seconds",
+    "2",
+    "--warmup",
+    "0",
+    "--capture",
+    "6",
+    "--capture-script",
+    "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/paper-capture.js",
+    "--transport",
+    "routed",
+    "--require-performance"
+  ],
+  "standaloneFileOpened": false,
+  "scope": "Idle timing only. Capture starts after explicit fixed simulation advance 2.7 seconds; this advance is not performance evidence.",
+  "sha256After": "00230a9ba0f07630bae339c4f175870038acb5f8a1d626e499eb9f004ed8f4a5",
+  "exitCode": 1,
+  "frozenSourceConfirmed": true,
+  "captureSha256": {
+    "phone-idle-normal.webm": "f148e6e1385cbdb001855642b269140fb75b6450ad7a9ecf369ff83587ffcc01"
+  }
+}

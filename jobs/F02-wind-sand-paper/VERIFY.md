@@ -115,3 +115,37 @@ python /tmp/F02-diagnose-reduced.py
 Full suite:FAIL, exit1,123.710s. Four groups pass (wind,sandTV,sandPhone,paperPhysics); five fail (scenes,paperGeometry,facesReduced,queriesFallback,refreshWarm). This was54 phone scene cases, not the later216-case suite. Diagnoses all exit0 and preserve observations in validation/3bbeffdb-functional-failed/. Actual shared GPU/CPU field agrees within Float32 tolerance; sand readback proves20,736/3,136 finite moving particles, heart/reform, tick and re-entrainment.
 
 Three real defects: one residual cover pixel in dawn/shred; zero paper backs among48,345 sampled segments; reset history changes CPU fragment PRNG state through stale river state. Two harness defects: querying before resize completes; comparing antialias-edge pixels after an explicitly requested diagnostic redraw instead of measuring idle reduced-motion freezing. The corrected suite waits for actual viewport state, demands exact static pixels during idle, separately demands unchanged simulation state on manual reduced step, and keeps strict zero remaining-cover pixels. Final source fixes and expanded suite remain pending. These checks catch actual buffer/model, force-coupling, cleanup, authorization, reduced-motion, responsive sizing and deterministic scheduling failures; they do not prove60-fps throughput.
+
+## Grouped fixes and second full-page run (00230a9b)
+
+FrozenHTML SHA00230a9ba0f07630bae339c4f175870038acb5f8a1d626e499eb9f004ed8f4a5.
+The source adds resetRV=null, wind-derived paper release moment, opaque per-owned-piece seam erasure, preserved atlasDPR, settled resize reanchor and state-preserving20k/3k GPU remap.
+
+```sh
+node /tmp/f02_dom_smoke.cjs
+node /workspace/.partybox-tools/fx_tools/F02-pending/reset-probe.cjs /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html
+node /workspace/.partybox-tools/fx_tools/F02-pending/roll-probe.cjs /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html
+node --check /workspace/.partybox-tools/fx_tools/F02-gpu/wind-gpu-resize.js
+node /workspace/.partybox-tools/fx_tools/F02-gpu/check-field.js /workspace/.partybox-tools/fx_tools/F02-gpu/wind-gpu-resize.js
+node /workspace/.partybox-tools/fx_tools/F02-gpu/check-resize.js
+```
+
+All PASS within mock/static scopes. Reset155/155/155 fragments with identical state; roll41,355 samples/21,958backs/3,381edges. Current moduleSHA5b52497a4c9fffe1e6341f5761e0271320f8f171951b9fcaccde8e14368850a7: reproducible3,000 cases against independent central differences of potential/divergence, max5.29e-9/2.27e-7 with2e-6 tolerance. FakeGL remap verifies preserved slots/clock/event, deterministic new jitter, ping-pong identity and allocation rollback. These are not graphical/GPU performance tests. Reports in validation/00230a9b-static/. The earlier unretained3,000-case diagnostic is informal and not used as required acceptance. An earlier isolated browser smoke preceded the blend fix and lacked contemporaneous source hashing; final-page actual browser readback checks supersede that historical scope.
+
+```sh
+python jobs/F02-wind-sand-paper/check.py --chromium /usr/bin/chromium --allow-policy-harness --report /tmp/F02-functional-00230a9b.json
+python /tmp/F02-diagnose-00230a9b.py
+python /tmp/F02-diagnose-paper-history.py
+```
+
+Full suiteFAIL,225.785s, six groups pass: wind,sandTV,sandPhone,paperPhysics,facesReduced,queriesFallback. New annular tick oracle and actual front/back/edge/curvature/lifecycle tests pass;60/120/144 states and absolute3.5s clock agree before cold/warm raster fails. The configured216-scene matrix stops after23 completed cases at phone/forward/Pop/shred/fakeout: ansB retains1 base pixel from3.3s through5.3s, A/D0 and everyrel0. No full216-case pass is claimed. Notebook holes pass fresh but fail after the exact suite history (firstcontrast316, then0), matching a retained canvas-context state issue. Cold/warm scene/debris/geometry are byte-identical; raster alpha260,281vs260,331 differs. TVauto DPR2 with default four-scene warmup times out30s; warm0 starts0.67s. Responsive remap was not reached in that run.
+
+Diagnoses exit0; raw results in validation/00230a9b-functional-failed/. The next revisions must reset complete pooled drawing context and fix natural cleanup. Responsive functional checks may isolate warm0, but default high-DPR startup remains failed/unresolved. Required60-Hz performance and strictdiskopening are still separate failed/unverified gates. These checks catch render history, cleanup, load stalls and responsive preservation without treating declared mechanisms as visible acceptance.
+
+##00230a9b milestone capture (idle timingFAIL)
+
+```sh
+python3 /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html --output /workspace/.partybox-tools/fx-validation/F02/00230a9b-milestone --views phone --events idle --motion no-preference --query 'warm=0&mat=paper&paper=shred' --seconds 2 --warmup 0 --capture 6 --capture-script /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/paper-capture.js --transport routed --require-performance
+```
+
+Exit1: phoneCPU4 idle-only2s26.44fps,p9569.34ms. Separate six-second390×844VP8/25fps clip1,197,382bytes starts after explicit fixed2.7s paper step, then resumes actual animation; not a paper throughput measurement. Zeroerrors/runtimeattempts. Sourcebefore/after00230a9b matches. Exact helper/script/capture hashes retained. This exercises revised helper normal capture; strict-file failure reporting is not yet rerun.

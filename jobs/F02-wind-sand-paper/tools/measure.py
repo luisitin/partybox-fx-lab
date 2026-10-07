@@ -20,7 +20,7 @@ import time
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode
 
-from playwright.async_api import async_playwright
+from playwright.async_api import Error as PlaywrightError, async_playwright
 
 
 INSTRUMENT = r"""(() => {
@@ -160,8 +160,11 @@ async def new_context(browser, case: dict, output: Path, record: bool,
     return context, page, errors, network, harness_loads
 
 
-async def prepare_page(page, uri: str, script: str | None):
+async def prepare_page(page, uri: str, script: str | None, evidence: dict | None = None):
     await page.goto(uri, wait_until="load", timeout=30000)
+    if evidence is not None and await page.evaluate("location.protocol === 'file:'"):
+        evidence["standaloneFileOpened"] = True
+        evidence.setdefault("fileDocumentLoads", []).append({"url": uri, "waitUntil": "load"})
     await page.evaluate("document.fonts.ready")
     if script:
         await page.evaluate(script)
@@ -241,6 +244,19 @@ async def record_screen(page, context, dest: Path, duration: float, case: dict) 
             "note": "Capture frame rate is not used as performance evidence"}
 
 
+def finish_report(report: dict, output: Path) -> dict:
+    report["allCasesMeetFrameTolerance"] = bool(report["cases"]) and all(
+        c.get("performance", {}).get("meets60FpsTolerance", False) for c in report["cases"])
+    report["noRuntimeNetworkAttempts"] = all(not c["runtimeNetworkAttempts"] and
+        not c.get("capture", {}).get("runtimeNetworkAttempts") for c in report["cases"])
+    report["noPageErrors"] = all(not c["errors"] and not c.get("capture", {}).get("errors") for c in report["cases"])
+    report["noHitchTriggerErrors"] = all(not p["error"] for c in report["cases"] for p in c.get("hitchProfiles", []))
+    report["allHitchWindowsComplete"] = all(p["windowComplete"] for c in report["cases"] for p in c.get("hitchProfiles", []))
+    report["allCapturesUnder10MB"] = all(c.get("capture", {}).get("under10MB", True) for c in report["cases"])
+    (output / "validation.json").write_text(json.dumps(report, indent=2) + "\n")
+    return report
+
+
 async def run(args):
     source = Path(args.html).resolve(strict=True)
     output = Path(args.output).resolve()
@@ -258,7 +274,8 @@ async def run(args):
         flags.extend(["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"])
     report = {"source": str(source), "chromium": args.chromium, "flags": flags,
               "hardwareGpuNodes": hardware_nodes, "transport": args.transport,
-              "standaloneFileOpened": args.transport == "file",
+              "standaloneFileOpened": False,
+              "fileDocumentLoads": [],
               "extraQuery": dict(parse_qsl(args.query)),
               "hitchConfiguration": {"fire": args.hitch_fire, "repeats": args.hitch_repeats,
                   "gapSeconds": args.hitch_gap, "windowSeconds": args.hitch_window,
@@ -295,8 +312,10 @@ async def run(args):
                     query.update(view=view, event=event)
                     uri = base + "?" + urlencode(query)
                     context, page, errors, network, harness_loads = await new_context(browser, case, output, False, uri, source, args.transport)
+                    stage = "load_document"
                     try:
-                        await prepare_page(page, uri, script)
+                        await prepare_page(page, uri, script, report)
+                        stage = "measure_frames"
                         await page.wait_for_timeout(args.warmup * 1000)
                         sample = await page.evaluate("cfg => window.__fxMeasure(cfg.durationMs, cfg.triggers)",
                             {"durationMs": args.seconds*1000, "triggers": triggers})
@@ -305,29 +324,51 @@ async def run(args):
                         case["inspection"] = await inspect_page(page)
                         await page.screenshot(path=str(output / f"{name}.png"))
                         (output / f"{name}-frames.json").write_text(json.dumps(sample, indent=2) + "\n")
+                    except PlaywrightError as exc:
+                        case["failure"] = {"stage": stage, "type": type(exc).__name__,
+                                           "message": str(exc), "url": uri}
+                        errors.append(stage + ": " + str(exc))
                     finally:
                         case["errors"] = errors
                         case["runtimeNetworkAttempts"] = network
                         case["harnessDocumentLoads"] = harness_loads
                         await context.close()
+                    if "failure" in case:
+                        report["cases"].append(case)
+                        print(json.dumps({"case": name, "failure": case["failure"],
+                            "standaloneFileOpened": report["standaloneFileOpened"]}), flush=True)
+                        if args.transport == "file" and "ERR_BLOCKED_BY_ADMINISTRATOR" in case["failure"]["message"]:
+                            await browser.close()
+                            return finish_report(report, output)
+                        (output / "validation.json").write_text(json.dumps(report, indent=2) + "\n")
+                        continue
                     if args.capture > 0:
                         context, page, capture_errors, capture_network, capture_loads = await new_context(browser, case, output, True, uri, source, args.transport)
+                        dest = output / f"{name}.webm"
+                        capture_failure = None
+                        stage = "load_capture_document"
                         try:
-                            await prepare_page(page, uri, script)
+                            await prepare_page(page, uri, script, report)
+                            stage = "record_capture"
                             if capture_script:
                                 await page.evaluate(capture_script)
-                            dest = output / f"{name}.webm"
                             recording = await record_screen(page, context, dest, args.capture, case)
+                        except PlaywrightError as exc:
+                            capture_failure = {"stage": stage, "type": type(exc).__name__,
+                                               "message": str(exc), "url": uri}
+                            capture_errors.append(stage + ": " + str(exc))
                         finally:
                             await context.close()
-                        case["capture"] = {"path": str(dest), "bytes": dest.stat().st_size,
-                                           "under10MB": dest.stat().st_size < 10_000_000,
-                                           "requestedSeconds": args.capture,
-                                           "recording": recording,
+                        case["capture"] = {"path": str(dest), "requestedSeconds": args.capture,
                                            "errors": capture_errors,
                                            "runtimeNetworkAttempts": capture_network,
                                            "harnessDocumentLoads": capture_loads}
-                        if shutil.which("ffprobe"):
+                        if capture_failure:
+                            case["capture"].update(failure=capture_failure, under10MB=False)
+                        else:
+                            case["capture"].update(bytes=dest.stat().st_size,
+                                under10MB=dest.stat().st_size < 10_000_000, recording=recording)
+                        if not capture_failure and shutil.which("ffprobe"):
                             meta = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                                 "format=duration:stream=codec_name,width,height,r_frame_rate",
                                 "-of", "json", str(dest)], capture_output=True, text=True)
@@ -341,15 +382,7 @@ async def run(args):
                         "pageErrors": len(errors), "networkAttempts": len(network),
                         "videoBytes": case.get("capture", {}).get("bytes")}), flush=True)
         await browser.close()
-    report["allCasesMeetFrameTolerance"] = all(c["performance"]["meets60FpsTolerance"] for c in report["cases"])
-    report["noRuntimeNetworkAttempts"] = all(not c["runtimeNetworkAttempts"] and
-        not c.get("capture", {}).get("runtimeNetworkAttempts") for c in report["cases"])
-    report["noPageErrors"] = all(not c["errors"] and not c.get("capture", {}).get("errors") for c in report["cases"])
-    report["noHitchTriggerErrors"] = all(not p["error"] for c in report["cases"] for p in c.get("hitchProfiles", []))
-    report["allHitchWindowsComplete"] = all(p["windowComplete"] for c in report["cases"] for p in c.get("hitchProfiles", []))
-    report["allCapturesUnder10MB"] = all(c.get("capture", {}).get("under10MB", True) for c in report["cases"])
-    (output / "validation.json").write_text(json.dumps(report, indent=2) + "\n")
-    return report
+    return finish_report(report, output)
 
 
 def main():

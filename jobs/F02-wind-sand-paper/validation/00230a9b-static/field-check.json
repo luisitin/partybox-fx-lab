@@ -1,0 +1,11 @@
+{
+  "pass": true,
+  "sourcePath": "/workspace/.partybox-tools/fx_tools/F02-gpu/wind-gpu-resize.js",
+  "sourceSHA256": "5b52497a4c9fffe1e6341f5761e0271320f8f171951b9fcaccde8e14368850a7",
+  "cases": 3000,
+  "h": 0.00001,
+  "tolerance": 0.000002,
+  "maxCurlError": 5.282505243994762e-9,
+  "maxDivergence": 2.2622867121291354e-7,
+  "scope": "Analytical JS wind compared independently with central differences of scalar potential, and independent central-difference divergence; no GPU/browser."
+}

@@ -1,0 +1,49 @@
+name: F02 Wind, sand and paper
+
+on:
+  pull_request:
+    paths:
+      - jobs/F02-wind-sand-paper/**
+      - .github/workflows/F02.yml
+
+permissions:
+  contents: read
+
+jobs:
+  offline-functional:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned browser tools
+        run: |
+          python -m pip install playwright==1.62.0
+          python -m playwright install --with-deps chromium
+      - name: Verify offline GPU, shared wind and paper/card behavior
+        run: python jobs/F02-wind-sand-paper/check.py --report /tmp/F02-functional.json
+      - name: Verify committed data and media integrity
+        working-directory: jobs/F02-wind-sand-paper
+        run: sha256sum --strict --check SHA256SUMS.txt
+      - name: Enforce TV and CPU-throttled phone performance and capture limits
+        if: always()
+        run: |
+          command -v ffmpeg
+          chromium_path=$(python -c 'from playwright.sync_api import sync_playwright; p=sync_playwright().start(); print(p.chromium.executable_path); p.stop()')
+          python jobs/F02-wind-sand-paper/tools/measure.py \
+            jobs/F02-wind-sand-paper/index.html \
+            --chromium "$chromium_path" \
+            --output /tmp/F02-perf \
+            --transport file --views tv,phone --events idle,win,tick \
+            --motion no-preference --capture 6 --require-performance
+      - name: Retain exact check evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: F02-functional-results
+          path: |
+            /tmp/F02-functional.json
+            /tmp/F02-perf
+          if-no-files-found: warn

@@ -1,0 +1,28 @@
+{
+  "pass": true,
+  "sourceSHA256": "5b52497a4c9fffe1e6341f5761e0271320f8f171951b9fcaccde8e14368850a7",
+  "down": {
+    "from": 20736,
+    "to": 3136,
+    "side": 56,
+    "addedCopies": 0
+  },
+  "up": {
+    "from": 3136,
+    "to": 20736,
+    "side": 144,
+    "addedCopies": 17600
+  },
+  "odd": {
+    "from": 41,
+    "to": 19,
+    "side": 5,
+    "addedCopies": 0
+  },
+  "deterministic": true,
+  "identicalPingPong": true,
+  "allocationFailureTransactional": true,
+  "nullAllocationTransactional": true,
+  "preservedClockAndEvent": true,
+  "scope": "Actual setCount method with recorded texture-upload arrays and fake WebGL handles; no shader/browser validation."
+}
