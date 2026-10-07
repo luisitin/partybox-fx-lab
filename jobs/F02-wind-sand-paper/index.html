@@ -1,0 +1,1087 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Wind, Sand and Paper — PartyBox</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--ui:#e9e6ff}
+html,body{margin:0;height:100%;background:#0f1020;overflow:hidden;font-family:system-ui,Segoe UI,Arial,sans-serif}
+canvas.stage{position:fixed;inset:0;width:100%;height:100%;display:block}
+#bg{z-index:0}#gpu{z-index:1}#c{z-index:2}#hud{z-index:3}
+#hud{position:fixed;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:5px;flex-wrap:wrap;max-width:94vw;width:max-content;justify-content:center;opacity:.88}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{font:700 12px system-ui,sans-serif;color:var(--ui);background:rgba(20,16,50,.72);border:1px solid rgba(233,230,255,.45);border-radius:999px;padding:5px 10px;min-height:44px;min-width:44px;cursor:pointer;white-space:nowrap}
+#hud button:focus-visible{outline:3px solid #ffd166}
+#live{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.kiosk #hud{display:none}
+</style></head>
+<body>
+<canvas class="stage" id="bg" aria-hidden="true"></canvas>
+<canvas class="stage" id="gpu" aria-hidden="true"></canvas>
+<canvas class="stage" id="c" role="img" aria-label="Wind lifts sand and torn paper to reveal a party card"></canvas>
+<div id="live" role="status" aria-live="polite"></div>
+<div id="hud"><button data-k="truth">truth</button><button data-k="sh">hitler</button><button data-k="night">night</button><button data-k="imp">imposter</button><button data-k="door">door</button><button data-k="fakeout">fake-out</button><button data-k="round">round</button><button data-k="dawn">dawn</button><button data-k="drawing">drawing</button><button id="bSkip">skip</button><button id="bMat">sand</button><button id="bPaper">tear</button><button id="bTheme">theme</button></div>
+<script>
+/* Original Partybox F02 GPU sand module. Inline this whole file in the page.
+   No dependency, asset, network, timer or unseeded random source.
+   Coordinates: screen UV, x right/y down. Values are artistic screen units,
+   not calibrated physical sand masses, wind speeds or Reynolds numbers. */
+const PartyboxWindGPU = (() => {
+  'use strict';
+  const TAU = Math.PI * 2;
+  const f32 = Math.fround;
+  const clamp = (x,a,b) => Math.max(a,Math.min(b,x));
+  const smooth = x => {x=clamp(x,0,1);return x*x*(3-2*x);};
+  function prng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=Math.imul(a^(a>>>15),1|a);t^=t+Math.imul(t^(t>>>7),61|t);return((t^(t>>>14))>>>0)/4294967296;};}
+  function seedHash(id,seed){let x=(id^seed)>>>0;x=Math.imul(x^(x>>>16),0x7feb352d);x=Math.imul(x^(x>>>15),0x846ca68b);return((x^(x>>>16))>>>0)/4294967296;}
+  function kindNumber(kind){return kind==='win'||kind===1?1:kind==='tick'||kind===2?2:0;}
+  class WindField {
+    constructor(seed=20260928,dir=1){this.dir=dir===-1?-1:1;this.aspect=16/9;this.groundMean=.84;this._scratch=new Float64Array(4);this.setSeed(seed);}
+    setSeed(seed){this.seed=Number(seed)>>>0;const r=prng(this.seed);this.modes=new Float32Array(16);this.weights=new Float32Array([.55,.28,.12,.05]);const basis=[[2.6,3.9,.35],[5.7,-4.2,-.22],[-8.3,7.1,.18],[12.1,10.7,-.13]];for(let i=0;i<4;i++){const b=basis[i];this.modes.set([b[0]*(.90+.20*r()),b[1]*(.90+.20*r()),b[2]*(.90+.20*r()),r()*TAU],i*4);}this.gustPhase=f32(r()*TAU);return this;}
+    reset(seed=this.seed){return this.setSeed(seed);}
+    setViewport(width,height){if(!(width>0&&height>0))throw new TypeError('positive viewport required');this.aspect=f32(width/height);return this;}
+    setGround(meanUV){if(!Number.isFinite(meanUV))throw new TypeError('finite ground height required');this.groundMean=f32(clamp(meanUV,.55,.96));return this;}
+    ground(u){return this.groundMean+.016*Math.sin(TAU*u+this.modes[3])+.006*Math.sin(16*u+this.modes[7]);}
+    // ψ is expressed in physical height-normalized coordinates X=aspect*(u-.5),Y=v-.5.
+    // Thus windUV=(∂ψ/∂v,-∂ψ/∂u)/aspect. No vector normalization or clipping.
+    _potential(u,v,time,strength,event,out){const aspect=this.aspect,X=(u-.5)*aspect,Y=v-.5,k=kindNumber(event?.kind),age=Math.max(0,Number(event?.age)||0);strength=clamp(Number(strength)||0,0,2);const win=k===1?.65*Math.exp(-age/.9):0;const effective=strength+win;const mean=.25+.60*effective*(.68+.32*Math.sin(.9*time+this.gustPhase));let n=0,nx=0,ny=0;for(let i=0;i<4;i++){const j=i*4,m=this.modes,phase=m[j]*X+m[j+1]*Y+m[j+2]*time+m[j+3],weight=this.weights[i],c=Math.cos(phase);n+=weight*Math.sin(phase);nx+=weight*m[j]*c;ny+=weight*m[j+1]*c;}const progress=this.dir>0?u:1-u,q=clamp((progress-.65)/.40,0,1),s=q*q*q*(10+q*(-15+6*q)),derivative=30*q*q*(q-1)*(q-1);const base=.007*Math.min(1,aspect/.40)*(1+.70*effective),amplitude=base*(1-.70*s),ax=-.70*base*derivative*this.dir/(.40*aspect);let psi=this.dir*aspect*mean*Y+amplitude*n,dx=amplitude*nx+ax*n,dy=this.dir*aspect*mean+amplitude*ny;if(k===2&&age<2.4){const rx=X,ry=(v-.43),radius=Math.sqrt(rx*rx+ry*ry+1e-8),delta=radius-age*.35,sigma=.095,envelope=1-smooth(age/2.4),ripple=.007*envelope*Math.exp(-(delta*delta)/(sigma*sigma)),gradient=ripple*(-2*delta/(sigma*sigma));psi+=ripple;dx+=gradient*rx/radius;dy+=gradient*ry/radius;}out[0]=dy/aspect;out[1]=-dx;out[2]=psi;out[3]=effective;return out;}
+    sample(u,v,time,strength=0,event=null,out=[]){const value=this._potential(u,v,time,strength,event,this._scratch);out[0]=value[0];out[1]=value[1];return out;}
+    samplePotential(u,v,time,strength=0,event=null){return this._potential(u,v,time,strength,event,this._scratch)[2];}
+    effectiveStrength(time,strength=0,event=null){return clamp(Number(strength)||0,0,2)+(kindNumber(event?.kind)===1?.65*Math.exp(-Math.max(0,Number(event?.age)||0)/.9):0);}
+  }
+  const WIND_GLSL = `
+    uniform float uAspect,uDirection,uGustPhase,uGroundMean;
+    uniform vec4 uModes[4],uWeights;
+    float smoothUnit(float x){x=clamp(x,0.,1.);return x*x*(3.-2.*x);}
+    float groundAt(float u){return uGroundMean+.016*sin(6.283185307179586*u+uModes[0].w)+.006*sin(16.*u+uModes[1].w);}
+    float effectiveStrength(float strength,int kind,float age){return clamp(strength,0.,2.)+(kind==1?.65*exp(-max(0.,age)/.9):0.);}
+    vec3 windPotential(vec2 uv,float time,float strength,int kind,float age){
+      vec2 physical=vec2((uv.x-.5)*uAspect,uv.y-.5);
+      float effective=effectiveStrength(strength,kind,age);
+      float mean=.25+.60*effective*(.68+.32*sin(.9*time+uGustPhase));
+      float noise=0.,nx=0.,ny=0.;
+      for(int i=0;i<4;i++){vec4 m=uModes[i];float phase=m.x*physical.x+m.y*physical.y+m.z*time+m.w,weight=uWeights[i],c=cos(phase);noise+=weight*sin(phase);nx+=weight*m.x*c;ny+=weight*m.y*c;}
+      float progress=uDirection>0.?uv.x:1.-uv.x,q=clamp((progress-.65)/.40,0.,1.);
+      float s=q*q*q*(10.+q*(-15.+6.*q)),derivative=30.*q*q*(q-1.)*(q-1.);
+      float base=.007*min(1.,uAspect/.40)*(1.+.70*effective),amplitude=base*(1.-.70*s),ax=-.70*base*derivative*uDirection/(.40*uAspect);
+      float psi=uDirection*uAspect*mean*physical.y+amplitude*noise,dx=amplitude*nx+ax*noise,dy=uDirection*uAspect*mean+amplitude*ny;
+      if(kind==2&&age<2.4){vec2 radial=vec2(physical.x,uv.y-.43);float radius=sqrt(dot(radial,radial)+1e-8),delta=radius-age*.35,sigma=.095,envelope=1.-smoothUnit(age/2.4),ripple=.007*envelope*exp(-(delta*delta)/(sigma*sigma)),gradient=ripple*(-2.*delta/(sigma*sigma));psi+=ripple;dx+=gradient*radial.x/radius;dy+=gradient*radial.y/radius;}
+      return vec3(dy/uAspect,-dx,psi);
+    }
+  `;
+  const FULL_VS=`#version 300 es
+    precision highp float;void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(p*2.-1.,0.,1.);}`;
+  const SIM_FS=`#version 300 es
+    precision highp float;precision highp int;
+    uniform sampler2D uState,uVelocity;uniform int uSide,uCount,uKind,uReleaseCount;
+    uniform uint uSeed;uniform float uDT,uTime,uStrength,uEventAge;
+    uniform vec4 uReleaseRect[4],uReleaseData[4];
+    layout(location=0)out vec4 stateOut;layout(location=1)out vec4 velocityOut;
+    ${WIND_GLSL}
+    uint hash32(uint x){x^=x>>16;x*=0x7feb352du;x^=x>>15;x*=0x846ca68bu;return x^(x>>16);}
+    float randomId(uint id){return float(hash32(id^uSeed))/4294967296.;}
+    vec2 heartTarget(uint id){float a=randomId(id*13u+7u)*6.283185307179586,r=sqrt(randomId(id*29u+19u));if(randomId(id*47u+3u)>.75)r=.98;float s=sin(a),scale=min(.34,uAspect*.44);return vec2(.5+16.*s*s*s/18.*scale*r/uAspect,.43-(13.*cos(a)-5.*cos(2.*a)-2.*cos(3.*a)-cos(4.*a))/18.*scale*r);}
+    void main(){ivec2 cell=ivec2(gl_FragCoord.xy);int i=cell.y*uSide+cell.x;if(i>=uCount){stateOut=vec4(0,0,2,0);velocityOut=vec4(0);return;}uint id=uint(i);vec4 p=texelFetch(uState,cell,0),v=texelFetch(uVelocity,cell,0);vec2 flow=windPotential(p.xy,uTime,uStrength,uKind,uEventAge).xy;float ground=groundAt(p.x);p.w+=uDT;
+      for(int j=0;j<4;j++){if(j>=uReleaseCount)break;vec4 data=uReleaseData[j];if(p.z>.5&&randomId(id*31u+uint(data.y))<data.x){vec4 rect=uReleaseRect[j];p.xy=rect.xy+rect.zw*vec2(randomId(id*71u+uint(data.y)+3u),randomId(id*97u+uint(data.y)+11u));p.z=0.;p.w=0.;flow=windPotential(p.xy,uTime,uStrength,uKind,uEventAge).xy;v.xy=flow*.35+vec2(0.,-.05-.06*v.z);v.w+=1.;}}
+      if(uKind==1&&uEventAge<3.){vec2 target=heartTarget(id),force=(target-p.xy)*14.-v.xy*7.+flow*.15+vec2(0.,.016);v.xy+=force*uDT;vec2 metric=vec2(v.x*uAspect,v.y);float speed=length(metric);if(speed>1.4)v.xy*=1.4/speed;p.xy+=v.xy*uDT;p.z=0.;p.w=0.;}
+      else if(p.z>.5){p.y=ground;v.xy=vec2(0.);float gust=effectiveStrength(uStrength,uKind,uEventAge);if(p.w>.60&&gust>.50+.35*v.z){p.z=0.;p.w=0.;p.y-=.003;v.xy=flow*.80+vec2(0.,-.07-.10*v.z);v.w+=1.;}}
+      else{vec2 relative=flow-v.xy;float drag=8.+4.*v.z+1.8*length(vec2(relative.x*uAspect,relative.y));vec2 force=relative*drag+vec2(0.,.20);if(uKind==1&&uEventAge>=3.&&uEventAge<6.){vec2 radial=p.xy-vec2(.5,.43);float burst=.85*smoothUnit((uEventAge-3.)/.45)*(1.-smoothUnit((uEventAge-4.2)/1.8));force+=radial*burst;}v.xy+=force*uDT;p.xy+=v.xy*uDT;ground=groundAt(p.x);if(p.y>=ground&&v.y>=0.){p.y=ground;if(v.y>.09){v.y=-v.y*.22;v.x*=.86;}else{p.z=1.;p.w=0.;v.xy=vec2(0.);}}}
+      if(p.x<-.06||p.x>1.06||p.y<-.20||p.y>1.15){v.w+=1.;uint cycle=uint(v.w);p.x=uDirection>0.?-.03:1.03;p.y=groundAt(p.x)-.03-randomId(id*41u+cycle*131u)*.34;p.z=0.;p.w=0.;v.xy=vec2(uDirection*.20,-.02);}
+      stateOut=p;velocityOut=v;
+    }`;
+  const GRAIN_VS=`#version 300 es
+    precision highp float;precision highp int;uniform sampler2D uNow,uBefore,uVelocity,uBeforeVelocity;uniform int uSide,uKind;uniform float uAlpha,uDPR,uEventAge;uniform vec3 uColors[3];out vec4 color;
+    void main(){int i=gl_VertexID;ivec2 q=ivec2(i%uSide,i/uSide);vec4 p=texelFetch(uNow,q,0),old=texelFetch(uBefore,q,0),v=texelFetch(uVelocity,q,0),oldVelocity=texelFetch(uBeforeVelocity,q,0);float blend=p.z==old.z&&v.w==oldVelocity.w?uAlpha:1.;vec2 xy=mix(old.xy,p.xy,blend);gl_Position=vec4(xy.x*2.-1.,1.-xy.y*2.,0.,1.);gl_PointSize=(1.+1.15*v.z)*uDPR;vec3 pigment=mix(uColors[0],uColors[1],v.z);pigment=mix(pigment,uColors[2],v.z*v.z*.35);if(uKind==1&&uEventAge<3.4)pigment=mix(pigment,vec3(1.,.85,.47),.4);color=vec4(pigment,.50+.38*v.z);}`;
+  const GRAIN_FS=`#version 300 es
+    precision highp float;in vec4 color;out vec4 outColor;void main(){vec2 p=gl_PointCoord-.5;if(dot(p,p)>.27)discard;outColor=color;}`;
+  const PROBE_FS=`#version 300 es
+    precision highp float;precision highp int;uniform vec2 uProbe;uniform float uTime,uStrength,uEventAge;uniform int uKind;out vec4 outColor;
+    ${WIND_GLSL}
+    void main(){vec3 value=windPotential(uProbe,uTime,uStrength,uKind,uEventAge);outColor=vec4(value,groundAt(uProbe.x));}`;
+  class GpuSand {
+    constructor(canvas,{phone=false,count=phone?3136:20736,seed=20260928,dir=1,field=null}={}){this.canvas=canvas;this.phone=phone;this.count=Math.max(1,Math.floor(count));this.side=Math.ceil(Math.sqrt(this.count));this.seed=Number(seed)>>>0;this.field=field||new WindField(this.seed,dir);this.dir=dir===-1?-1:1;this.pending=[];this.passCount=0;this.drawCount=0;this.lastEvent={kind:'idle',age:0,strength:0};this.time=0;this.dpr=1;this.gl=canvas.getContext('webgl2',{alpha:true,antialias:false,depth:false,stencil:false,powerPreference:'high-performance',preserveDrawingBuffer:false});if(!this.gl)throw new Error('WebGL2 is unavailable');if(!this.gl.getExtension('EXT_color_buffer_float'))throw new Error('Float GPU state is unavailable');const gl=this.gl;this.vao=gl.createVertexArray();gl.bindVertexArray(this.vao);this.locations=new Map();this.sim=this._program(FULL_VS,SIM_FS);this.render=this._program(GRAIN_VS,GRAIN_FS);this.probe=this._program(FULL_VS,PROBE_FS);this.targets=[];this.index=0;this._allocate();this.probeTexture=this._texture(1,1,null);this.probeFramebuffer=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,this.probeFramebuffer);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,this.probeTexture,0);gl.drawBuffers([gl.COLOR_ATTACHMENT0]);this._checkFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,null);}
+    _shader(type,source){const gl=this.gl,s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){const info=gl.getShaderInfoLog(s);gl.deleteShader(s);throw new Error('Sand shader compilation: '+info);}return s;}
+    _program(vs,fs){const gl=this.gl,p=gl.createProgram(),v=this._shader(gl.VERTEX_SHADER,vs),f=this._shader(gl.FRAGMENT_SHADER,fs);gl.attachShader(p,v);gl.attachShader(p,f);gl.linkProgram(p);gl.deleteShader(v);gl.deleteShader(f);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error('Sand shader linking: '+gl.getProgramInfoLog(p));return p;}
+    _texture(w,h,data){const gl=this.gl,t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,w,h,0,gl.RGBA,gl.FLOAT,data);return t;}
+    _checkFramebuffer(){const gl=this.gl;if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw new Error('Sand float framebuffer is incomplete');}
+    _allocate(){const gl=this.gl;for(const r of this.targets){gl.deleteFramebuffer(r.fb);gl.deleteTexture(r.pos);gl.deleteTexture(r.vel);}this.targets=[];const slots=this.side*this.side,p=new Float32Array(slots*4),v=new Float32Array(slots*4);for(let i=0;i<slots;i++){if(i>=this.count){p[i*4+2]=2;continue;}const r=seedHash(i*17+7,this.seed),u=seedHash(i*31+19,this.seed),bed=i%5<2,floor=this.field.ground(u);p.set([u,bed?floor:floor-.03-seedHash(i*43+11,this.seed)*.34,bed?1:0,bed?1:0],i*4);v.set([bed?0:this.dir*.20,0,r,0],i*4);}for(let i=0;i<2;i++){const pos=this._texture(this.side,this.side,p),vel=this._texture(this.side,this.side,v),fb=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fb);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,pos,0);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT1,gl.TEXTURE_2D,vel,0);gl.drawBuffers([gl.COLOR_ATTACHMENT0,gl.COLOR_ATTACHMENT1]);this._checkFramebuffer();this.targets.push({pos,vel,fb});}this.index=0;gl.bindFramebuffer(gl.FRAMEBUFFER,null);}
+    _loc(p,name){let map=this.locations.get(p);if(!map){map=new Map();this.locations.set(p,map);}if(!map.has(name))map.set(name,this.gl.getUniformLocation(p,name));return map.get(name);}
+    _f(p,name,x){this.gl.uniform1f(this._loc(p,name),x);}
+    _i(p,name,x){this.gl.uniform1i(this._loc(p,name),x);}
+    _bind(p,name,unit,texture){const gl=this.gl;gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);this._i(p,name,unit);}
+    _fieldUniforms(p){const gl=this.gl,f=this.field;this._f(p,'uAspect',f.aspect);this._f(p,'uDirection',f.dir);this._f(p,'uGustPhase',f.gustPhase);this._f(p,'uGroundMean',f.groundMean);gl.uniform4fv(this._loc(p,'uModes[0]'),f.modes);gl.uniform4fv(this._loc(p,'uWeights'),f.weights);}
+    resize(width,height,dpr=1){this.field.setViewport(width,height);this.dpr=Math.min(Math.max(1,dpr),2);this.canvas.width=Math.max(1,Math.round(width*this.dpr));this.canvas.height=Math.max(1,Math.round(height*this.dpr));this.canvas.style.width=width+'px';this.canvas.style.height=height+'px';return this;}
+    update(dt,time,event={}){if(!Number.isFinite(dt)||dt<0||dt>1/30+1e-9)throw new TypeError('fixed timestep 0..1/30 required');if(!Number.isFinite(time))throw new TypeError('finite simulation time required');const gl=this.gl,p=this.sim,a=this.targets[this.index],b=this.targets[1-this.index];this.time=time;this.lastEvent={kind:event.kind||'idle',age:Math.max(0,Number(event.age)||0),strength:clamp(Number(event.strength)||0,0,2)};gl.bindVertexArray(this.vao);gl.disable(gl.BLEND);gl.bindFramebuffer(gl.FRAMEBUFFER,b.fb);gl.viewport(0,0,this.side,this.side);gl.useProgram(p);this._bind(p,'uState',0,a.pos);this._bind(p,'uVelocity',1,a.vel);this._i(p,'uSide',this.side);this._i(p,'uCount',this.count);this._i(p,'uKind',kindNumber(this.lastEvent.kind));this._i(p,'uReleaseCount',this.pending.length);gl.uniform1ui(this._loc(p,'uSeed'),this.seed);this._f(p,'uDT',dt);this._f(p,'uTime',time);this._f(p,'uStrength',this.lastEvent.strength);this._f(p,'uEventAge',this.lastEvent.age);this._fieldUniforms(p);if(this.pending.length){const rect=new Float32Array(16),data=new Float32Array(16);for(let i=0;i<this.pending.length;i++){rect.set(this.pending[i].rect,i*4);data.set([this.pending[i].fraction,this.pending[i].seed,0,0],i*4);}gl.uniform4fv(this._loc(p,'uReleaseRect[0]'),rect);gl.uniform4fv(this._loc(p,'uReleaseData[0]'),data);}gl.drawArrays(gl.TRIANGLES,0,3);this.index=1-this.index;this.pending.length=0;this.passCount++;gl.bindFramebuffer(gl.FRAMEBUFFER,null);return this;}
+    draw(alpha=1,{interpolation=true,colors=[[1,.82,.40],[.91,.66,.24],[.72,.45,.16]]}={}){const gl=this.gl,p=this.render;gl.bindVertexArray(this.vao);gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,this.canvas.width,this.canvas.height);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.enable(gl.BLEND);gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);gl.useProgram(p);this._bind(p,'uNow',0,this.targets[this.index].pos);this._bind(p,'uBefore',1,this.targets[1-this.index].pos);this._bind(p,'uVelocity',2,this.targets[this.index].vel);this._bind(p,'uBeforeVelocity',3,this.targets[1-this.index].vel);this._i(p,'uSide',this.side);this._i(p,'uKind',kindNumber(this.lastEvent.kind));this._f(p,'uAlpha',interpolation?clamp(alpha,0,1):1);this._f(p,'uDPR',this.dpr);this._f(p,'uEventAge',this.lastEvent.age);const palette=new Float32Array(9);for(let i=0;i<3;i++){const c=colors[i]||colors[0];const divisor=Math.max(...c)>1?255:1;palette.set(c.map(x=>clamp(x/divisor,0,1)),i*3);}gl.uniform3fv(this._loc(p,'uColors[0]'),palette);gl.drawArrays(gl.POINTS,0,this.count);this.drawCount++;return this;}
+    release(rect,{fraction=.003,seed=0}={}){const value=Array.isArray(rect)?rect:[rect.x,rect.y,rect.w??rect.width,rect.h??rect.height];if(value.length!==4||value.some(x=>!Number.isFinite(x))||value[2]<0||value[3]<0)throw new TypeError('release rectangle is finite UV [x,y,w,h]');if(this.pending.length>=4)return false;this.pending.push({rect:value.slice(),fraction:clamp(fraction,0,1),seed:(Number(seed)>>>0)%16777216});return true;}
+    readback(){const gl=this.gl,slots=this.side*this.side,positions=new Float32Array(slots*4),velocities=new Float32Array(slots*4);gl.bindFramebuffer(gl.FRAMEBUFFER,this.targets[this.index].fb);gl.readBuffer(gl.COLOR_ATTACHMENT0);gl.readPixels(0,0,this.side,this.side,gl.RGBA,gl.FLOAT,positions);gl.readBuffer(gl.COLOR_ATTACHMENT1);gl.readPixels(0,0,this.side,this.side,gl.RGBA,gl.FLOAT,velocities);gl.bindFramebuffer(gl.FRAMEBUFFER,null);return{positions:positions.subarray(0,this.count*4),velocities:velocities.subarray(0,this.count*4)};}
+    windProbe(u,v,time,strength=0,event=null){const gl=this.gl,p=this.probe,result=new Float32Array(4);gl.bindVertexArray(this.vao);gl.bindFramebuffer(gl.FRAMEBUFFER,this.probeFramebuffer);gl.viewport(0,0,1,1);gl.disable(gl.BLEND);gl.useProgram(p);this._fieldUniforms(p);gl.uniform2f(this._loc(p,'uProbe'),u,v);this._f(p,'uTime',time);this._f(p,'uStrength',clamp(Number(strength)||0,0,2));this._i(p,'uKind',kindNumber(event?.kind));this._f(p,'uEventAge',Math.max(0,Number(event?.age)||0));gl.drawArrays(gl.TRIANGLES,0,3);gl.readBuffer(gl.COLOR_ATTACHMENT0);gl.readPixels(0,0,1,1,gl.RGBA,gl.FLOAT,result);gl.bindFramebuffer(gl.FRAMEBUFFER,null);return result;}
+    reset(seed=this.seed){this.seed=Number(seed)>>>0;this.field.setSeed(this.seed);this.pending.length=0;this.passCount=this.drawCount=0;this.time=0;this.lastEvent={kind:'idle',age:0,strength:0};this._allocate();return this;}
+    state(){return{renderer:'webgl2-gpu',count:this.count,textureSize:this.side,computePasses:this.passCount,draws:this.drawCount,seed:this.seed,time:this.time,event:{...this.lastEvent},pendingReleases:this.pending.length,aspect:this.field.aspect,groundMean:this.field.groundMean,stateCodes:{airborne:0,settled:1,inactive:2},readbackLayout:{positions:'UV x,y; state; age seconds',velocities:'UV/sec x,y; seeded response; respawn cycle'}};}
+    destroy(){const gl=this.gl;for(const r of this.targets){gl.deleteFramebuffer(r.fb);gl.deleteTexture(r.pos);gl.deleteTexture(r.vel);}gl.deleteFramebuffer(this.probeFramebuffer);gl.deleteTexture(this.probeTexture);for(const p of [this.sim,this.render,this.probe])gl.deleteProgram(p);gl.deleteVertexArray(this.vao);this.targets=[];}
+  }
+  return {WindField,GpuSand,WIND_GLSL};
+})();
+globalThis.PartyboxWindGPU=PartyboxWindGPU;
+
+</script>
+<script>
+(() => {
+'use strict';
+const Q = new URLSearchParams(location.search);
+const INK = '#1a0b12', LIGHT = '#fff7fb';
+const THEMES = {
+  pop: { flat: true, bg: '#0f1020', bg2: null, far: '#3b2d4f', mid: '#7a5140', near: '#d5963d', rim: null, outline: INK,
+    sand: ['#ffd166', '#e8a93e', '#b8742a'], speck: '#8f5720', card: LIGHT, card2: LIGHT, ink: INK,
+    paper: { face: '#e6b872', fib: '#c48f4e', panel: '#f8dea6', rim: '#fff4dc', back: '#f3e2bd', ink: INK },
+    accent: { drawing:'#fb8b24', truth: '#06d6a0', sh: '#ff5d8f', night: '#b388ff', imp: '#4cc9f0', door: '#ffd166' }, ui: '#f5f6ff' },
+  gouache: { flat: false, bg: '#0f1230', bg2: '#1b2350', far: '#2b2f57', mid: '#4a4668', near: '#af9b7c', rim: '#e9d29c', outline: null,
+    sand: ['#e9d7ad', '#cbb48c', '#8a7b86'], speck: '#8a7b86', card: '#e9dcc0', card2: '#d6c5a0', ink: '#2b2350',
+    paper: { face: '#d9c49c', fib: '#b09b78', panel: '#eadcba', rim: '#f6eed8', back: '#e6d8b8', ink: '#2b2350' },
+    accent: { drawing:'#d8a47f', truth: '#7fb8ad', sh: '#c9788f', night: '#8f8fd0', imp: '#7a9ad0', door: '#d9b46a' }, ui: '#e8e2ff' }
+};
+let themeName = Q.get('theme') === 'gouache' ? 'gouache' : 'pop';
+let T = THEMES[themeName];
+const motionMedia = matchMedia('(prefers-reduced-motion: reduce)');
+let reduced = Q.get('motion') === '0' || (motionMedia.matches && Q.get('motion') !== '1');
+if (Q.has('kiosk')) document.documentElement.classList.add('kiosk');
+const DIR = Q.get('dir') === '-1' ? -1 : 1;
+const HOLDFLAG = Q.has('hold') && Q.get('hold') !== '0';
+let MAT = (Q.get('mat') === 'paper' || Q.has('paper')) ? 'paper' : 'sand', PAPER = Q.get('paper') === 'shred' ? 'shred' : 'tear';
+const ROLE = Q.get('role') === 'liberal' ? 'liberal' : 'fascist';
+
+// timeline (seconds after fire)
+const T_ANT = 0.15, T_RISE = 0.85, T_SET = 1.15, T_HOLD = 2.15, T_WIND = 2.35, T_THIN = 2.95, T_THICK = 3.40, T_PEAK = 3.50, T_SETTLE = 4.45, T_SHOWN = 7.35, T_END = 7.95;
+
+function prng(seed){ let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+let seed = Number.parseInt(Q.get('seed') || '20260928', 10) >>> 0;
+let rnd = prng(seed), rndG = prng(seed ^ 0x9e3779b9), rndD = prng(seed ^ 0x51ed270b), rndC = prng(seed ^ 0x2c1b3c6d);
+
+const NT = 64, nTab = Array.from({ length: NT * NT }, () => rnd());
+const sm = t => t * t * (3 - 2 * t);
+function vn(x, y){ const xi = Math.floor(x), yi = Math.floor(y), fx = sm(x - xi), fy = sm(y - yi);
+  const g = (a, b) => nTab[((b % NT + NT) % NT) * NT + ((a % NT + NT) % NT)];
+  return (g(xi, yi) * (1 - fx) + g(xi + 1, yi) * fx) * (1 - fy) + (g(xi, yi + 1) * (1 - fx) + g(xi + 1, yi + 1) * fx) * fy; }
+const fbm = (x, y) => vn(x, y) * 0.55 + vn(x * 2.1 + 7, y * 2.1 + 3) * 0.3 + vn(x * 4.3 + 1, y * 4.3 + 9) * 0.15;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = t => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+
+const cv = document.getElementById('c'), bg = document.getElementById('bg'), gpuCanvas = document.getElementById('gpu');
+let ctx = cv.getContext('2d', { alpha: true }); const bgCtx = bg.getContext('2d', { alpha: false });
+let gpu = null, gpuReason = 'initializing', tickAge = -1, winAge=-1, paused = false, raf = 0, frames = 0, accumulator = 0, interpolation = 1;
+let uid=0,windOverride=null,notebookStub=null;
+const frameTimes = [], metrics = { exits:0, settled:0, reentrained:0, midairRemovals:0, maxTurn:0, denied:0, coverCalls:0, hiddenCalls:0, warmups:0 };
+let faceProvider = null; const activeCanvases = new Set(), canvasPool = new Map(), grainPool = [];
+const gpuStrength = () => windOverride!==null?windOverride:tickAge >= 0 && tickAge < 2.4 ? .65 + .7 * Math.sin(Math.PI * tickAge / 2.4) ** 2 : scene ? .65 + .55 * Math.exp(-(((scene.S - 2.8) / .85)**2)) : cast ? .65 + .55 * Math.exp(-(((tt - 2.7) / .7)**2)) : .15;
+let field=null;
+const eventState=()=>({strength:gpuStrength(),kind:winAge>=0?'win':tickAge>=0?'tick':'idle',age:winAge>=0?winAge:Math.max(0,tickAge)});
+function sharedWind(x,y,t=clock,strength=gpuStrength()){
+  if(field){const v=field.sample(x/W,y/H,t,strength,eventState());return[v[0]*W,v[1]*H];}
+  return [DIR * W * (.24 + strength*.55), H*.04*Math.sin(x/W*6 + t)];
+}
+function recycleAssets(){ for(const b of activeCanvases){ const key=b.width+'x'+b.height; let list=canvasPool.get(key);if(!list)canvasPool.set(key,list=[]);if(list.length<20)list.push(b); } activeCanvases.clear(); }
+function collectUnusedAssets(){
+ const needed=new Set(),keep=o=>{if(!o)return;for(const v of Object.values(o))if(v instanceof HTMLCanvasElement)needed.add(v);else if(Array.isArray(v))for(const item of v)if(item instanceof HTMLCanvasElement)needed.add(item);};keep(cast);if(scene)scene.cards.forEach(keep);for(const g of grains)if(g.at)keep(g.at);
+ for(const b of [...activeCanvases])if(!needed.has(b)){const key=b.width+'x'+b.height;let list=canvasPool.get(key);if(!list)canvasPool.set(key,list=[]);if(list.length<20)list.push(b);activeCanvases.delete(b);}
+ let total=[...canvasPool.values()].reduce((n,a)=>n+a.length,0);for(const[key,a]of canvasPool){while(total>48&&a.length){a.pop();total--;}if(!a.length)canvasPool.delete(key);}
+}
+function releaseGrain(i,reason){ const g=grains[i]; if(reason==='exit')metrics.exits++; grains[i]=grains[grains.length-1];grains.pop();grainPool.push(g); }
+function clearDebris(){ for(const g of grains)grainPool.push(g);grains=[]; }
+const live = document.getElementById('live');
+let W = 0, H = 0, S = 1, DPR = 1, cs = 4, portrait = false;
+
+// ---------- state ----------
+let tt = -1;            // seconds since fire; -1 = idle
+let kind = null, held = HOLDFLAG, cast = null, clock = 0;
+let grains = [], wisps = [], dep = [], wispT = 0, windFired = false, poofDone = false;
+let peakBurst = false, RV = null, fireN = 0;
+const STREAKS = new Map();
+const MAXG = 1200;
+
+const KINDS = {
+  truth: { wide: true, title: 'THE TRUTH', big: ['Flamingos are', 'born grey.'], sub: [], tag: 'TRUE', say: 'The truth: flamingos are born grey.' },
+  sh: { title: 'SECRET ROLE', big: [ROLE === 'liberal' ? 'LIBERAL' : 'FASCIST'], sub: ROLE === 'liberal' ? ['You are on the good side.', 'Find the Fascists.'] : ['Your team: Ben, Cleo', 'Hitler: Dev'], say: ROLE === 'liberal' ? 'Your secret role: Liberal.' : 'Your secret role: Fascist.' },
+  night: { title: 'NIGHTFALL', big: ['WEREWOLF'], sub: ['Wake at night.', 'Pick a victim.'], say: 'Your secret role: Werewolf.' },
+  imp: { title: 'YOUR WORD', big: ['IMPOSTER'], sub: ['You do not know the word.', 'Blend in.'], say: 'You are the imposter.' },
+  drawing: { wide:true,title:'BROKEN PENCIL',big:['A moonlit', 'paper garden'],sub:[],say:'The drawing tears free of its notebook. The spiral stub stays behind.' },
+  door: { title: 'MYSTERY BOX', big: ['DOOR 3'], sub: ['Behind it waits', 'a golden key.'], say: 'Mystery Box: door 3. Behind it waits a golden key.' }
+};
+const FONT = '"Segoe UI",system-ui,Arial,sans-serif';
+
+function resize(){
+  const previousW=W,previousH=H;W=innerWidth;H=innerHeight;if(previousW&&previousH)for(const g of grains){g.x*=W/previousW;g.px*=W/previousW;g.y*=H/previousH;g.py*=H/previousH;g.vx*=W/previousW;g.vy*=H/previousH;}portrait = Q.get('view') === 'phone' || (Q.get('view') !== 'tv' && H > W);
+  DPR = Math.min(window.devicePixelRatio || 1, portrait ? 1 : 1.5);
+  bg.width = Math.round(W*DPR);bg.height=Math.round(H*DPR);bgCtx.setTransform(DPR,0,0,DPR,0,0);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  S = Math.max(Math.min(W / 1920, H / 1080) * (portrait ? 1.9 : 1), 0.6);
+  cs = Math.max(4, Math.round(Math.min(W, H) / 170));
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if(field){field.setViewport(W,H);field.setGround(portrait?.74:.84);}if(gpu)gpu.resize(W,H,DPR);
+  bgGrad = null; stars = null; dep = new Array(Math.ceil(W / 16) + 3).fill(0);
+  if(cast){const old=cast,k=cast.kind,t=tt;layout(k);tt=t;renderAssets();cast.revealAuthorized=old.revealAuthorized;if(old.hiddenReady){if(faceProvider){cast.bmp=old.bmp;cast.hiddenReady=true;}else if(cast.drawHidden)cast.drawHidden();}eraseAny(tt,false);if(k==='drawing')notebookStub={...cast};}
+  if (scene) restoreScene();
+}
+let bgGrad = null, stars = null;
+const GMAX = () => portrait ? 750 : 2200;
+
+// ---------- near dune surface ----------
+const nearMean = () => H * (portrait ? 0.74 : 0.84);
+function depAt(x){ const f = clamp(x / 16, 0, dep.length - 2), i = Math.floor(f), a = f - i; return dep[i] * (1 - a) + dep[i + 1] * a; }
+function riseP(t){
+  if (t < T_ANT) return 0;
+  if (t < 0.75) { const q = (t - T_ANT) / 0.6; return 1.03 * (1 - Math.pow(1 - q, 1.3)); }
+  if (t < T_RISE) return 1.03 - 0.03 * sm((t - 0.75) / 0.1);
+  return 1;
+}
+function plateauG(){ if (tt < 0) return 0; if (tt < T_END) return clamp(riseP(tt), 0, 1); return 1 - clamp((tt - T_END) / 0.5, 0, 1); }
+function bodyDY(){
+  if (!cast || reduced) return 0;
+  const D = cast.h + cast.foot + 0.04 * H;
+  if (MAT === 'paper' && tt < T_RISE) return -(cast.Yf + 14) * (1 - sm(clamp((tt - T_ANT) / (T_RISE - T_ANT), 0, 1)));
+  if (tt < T_RISE) return (1 - riseP(tt)) * D;
+  if (tt >= T_SHOWN && !cast.noSink) { const k = clamp((tt - T_SHOWN) / (T_END - T_SHOWN), 0, 1); return k * k * D; }
+  return 0;
+}
+function plat(y, x, k, g, t){
+  const d = Math.max(0, Math.abs(x - (k.x + k.w / 2)) - k.w / 2), A = (portrait ? 24 : 40) * 2.2, w = 1 - sm(clamp(d / A, 0, 1));
+  y += w * (k.Yf - y) * g;
+  if (t >= 0 && t < T_RISE) y -= w * (portrait ? 4 : 6) * (t < T_ANT ? t / T_ANT : Math.max(0, 1 - g));
+  return y;
+}
+function surface(x){
+  let y=field?H*field.ground(x/W):nearMean()+Math.sin(x*.0045+1.3)*H*.012+Math.sin(x*.013)*H*.004;
+  if (scene) for (const c of scene.cards) y = plat(y, x, c, c.g, c.t);
+  else if (cast) y = plat(y, x, cast, plateauG(), tt);
+  return y - depAt(x);
+}
+
+// ---------- layout ----------
+function fitSize(text, maxW, size, weight, min){
+  const c = fitSize.c || (fitSize.c = document.createElement('canvas').getContext('2d'));
+  c.font = `${weight} ${size}px ${FONT}`;
+  while (c.measureText(text).width > maxW && size > min) { size -= 1; c.font = `${weight} ${size}px ${FONT}`; }
+  return size;
+}
+function layout(k){
+  kind = k; const spec = KINDS[k], wide = !!spec.wide, u = portrait ? 1 : H / 1080;
+  let cw, ch;
+  if (portrait) { cw = W * 0.84; ch = wide ? Math.min(H * 0.56, cw) : Math.min(H * 0.56, cw * 1.44); }
+  else if (wide) { cw = 1000 * u; ch = 670 * u; } else { cw = 540 * u; ch = 760 * u; }
+  cw = Math.round(cw); ch = Math.round(ch);
+  const Yf = Math.round(nearMean() - 0.02 * H), cx = Math.round((W - cw) / 2), cy = Yf - ch;
+  const ov = portrait ? 4 : 6, foot = Math.round(ch * 0.07);
+  const rimIn = 0.04 * cw, rimT = portrait ? 8 : Math.round(14 * u), inner = cw - 2 * (rimIn + rimT);
+  const tSize = portrait ? Math.max(14, ch * 0.045) : 36 * u, subSize = portrait ? 18 : 36 * u;
+  const plW = inner * (wide ? 0.92 : 0.8);
+  let bigSize = portrait ? (wide ? 40 : 36) : (wide ? 96 : 88) * u;
+  for (const l of spec.big) bigSize = fitSize(l, plW * 0.94, bigSize, 900, portrait ? 30 : 60 * u);
+  const nl = spec.big.length, plH = wide ? bigSize * (nl * 1.15 + 0.35) : bigSize * 1.5;
+  const L = { rimIn, rimT, inner, stripY: portrait ? 0.085 * ch : 0.085 * ch, stripH: Math.max(4, 0.012 * ch + 2), titleY: 0.155 * ch, tSize,
+    med: wide ? null : { x: cw / 2, y: 0.335 * ch, r: cw * 0.19 }, bigSize, subSize,
+    plaque: { x: cw / 2, y: (wide ? 0.46 : 0.635) * ch, w: plW, h: plH },
+    subs: wide ? [] : [{ y: 0.775 * ch, w: inner * 0.7 }, { y: 0.845 * ch, w: inner * 0.45 }],
+    stamp: wide && k==='truth' ? { x: cw / 2, y: 0.815 * ch, w: cw * 0.34, h: ch * 0.15 } : null };
+  cast = { kind: k, x: cx, y: cy, w: cw, h: ch, ov, foot, bx: cx - ov, by: cy - ov, bw: cw + 2 * ov, bh: ch + 2 * ov + foot, Yf, L, u,
+    cells: [], ptr: 0, total: 0, eroded: 0 };
+  if (MAT === 'sand') buildCells(); else { cast.cells = []; cast.total = 0; cast.ptr = 0; }
+  buildRiver();
+  tt=0;wisps=[]; windFired = false; peakBurst = false; poofDone = false; wispT = 0;
+}
+function inCast(px, py, m){
+  const c = cast, ov = c.ov, r = Math.min(c.w, c.h) * 0.07, hw = c.w / 2, hh = c.h / 2, x = px - ov - hw, y = py - ov - hh;
+  const dx = Math.max(Math.abs(x) - (hw - r), 0), dy = Math.max(Math.abs(y) - (hh - r), 0);
+  return Math.hypot(dx, dy) <= r + ov * 0.8 + (m || 0);
+}
+function buildCells(){
+  const c = cast, L = c.L, ov = c.ov, cols = Math.ceil(c.bw / cs), rows = Math.ceil((c.h + 2 * ov) / cs), list = [];
+  const rq = prng((seed ^ 0x7f4a7c15) + (c.sid || 0) * 7789), sid = (c.sid || 0) * 11.3;
+  const pl = L.plaque, m = L.med, s0 = L.subs[0], s1 = L.subs[L.subs.length - 1];
+  for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) {
+    const px = q * cs + cs / 2, py = r * cs + cs / 2;
+    if (!inCast(px, py, cs * 0.9)) continue;
+    const x = px - ov, y = py - ov, u = clamp(DIR > 0 ? x / c.w : 1 - x / c.w, 0, 1), v = clamp(y / c.h, 0, 1);
+    // depth 0..1 = how far inside a thick region (plaque, medallion, subtitles) the cell sits; the region erodes from its rim inward
+    let depth = 0;
+    const dpl = Math.min(pl.w / 2 - Math.abs(x - pl.x), pl.h / 2 - Math.abs(y - pl.y)) + cs;
+    if (dpl > 0) depth = Math.max(depth, clamp(dpl / (pl.h * 0.5), 0, 1));
+    if (m) { const dm = m.r + cs - Math.hypot(x - m.x, y - m.y); if (dm > 0) depth = Math.max(depth, clamp(dm / m.r, 0, 1)); }
+    if (s0 && Math.abs(x - c.w / 2) <= L.inner / 2 && y >= s0.y - L.subSize && y <= s1.y + L.subSize) depth = Math.max(depth, 0.45);
+    const thick = depth > 0;
+    // one ragged front for the whole card: a diagonal sweep along the wind, torn by three scales of noise (fingers, lumps, single cells)
+    const fr = clamp(u * 0.84 + 0.12 * (v - 0.5) + 0.34 * (fbm(x * 0.011 + 3 + sid, y * 0.014 + 8) - 0.5) + 0.14 * (vn(x * 0.035 + 5, y * 0.05 + 1) - 0.5) + (rq() - 0.5) * 0.05, 0, 1);
+    const te = T_WIND + (T_THICK - 0.25 - T_WIND) * fr + depth * 0.15 * (0.4 + 0.9 * fbm(x * 0.03 + 9, y * 0.03 + 2));
+    list.push([px, py, te, thick ? 1 : 0]);
+  }
+  list.sort((a, b) => a[2] - b[2]);
+  c.cells = list; c.total = list.length; c.ptr = 0;
+}
+// The river is a channel: a centreline (y) and a half-width (w) through pivot gates, in "u" = distance along the wind.
+// A grain keeps its lane eta (= offset / width), so its path is centreline + eta * width: streamlines never cross, they squeeze
+// through the pinch gates and fan out between them. Smoothstep between gates = zero slope at every gate (a slalom).
+let rvY = 0, rvW = 1;
+function buildRiver(){
+  const fx = [0.16,0.34,0.53,0.72,0.92,1.12,1.32];
+  const swing=clamp(Number(Q.get('swing')??.3),0,1.5);
+  const fy=[.47,.43,.39,.36,.34,.32,.31].map((v,i)=>.43+(v-.43)*swing + Math.sin(i*1.7)*.024*swing);
+  const fw=[.34,.32,.30,.28,.26,.24,.23];
+  const q = prng((seed ^ 0x3c6ef372) + fireN * 7919), n0 = fx.length;
+  for (let i = 0; i < n0; i++) { fx[i] += i && i < n0 - 1 ? (q() - 0.5) * 0.03 : 0; fy[i] += (q() - 0.5) * .018; fw[i] *= 0.8 + q() * 0.45; if (MAT === 'paper') fw[i] = Math.max(fw[i] * 1.4, portrait ? 0.11 : 0.12); }
+  const gx = fx.map(f => f * W), gy = fy.map(f => f * H), gw = fw.map(f => f * H), N = 160, u1 = W * 1.3, du = u1 / N;
+  const tY = new Float32Array(N + 1), tW = new Float32Array(N + 1), n = gx.length;
+  for (let i = 0; i <= N; i++) {
+    const u = i * du; let k = 0; while (k < n - 1 && u >= gx[k + 1]) k++;
+    if (u <= gx[0]) { tY[i] = gy[0]; tW[i] = gw[0]; } else if (k >= n - 1) { tY[i] = gy[n - 1]; tW[i] = gw[n - 1]; }
+    else { const a = sm(clamp((u - gx[k]) / (gx[k + 1] - gx[k]), 0, 1)); tY[i] = gy[k] + (gy[k + 1] - gy[k]) * a; tW[i] = gw[k] + (gw[k + 1] - gw[k]) * a; }
+  }
+  RV = { N, du, tY, tW, gx, gy, gw, wRef: gw[0], wMin: H * 0.04 };
+}
+function riverAt(u){
+  const R = RV, f = clamp(u / R.du, 0, R.N - 1.001), i = f | 0, a = f - i;
+  rvY = R.tY[i] * (1 - a) + R.tY[i + 1] * a; rvW = R.tW[i] * (1 - a) + R.tW[i + 1] * a;
+}
+function riverTick(){}
+
+// ---------- assets: sand cast, relief, card ----------
+function mk(w,h){
+ const iw=Math.max(1,Math.round(w*DPR)),ih=Math.max(1,Math.round(h*DPR)),key=iw+'x'+ih,list=canvasPool.get(key);
+ const b=list&&list.length?list.pop():document.createElement('canvas');
+ if(b.width!==iw)b.width=iw;if(b.height!==ih)b.height=ih;const c=b.getContext('2d');
+ c.resetTransform();c.globalAlpha=1;c.globalCompositeOperation='source-over';c.clearRect(0,0,iw,ih);c.setTransform(DPR,0,0,DPR,0,0);activeCanvases.add(b);return[b,c];
+}
+function rr(c, x, y, w, h, r){ c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+function emb(c, fn, o, face, dark, lit, rule){
+  c.save(); c.fillStyle = lit; c.translate(o * 0.8, -o * 0.8); fn(c); c.fill(rule); c.restore();
+  c.save(); c.fillStyle = dark; c.translate(-o * 1.5, o * 1.5); fn(c); c.fill(rule); c.restore();
+  c.fillStyle = face; fn(c); c.fill(rule);
+}
+function embText(c, txt, x, y, size, wt, o, face, dark, lit){
+  c.font = `${wt} ${size}px ${FONT}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillStyle = lit; c.fillText(txt, x + o * 0.8, y - o * 0.8); c.fillStyle = dark; c.fillText(txt, x - o * 1.5, y + o * 1.5); c.fillStyle = face; c.fillText(txt, x, y);
+}
+function groove(c, x1, y1, x2, y2, lw, o, dark, lit){
+  c.lineCap = 'round'; c.lineWidth = lw;
+  c.strokeStyle = lit; c.beginPath(); c.moveTo(x1 - o * 0.8, y1 + o * 0.8); c.lineTo(x2 - o * 0.8, y2 + o * 0.8); c.stroke();
+  c.strokeStyle = dark; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+}
+function drawIcon(c, k, x, y, s, ac){
+  c.save(); c.translate(x, y); c.fillStyle = ac; c.strokeStyle = T.flat ? T.outline : 'rgba(30,20,50,.5)'; c.lineWidth = T.flat ? 3 * S + 1 : 2;
+  if (k === 'sh') { // hooded figure
+    c.beginPath(); c.moveTo(-s * 0.9, s * 0.9); c.quadraticCurveTo(-s * 0.95, -s * 0.1, 0, -s * 1.0); c.quadraticCurveTo(s * 0.95, -s * 0.1, s * 0.9, s * 0.9); c.closePath(); c.fill(); c.stroke();
+    c.fillStyle = T.ink; c.beginPath(); c.ellipse(0, -s * 0.05, s * 0.45, s * 0.5, 0, 0, 6.283); c.fill();
+    c.fillStyle = T.card; c.beginPath(); c.arc(-s * 0.17, -s * 0.1, s * 0.09, 0, 6.283); c.arc(s * 0.17, -s * 0.1, s * 0.09, 0, 6.283); c.fill();
+  } else if (k === 'night') { // crescent moon + stars
+    c.beginPath(); c.arc(0, 0, s * 0.85, 0, 6.283); c.fill(); c.stroke();
+    c.fillStyle = T.card; c.beginPath(); c.arc(s * 0.42, -s * 0.2, s * 0.72, 0, 6.283); c.fill();
+    c.fillStyle = T.ink; for (const [px, py, pr] of [[0.55, -0.6, 0.09], [0.85, 0.15, 0.07], [0.5, 0.65, 0.06]]) { c.beginPath(); c.arc(s * px, s * py, s * pr, 0, 6.283); c.fill(); }
+  } else if (k === 'imp') { // masked face
+    c.beginPath(); c.arc(0, 0, s * 0.85, 0, 6.283); c.fill(); c.stroke();
+    c.fillStyle = T.ink; c.beginPath(); c.ellipse(-s * 0.32, -s * 0.15, s * 0.22, s * 0.11, -0.2, 0, 6.283); c.ellipse(s * 0.32, -s * 0.15, s * 0.22, s * 0.11, 0.2, 0, 6.283); c.fill();
+    c.font = `900 ${s * 0.7}px system-ui,Arial,sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('?', 0, s * 0.42);
+  } else if (k === 'door') { // arched door
+    c.beginPath(); c.moveTo(-s * 0.6, s * 0.95); c.lineTo(-s * 0.6, -s * 0.2); c.arc(0, -s * 0.2, s * 0.6, Math.PI, 0); c.lineTo(s * 0.6, s * 0.95); c.closePath(); c.fill(); c.stroke();
+    c.fillStyle = T.ink; c.beginPath(); c.arc(s * 0.32, s * 0.4, s * 0.07, 0, 6.283); c.fill();
+    c.fillStyle = T.card; c.globalAlpha = 0.85; c.fillRect(-s * 0.5, s * 0.86, s * 1.0, s * 0.06); c.globalAlpha = 1;
+  }
+  c.restore();
+}
+
+
+function renderAssets(){
+  const k = cast, L = k.L, ov = k.ov, cw = k.w, ch = k.h, R = Math.min(cw, ch) * 0.07, sd = T.sand, o = portrait ? 1.5 : 2;
+  [k.base, k.bc] = mk(k.bw, k.bh); [k.rel, k.rc] = mk(k.bw, k.bh); [k.rev, k.vc] = mk(k.bw, k.bh); k.tmp = null; k.ptr = 0;
+  // --- base sand silhouette: card rectangle, grainy overfill, foot sunk into the dune
+  let p;
+  if (MAT === 'sand') {
+  const b = k.bc, sil = () => { b.beginPath(); rr(b, ov * 0.45, ov * 0.45, cw + ov * 1.1, ch + ov * 1.1, R + ov * 0.5); rr(b, ov * 0.45 + R * 0.5, ov + ch - 1, cw + ov * 1.1 - R, ov * 0.55 + k.foot + 1, 1); };
+  if (T.flat) b.fillStyle = sd[1]; else { const g = b.createLinearGradient(k.bw, 0, 0, k.bh); g.addColorStop(0, sd[0]); g.addColorStop(0.55, sd[1]); g.addColorStop(1, sd[1]); b.fillStyle = g; }
+  sil(); b.fill();
+  const sx0 = ov * 0.45, sw0 = cw + ov * 1.1, sh0 = ch + ov * 1.1, sr0 = R + ov * 0.5, fy0 = ov + ch - 1, fx0 = sx0 + R * 0.5;
+  const inSil = (x, y) => { // the silhouette as arithmetic: a path clip under thousands of specks costs the GPU ~250 ms at the fire
+    if (y >= fy0 && y <= fy0 + ov * 0.55 + k.foot + 1 && x >= fx0 && x <= fx0 + sw0 - R) return true;
+    const dx = Math.max(Math.abs(x - sx0 - sw0 / 2) - (sw0 / 2 - sr0), 0), dy = Math.max(Math.abs(y - sx0 - sh0 / 2) - (sh0 / 2 - sr0), 0);
+    return dx * dx + dy * dy <= sr0 * sr0;
+  };
+  const n = Math.round(cw * ch / (T.flat ? 1500 : portrait ? 420 : 180));
+  for (let i = 0; i < n; i++) { const r = rndD(); b.fillStyle = T.flat ? T.speck : (i % 2 ? sd[2] : sd[0]); b.globalAlpha = T.flat ? 0.9 : 0.07; const z = T.flat ? 2 * Math.max(0.7, S) + 1 : 1, sxp = rndD() * k.bw, syp = rndD() * (ch + ov); if (inSil(sxp, syp)) b.fillRect(sxp, syp, z + (r > 0.9 ? 1 : 0), z); }
+  b.globalAlpha = 1;
+  for (let i = 0, m = Math.round((cw + ch) * 1.3); i < m; i++) { // grainy edge dust (never in the empty corners: those cells are not erased)
+    const side = rndD() * 4 | 0, t = rndD(), e = rndD() * ov * 0.7;
+    const x = side < 2 ? ov + t * cw : (side === 2 ? ov - e : ov + cw + e), y = side < 2 ? (side ? ov + ch + e : ov - e) : ov + t * ch;
+    if (!inCast(x, y)) continue;
+    b.fillStyle = sd[(rndD() * 2) | 0 ? 1 : 2]; b.globalAlpha = 0.9; const z = (1 + rndD()) * Math.max(0.8, S) + 0.4; b.fillRect(x, y, z, z);
+  }
+  b.globalAlpha = 1;
+  if (T.outline) { b.lineWidth = portrait ? 2.5 : 3.5; b.strokeStyle = T.outline; b.beginPath(); rr(b, ov * 0.45, ov * 0.45, cw + ov * 1.1, ch + ov * 1.1, R + ov * 0.5); b.stroke(); }
+  // --- relief (raised: lit face, shadow lower-left, lit sliver upper-right)
+  const c = k.rc, lit = sd[0], dark = sd[2]; c.save(); c.translate(ov, ov);
+  const rim = C => { C.beginPath(); rr(C, L.rimIn, L.rimIn, cw - 2 * L.rimIn, ch - 2 * L.rimIn, R * 0.7); rr(C, L.rimIn + L.rimT, L.rimIn + L.rimT, cw - 2 * (L.rimIn + L.rimT), ch - 2 * (L.rimIn + L.rimT), R * 0.4); };
+  emb(c, rim, o, lit, dark, lit, 'evenodd');
+  embText(c, KINDS[k.kind].title, cw / 2, L.titleY, L.tSize, 800, o, lit, dark, lit);
+  if (L.med) {
+    const m = L.med;
+    if (k.kind === 'door') { const s = m.r * 0.95; emb(c, C => { C.beginPath(); C.moveTo(m.x - s * 0.6, m.y + s * 0.95); C.lineTo(m.x - s * 0.6, m.y - s * 0.2); C.arc(m.x, m.y - s * 0.2, s * 0.6, Math.PI, 0); C.lineTo(m.x + s * 0.6, m.y + s * 0.95); C.closePath(); }, o, lit, dark, lit); c.fillStyle = dark; c.beginPath(); c.arc(m.x + s * 0.32, m.y + s * 0.4, s * 0.07, 0, 6.283); c.fill(); }
+    else { emb(c, C => { C.beginPath(); C.arc(m.x, m.y, m.r, 0, 6.283); }, o, lit, dark, lit); c.font = `900 ${m.r * 1.15}px ${FONT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = sd[1]; c.fillText('?', m.x - o * 0.8, m.y + m.r * 0.06 + o * 0.8); c.fillStyle = dark; c.fillText('?', m.x, m.y + m.r * 0.06); }
+  }
+  p = L.plaque;
+  emb(c, C => { C.beginPath(); rr(C, p.x - p.w / 2, p.y - p.h / 2, p.w, p.h, Math.min(12, p.h * 0.12)); }, o, lit, dark, lit);
+  if (k.ans) ansEngrave(c, k, o, lit, dark, sd[1]); else for (let i = 1; i <= 3; i++) { const yy = p.y - p.h / 2 + p.h * i / 4; groove(c, p.x - p.w * 0.42, yy, p.x + p.w * 0.42, yy, Math.max(2, p.h * 0.03), o * 0.6, dark, lit); }
+  for (const s of L.subs) groove(c, cw / 2 - s.w / 2 + L.subSize * 0.16, s.y, cw / 2 + s.w / 2 - L.subSize * 0.16, s.y, L.subSize * 0.32, o * 0.8, dark, lit);
+  if (L.stamp) { const s = L.stamp; c.save(); c.translate(s.x, s.y); c.rotate(-5 * Math.PI / 180); c.lineJoin = 'round';
+    c.lineWidth = 3.5; c.strokeStyle = lit; c.beginPath(); rr(c, -s.w / 2 - o * 0.8, -s.h / 2 + o * 0.8, s.w, s.h, s.h * 0.25); c.stroke();
+    c.strokeStyle = dark; c.beginPath(); rr(c, -s.w / 2, -s.h / 2, s.w, s.h, s.h * 0.25); c.stroke(); c.restore(); }
+  c.restore();
+  } else { p = L.plaque; paperCover(k); }
+  if (k.ans) return;
+  // --- the card that lies under the sand
+  const [bm, d] = mk(cw, ch); k.bmp = bm; k.hiddenReady=false;
+  k.drawHidden=()=>{if(k.hiddenReady)return;if(faceProvider&&!k.revealAuthorized)return;k.hiddenReady=true;metrics.hiddenCalls++;
+  if(faceProvider && typeof faceProvider.hidden==='function'){ faceProvider.hidden(d,{width:cw,height:ch,kind:k.kind});return; }
+  const ac = T.accent[k.kind], sp = KINDS[k.kind];
+  const g = d.createLinearGradient(0, 0, 0, ch); g.addColorStop(0, T.card); g.addColorStop(1, T.card2);
+  d.fillStyle = g; d.beginPath(); rr(d, 0, 0, cw, ch, R); d.fill();
+  if (T.outline) { d.lineWidth = portrait ? 2.5 : 4; d.strokeStyle = T.outline; d.beginPath(); rr(d, d.lineWidth / 2, d.lineWidth / 2, cw - d.lineWidth, ch - d.lineWidth, R); d.stroke(); }
+  d.strokeStyle = T.ink; d.globalAlpha = 0.35; d.lineWidth = portrait ? 1.5 : 2.5; d.beginPath(); rr(d, L.rimIn + L.rimT * 0.5, L.rimIn + L.rimT * 0.5, cw - 2 * (L.rimIn + L.rimT * 0.5), ch - 2 * (L.rimIn + L.rimT * 0.5), R * 0.5); d.stroke(); d.globalAlpha = 1;
+  d.fillStyle = ac; d.fillRect(L.rimIn + L.rimT + 4, L.stripY, cw - 2 * (L.rimIn + L.rimT + 4), L.stripH);
+  d.textAlign = 'center'; d.textBaseline = 'middle'; d.fillStyle = T.ink;
+  d.font = `800 ${L.tSize}px ${FONT}`; d.globalAlpha = 0.8; d.fillText(sp.title, cw / 2, L.titleY); d.globalAlpha = 1;
+  if (L.med) drawIcon(d, k.kind, L.med.x, L.med.y, L.med.r * 0.95, ac);
+  const nl = sp.big.length; d.fillStyle = T.ink;
+  sp.big.forEach((ln, i) => { d.font = `900 ${L.bigSize}px ${FONT}`; d.fillText(ln, cw / 2, p.y + (i - (nl - 1) / 2) * L.bigSize * 1.15); });
+  sp.sub.forEach((ln, i) => { const z = fitSize(ln, L.inner * 0.96, L.subSize, 600, 12); d.font = `600 ${z}px ${FONT}`; d.globalAlpha = 0.85; d.fillText(ln, cw / 2, L.subs[i].y); d.globalAlpha = 1; });
+  if(k.kind==='drawing'){d.clearRect(0,0,cw,ch);}
+  };
+  if(MAT==='sand'&&faceProvider&&typeof faceProvider.cover==='function'){k.rc.clearRect(0,0,k.bw,k.bh);paintProvidedCover(k);}
+}
+
+// ---------- paper: a printed cover sheet, and the pieces it tears into ----------
+function paintProvidedCover(k){
+ if(!faceProvider.coverCache){const b=document.createElement('canvas');b.width=Math.round(k.w*DPR);b.height=Math.round(k.h*DPR);const c=b.getContext('2d');c.setTransform(DPR,0,0,DPR,0,0);metrics.coverCalls++;faceProvider.cover(c,{width:k.w,height:k.h,kind:k.kind});faceProvider.coverCache=b;}
+ k.bc.clearRect(0,0,k.bw,k.bh);k.bc.drawImage(faceProvider.coverCache,k.ov,k.ov,k.w,k.h);
+}
+function pathPts(c, pts, close){ c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]); if (close) c.closePath(); }
+function paperCover(k){
+  const P = T.paper, L = k.L, ov = k.ov, cw = k.w, ch = k.h, R = Math.min(cw, ch) * 0.07, sp = KINDS[k.kind], ac = T.accent[k.kind], c = k.bc, ink = P.ink, p = L.plaque;
+  c.save(); c.translate(ov, ov);
+  c.fillStyle = P.face; c.beginPath(); rr(c, 0, 0, cw, ch, R); c.fill();
+  c.save(); c.beginPath(); rr(c, 0, 0, cw, ch, R); c.clip();
+  if (!T.flat) { const g = c.createLinearGradient(0, 0, cw, ch); g.addColorStop(0, 'rgba(255,255,255,.16)'); g.addColorStop(1, 'rgba(60,40,20,.14)'); c.fillStyle = g; c.fillRect(0, 0, cw, ch); }
+  for (let i = 0, n = Math.round(cw * ch / (T.flat ? 700 : portrait ? 950 : 400)); i < n; i++) { // paper fibres
+    const x = rndD() * cw, y = rndD() * ch, a = rndD() * 6.283, l = 3 + rndD() * (T.flat ? 5 : 9);
+    c.strokeStyle = rndD() < 0.5 ? P.fib : P.rim; c.globalAlpha = T.flat ? 0.5 : 0.3; c.lineWidth = 1; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); c.stroke();
+  }
+  c.globalAlpha = 1; c.restore();
+  const inset = L.rimIn + L.rimT + 4, lw = portrait ? 2 : 3;
+  if (T.flat) { c.lineWidth = portrait ? 2.5 : 4; c.strokeStyle = ink; c.beginPath(); rr(c, c.lineWidth / 2, c.lineWidth / 2, cw - c.lineWidth, ch - c.lineWidth, R); c.stroke(); }
+  c.fillStyle = ac; c.fillRect(inset, L.stripY, cw - 2 * inset, L.stripH);
+  if (T.flat) { c.lineWidth = lw; c.strokeStyle = ink; c.strokeRect(inset, L.stripY, cw - 2 * inset, L.stripH); }
+  c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = ink; c.font = `800 ${L.tSize}px ${FONT}`; c.globalAlpha = 0.85; c.fillText(sp.title, cw / 2, L.titleY); c.globalAlpha = 1;
+  if (L.med) { const m = L.med; c.fillStyle = P.panel; c.beginPath(); c.arc(m.x, m.y, m.r, 0, 6.283); c.fill(); if (T.flat) { c.lineWidth = lw; c.strokeStyle = ink; c.stroke(); } c.fillStyle = ink; c.font = `900 ${m.r * 1.15}px ${FONT}`; c.fillText('?', m.x, m.y + m.r * 0.06); }
+  c.fillStyle = P.panel; c.beginPath(); rr(c, p.x - p.w / 2, p.y - p.h / 2, p.w, p.h, Math.min(12, p.h * 0.12)); c.fill();
+  if (T.flat) { c.lineWidth = lw; c.strokeStyle = ink; c.stroke(); }
+  c.fillStyle = ink; c.globalAlpha = T.flat ? 1 : 0.8;
+  const nb = k.kind === 'truth' ? 3 : 2;
+  if (k.ans) ansPrint(c, k, ink);
+  else for (let i = 1; i <= nb; i++) { const yy = p.y - p.h / 2 + p.h * i / (nb + 1), bw = p.w * (i === nb ? 0.5 : 0.84), bh = Math.max(6, p.h * (nb === 3 ? 0.10 : 0.16)); c.beginPath(); rr(c, p.x - bw / 2, yy - bh / 2, bw, bh, 3); c.fill(); }
+  for (const s of L.subs) { c.beginPath(); rr(c, cw / 2 - s.w / 2, s.y - L.subSize * 0.15, s.w, L.subSize * 0.3, 3); c.fill(); }
+  c.globalAlpha = 1;
+  if (L.stamp) { const s = L.stamp; c.save(); c.translate(s.x, s.y); c.rotate(-5 * Math.PI / 180); c.setLineDash([12, 9]); c.lineWidth = lw; c.strokeStyle = ink; c.globalAlpha = 0.5; c.beginPath(); rr(c, -s.w / 2, -s.h / 2, s.w, s.h, s.h * 0.25); c.stroke(); c.restore(); }
+  if(k.kind==='drawing')drawNotebookArt(c,cw,ch);c.restore();
+  if(faceProvider&&typeof faceProvider.cover==='function')paintProvidedCover(k);
+  const pp = mk(k.bw, k.bh); pp[1].setTransform(1, 0, 0, 1, 0, 0); pp[1].drawImage(k.base, 0, 0); k.pp = pp[0];
+  k.swept = false; buildShards(k); bakeAtlas(k);
+}
+function edgeLine(a, b, rough, lv, q){
+  let pts = [a, b], amp = rough;
+  for (let l = 0; l < lv && amp > 0; l++) {
+    const out = [pts[0]];
+    for (let i = 0; i + 1 < pts.length; i++) {
+      const p0 = pts[i], p1 = pts[i + 1], dx = p1[0] - p0[0], dy = p1[1] - p0[1], len = Math.hypot(dx, dy) || 1, d = (q() - 0.5) * 2 * amp * len;
+      out.push([(p0[0] + p1[0]) / 2 - dy / len * d, (p0[1] + p1[1]) / 2 + dx / len * d], p1);
+    }
+    pts = out; amp *= 0.62;
+  }
+  return pts;
+}
+function buildShards(k){
+  const cw = k.w, ch = k.h, ov = k.ov, shred = PAPER === 'shred', q = prng((seed ^ 0x51f15e) + fireN * 104729 + (k.sid || 0) * 7789), sid = (k.sid || 0) * 11.3;
+  const nx = shred ? Math.max(2, Math.round(cw / (portrait ? 165 : 250))) : Math.max(3, Math.round(cw / (portrait ? 88 : 150)));
+  const ny = shred ? Math.max(10, Math.round(ch / (portrait ? 10 : 15))) : Math.max(3, Math.round(ch / (portrait ? 80 : 130)));
+  const dx = cw / nx, dy = ch / ny, jx = shred ? 0.28 : 0.33, jy = shred ? 0.06 : 0.33, vt = [];
+  for (let j = 0; j <= ny; j++) { vt.push([]); for (let i = 0; i <= nx; i++) {
+    const inX = i > 0 && i < nx, inY = j > 0 && j < ny;
+    vt[j].push([ov + i * dx + (inX ? (q() - 0.5) * 2 * jx * dx : 0), ov + j * dy + (inY ? (q() - 0.5) * 2 * jy * dy : 0)]); } }
+  const rH = shred ? 0.025 : 0.11, rV = shred ? 0.4 : 0.11, H = [], Vv = [];
+  for (let j = 0; j <= ny; j++) { H.push([]); for (let i = 0; i < nx; i++) H[j].push(edgeLine(vt[j][i], vt[j][i + 1], j === 0 || j === ny ? 0 : rH, shred ? 1 : 3, q)); }
+  for (let j = 0; j < ny; j++) { Vv.push([]); for (let i = 0; i <= nx; i++) Vv[j].push(edgeLine(vt[j][i], vt[j + 1][i], i === 0 || i === nx ? 0 : rV, 3, q)); }
+  const P = [], id = (i, j) => j * nx + i;
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    const top = H[j][i], right = Vv[j][i + 1], bot = H[j + 1][i], left = Vv[j][i];
+    const poly = top.concat(right.slice(1), bot.slice().reverse().slice(1), left.slice().reverse().slice(1, -1));
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, sx = 0, sy = 0;
+    for (const [x, y] of poly) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); sx += x; sy += y; }
+    const cx = sx / poly.length, cy = sy / poly.length, rx = cx - ov, ry = cy - ov, u = clamp(DIR > 0 ? rx / cw : 1 - rx / cw, 0, 1), v = clamp(ry / ch, 0, 1);
+    const fr = clamp(u * 0.84 + 0.12 * (v - 0.5) + 0.34 * (fbm(rx * 0.011 + 3 + sid, ry * 0.014 + 8) - 0.5) + 0.14 * (vn(rx * 0.035 + 5, ry * 0.05 + 1) - 0.5) + (q() - 0.5) * 0.06, 0, 1);
+    P.push({ i, j, poly, x0, y0, x1, y1, cx, cy, te: T_WIND + (T_THICK - 0.15 - T_WIND) * fr + .11*v + .065*(i%3), gone: false, edges: [
+      { pts: top, nb: j > 0 ? id(i, j - 1) : -1 }, { pts: right, nb: i < nx - 1 ? id(i + 1, j) : -1 }, { pts: bot, nb: j < ny - 1 ? id(i, j + 1) : -1 }, { pts: left, nb: i > 0 ? id(i - 1, j) : -1 }] });
+  }
+  k.pieces = P; k.total = P.length; k.ptr = 0; k.order = P.map((_, n) => n).sort((a, b) => P[a].te - P[b].te);
+}
+function tearTo(t, spawn){
+  const k = cast; if (!k || !k.pieces) return;
+  while (k.ptr < k.total && k.pieces[k.order[k.ptr]].te <= t) {
+    const p=k.pieces[k.order[k.ptr++]];p.gone=true;
+    const c = k.bc; c.globalCompositeOperation = 'destination-out'; pathPts(c, p.poly, true); c.fill(); c.lineWidth = 8; c.lineJoin = 'round'; c.stroke(); c.globalCompositeOperation = 'source-over';
+    k.vc.fillStyle = k.vc.strokeStyle = '#000'; pathPts(k.vc, p.poly, true); k.vc.fill(); k.vc.lineWidth = 2; k.vc.lineJoin = 'round'; k.vc.stroke();
+    for (const e of p.edges) if (e.nb >= 0 && !k.pieces[e.nb].gone) rimEdge(c, k.pieces[e.nb], e.pts);
+    if (spawn && !reduced) flyPiece(k, p, t);
+  }
+  if (k.ptr >= k.total) k.swept = true;
+}
+function rimEdge(c, nb, pts){
+  const P = T.paper, w = portrait ? 2.2 : 3.4;
+  c.save(); pathPts(c, nb.poly, true); c.clip(); c.lineJoin = 'round'; pathPts(c, pts);
+  if (!T.flat) { c.strokeStyle = P.rim; c.globalAlpha = 0.4; c.lineWidth = 2 * (w + 1.5); c.stroke(); c.globalAlpha = 1; }
+  c.strokeStyle = P.rim; c.lineWidth = 2 * w; c.stroke();
+  if (T.flat) { c.strokeStyle = P.ink; c.lineWidth = portrait ? 2 : 2.8; c.stroke(); }
+  c.restore();
+}
+// ---------- paper: sprites and flying pieces ----------
+function bakeAtlas(k){
+  const P = T.paper, ps = k.pieces, m = 3, AW = portrait ? 512 : 1800, ink = P.ink, bl = portrait ? 2 : 2.8; let x = 0, y = 0, rowH = 0;
+  for (const p of ps) {
+    const w = Math.ceil(p.x1 - p.x0) + 2 * m, h = Math.ceil(p.y1 - p.y0) + 2 * m;
+    if (x + w > AW) { x = 0; y += rowH; rowH = 0; }
+    p.sx = x; p.sy = y; p.sw = w; p.sh = h; p.bx = (p.x0 + p.x1) / 2; p.by = (p.y0 + p.y1) / 2; x += w; rowH = Math.max(rowH, h);
+  }
+  const [af, fc] = mk(AW, y + rowH), [ab, bc] = mk(AW, y + rowH), fq = prng(seed ^ 0x2545f491);
+  for (const p of ps) for (const front of [true, false]) {
+    const c = front ? fc : bc;
+    c.save(); c.translate(p.sx - p.x0 + m, p.sy - p.y0 + m); pathPts(c, p.poly, true);
+    if (front) c.clip(), c.drawImage(k.pp, (p.x0 - m) * DPR, (p.y0 - m) * DPR, p.sw * DPR, p.sh * DPR, p.x0 - m, p.y0 - m, p.sw, p.sh);
+    else {
+      c.fillStyle = P.back; c.fill(); c.save(); c.clip(); c.strokeStyle = P.fib; c.globalAlpha = T.flat ? 0.35 : 0.22; c.lineWidth = 1;
+      for (let i = 0, n = Math.round((p.x1 - p.x0) * (p.y1 - p.y0) / 700); i < n; i++) { const fx = p.x0 + fq() * (p.x1 - p.x0), fy = p.y0 + fq() * (p.y1 - p.y0), a = fq() * 6.283, l = 3 + fq() * 6; c.beginPath(); c.moveTo(fx, fy); c.lineTo(fx + Math.cos(a) * l, fy + Math.sin(a) * l); c.stroke(); }
+      c.restore();
+    }
+    for (const e of p.edges) if (e.nb >= 0) rimEdge(c, p, e.pts);
+    c.lineJoin = 'round'; c.lineWidth = T.flat ? bl : 1.2; c.strokeStyle = T.flat ? ink : 'rgba(43,35,80,.4)';
+    if (front) { for (const e of p.edges) if (e.nb >= 0) { pathPts(c, e.pts); c.stroke(); } } else { pathPts(c, p.poly, true); c.stroke(); }
+    c.restore();
+  }
+  k.atF = af; k.atB = ab;
+}
+function flyPiece(k, p, t){
+  const shred = PAPER === 'shred', sp = SPD(), w = p.x1 - p.x0, h = p.y1 - p.y0, age = Math.max(0, t - p.te);
+  const ns = shred ? clamp(Math.round((p.sw - 6) / (portrait ? 22 : 30)), 1, portrait ? 5 : 8) : 1;
+  grain(k.bx+p.bx,k.by+p.by,{flake:true,p,ns,at:k, theta:(rndG()-.5)*.28,omega:(rndG()-.5)*1.3,rollVelocity:(rndG()-.5)*.6, mg: Math.hypot(w, h), v0: (480 + rndG() * 260) * sp, v1: (1250 + rndG() * 700) * sp, lift: 30 + rndG() * 90, ramp: 0.3, size: 4, catchUp: age,
+    fl0: 0, flr: (shred ? 3 : 5) + rndG() * (shred ? 4 : 7), spin: (rndG() - 0.5) * (shred ? 0.5 : 3.2), tw: 0.35 + rndG() * 0.3 });
+  for (let i = 0, n = shred ? 1 : 4; i < n; i++) {
+    const v = p.poly[(rndG() * p.poly.length) | 0];
+    grain(k.bx + v[0], k.by + v[1], { scrap: true, col: dustCol(), size: gsz() * 0.9, v0: (250 + rndG() * 250) * sp, v1: (800 + rndG() * 500) * sp, lift: 10 + rndG() * 40, catchUp: age, rot0: rndG() * 6.283, spin: (rndG() - 0.5) * 14, fl0: rndG() * 6.283, flr: 8 + rndG() * 10 });
+  }
+}
+const FL = [], SC = [];
+function drawScrap(g){
+ const D=DPR,cr=Math.cos(g.theta),sr=Math.sin(g.theta),normal=Math.cos(g.roll),f=Math.max(.04,Math.abs(normal)),w=g.size*1.7,h=g.size*1.2,x=g.px+(g.x-g.px)*interpolation,y=g.py+(g.y-g.py)*interpolation;
+ ctx.globalAlpha=.65+.35*f;ctx.fillStyle=g.col;ctx.setTransform(D*cr,D*sr,-D*sr*f,D*cr*f,D*x,D*y);ctx.fillRect(-w/2,-h/2,w,h);
+}
+function paperGeometry(g){
+ const p=g.p,ns=g.ns,sw=p.sw,sh=p.sh,ox=p.bx-p.x0+3,oy=p.by-p.y0+3,cr=Math.cos(g.theta),sr=Math.sin(g.theta),x=g.px+(g.x-g.px)*interpolation,y=g.py+(g.y-g.py)*interpolation,segments=[];
+ for(let i=0;i<ns;i++){
+  const cell=sw/ns,dx=(i+.5)*cell-ox,phase=g.ph+i*.91,development=1-Math.exp(-g.age*4),curve=ns>1?Math.sin(phase+g.roll+i*.25)*(portrait?5:10)*development:0;
+  const angle=g.theta+(ns>1?Math.cos(phase+g.roll)*.16:0),ca=Math.cos(angle),sa=Math.sin(angle),px=x+cr*dx-sr*curve,py=y+sr*dx+cr*curve,normal=Math.cos(g.roll+(ns>1?i*.22*Math.sin(g.ph)*development:0)),f=Math.max(.035,Math.abs(normal));
+  const width=Math.min(Math.ceil(cell*DPR)+1,Math.round(sw*DPR)-Math.floor(i*cell*DPR)),local=[[-cell/2,-oy],[-cell/2+width/DPR,-oy],[-cell/2+width/DPR,-oy+sh],[-cell/2,-oy+sh]];
+  const vertices=local.map(([lx,ly])=>[px+ca*lx-sa*f*ly,py+sa*lx+ca*f*ly]);
+  segments.push({i,px,py,ca,sa,f,normal,front:normal>=0,shade:.5+.5*f,vertices,cell,oy,sx:Math.floor(i*cell*DPR),width});
+ }
+ return{uid:g.uid,segments};
+}
+function drawFlake(g){
+ const D=DPR,p=g.p,k=g.at,geometry=paperGeometry(g),x=g.px+(g.x-g.px)*interpolation,y=g.py+(g.y-g.py)*interpolation;
+ if(!k.atF||!k.atB)return;
+ if(y>H*.48){ctx.save();ctx.setTransform(D,0,0,D,0,0);ctx.fillStyle='rgba(0,0,0,.15)';ctx.beginPath();ctx.ellipse(x+g.size*2,surface(x)+5,Math.max(4,p.sw*.2),3,0,0,Math.PI*2);ctx.fill();ctx.restore();}
+ for(const segment of geometry.segments){const{ca,sa,f,px,py,front,shade,cell,oy,sx,width}=segment;ctx.globalAlpha=shade;ctx.setTransform(D*ca,D*sa,-D*sa*f,D*ca*f,D*px,D*py);
+  ctx.drawImage(front?k.atF:k.atB,p.sx*D+sx,p.sy*D,width,p.sh*D,-cell/2,-oy,width/D,p.sh);
+  if(f<.18){ctx.strokeStyle=T.paper.rim;ctx.lineWidth=1.1;ctx.beginPath();ctx.moveTo(-cell/2,0);ctx.lineTo(cell/2,0);ctx.stroke();}
+ }
+}
+function drawPaperBits(){
+  for (const g of SC) drawScrap(g);
+  for (const g of FL) drawFlake(g);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.globalAlpha = 1; SC.length = FL.length = 0;
+}
+
+// ---------- grains ----------
+const gsz = () => portrait ? 2 + rndG() * 2 : (3 + rndG() * 3) * clamp(H / 1080, 0.7, 1.4);
+const sandCol = () => T.sand[(rndG() * 3) | 0];
+const dustCol = () => { if (MAT === 'sand') return sandCol(); const P = T.paper, a = [P.face, P.rim, P.back, P.fib, P.panel]; return a[(rndG() * a.length) | 0]; };
+const SPD = () => portrait ? 0.7 : 1;
+function addGrain(g){if(reduced)return;if(grains.length<GMAX()){g.age=0;grains.push(g);}else{metrics.denied++;grainPool.push(g);}}
+function addDep(x, a){
+  if (cast && Math.abs(x - (cast.x + cast.w / 2)) < cast.w / 2 + 70) return;
+  const f = clamp(x / 16, 0, dep.length - 2), i = Math.floor(f), cap = portrait ? 6 : 10;
+  dep[i] = Math.min(cap, dep[i] + a * (1 - (f - i))); dep[i + 1] = Math.min(cap, dep[i + 1] + a * (f - i));
+}
+function advancePaper(g,dt,wind){
+ const rx=wind[0]-g.vx,ry=wind[1]-g.vy,scale=Math.max(150,W),nx=-Math.sin(g.theta),ny=Math.cos(g.theta),tx=Math.cos(g.theta),ty=Math.sin(g.theta),normal=rx*nx+ry*ny,tangent=rx*tx+ry*ty;
+ const response=g.flake?2.4:5,lift=clamp(g.omega*.07,-.3,.3);
+ g.vx+=(response*(normal*nx+.22*tangent*tx)+lift*(-ry))*dt;
+ g.vy+=(response*(normal*ny+.22*tangent*ty)+lift*rx+H*.12)*dt;
+ g.omega+=(normal/scale*(1.2+.8*Math.sin(g.theta))*DIR-g.omega*.55)*dt;g.theta+=g.omega*dt;
+ g.rollVelocity+=((rx*Math.cos(g.roll)+normal)/scale*3-g.rollVelocity*.7)*dt;g.roll+=g.rollVelocity*dt;
+ return g;
+}
+function stepGrains(dt){
+ for(let i=grains.length-1;i>=0;i--){const g=grains[i];g.px=g.x;g.py=g.y;g.age+=dt;
+  if(g.settled){
+   if(tickAge>=0&&tickAge<.5&&g.age-g.settleAge>.5){g.settled=false;g.vy=-H*.13;g.vx=DIR*W*.22;metrics.reentrained++;}
+   else continue;
+  }
+  const wind=sharedWind(g.x,g.y),rx=wind[0]-g.vx,ry=wind[1]-g.vy;
+  if(g.flake||g.scrap){
+   advancePaper(g,dt,wind);
+  }else{const drag=g.pour?2.2:5;g.vx+=rx*drag*dt;g.vy+=(ry*drag+H*(g.pour?.4:.08))*dt;}
+  const oldHeading=Math.atan2(g.vy,g.vx);g.x+=g.vx*dt;g.y+=g.vy*dt;
+  if(g.lastHeading!==undefined){const a=Math.abs(Math.atan2(Math.sin(oldHeading-g.lastHeading),Math.cos(oldHeading-g.lastHeading)));metrics.maxTurn=Math.max(metrics.maxTurn,a);}g.lastHeading=oldHeading;
+  const mg=60+(g.mg||0);if(g.x>W+mg||g.x<-mg||g.y<-mg||g.y>H+mg){releaseGrain(i,'exit');continue;}
+  // Retain some fragments on a far dune. Rest stays on the foreground bed; no mid-air age fade.
+  const bed=g.flake&&g.landFar?H*.65+Math.sin(g.x*.007)*H*.025:surface(g.x)-1;
+  if(g.vy>0&&g.y>=bed&&g.age>.12){g.y=bed;g.vx=g.vy=0;g.settled=true;g.settleAge=g.age;g.roll*=.2;metrics.settled++;if(g.dep)addDep(g.x,.12);}
+ }
+}
+function initAmbient(){if(!gpu&&!reduced){const n=portrait?180:500;for(let i=0;i<n;i++)grain(rndG()*W,H*(.45+rndG()*.35),{vx:DIR*W*.16,vy:0,size:portrait?1.5:2});}}
+function laneY(g){ // where a grain of lane eta sits on the river now
+  riverAt(g.u);
+  const wob = Math.sin(clock * 2.3 + g.u * 0.007) * H * 0.02 * clamp(g.u / (W * 0.6), 0, 1);
+  return rvY + wob + g.eta * rvW - Math.min(1, g.age / 0.4) * g.lift + Math.sin(g.ph + g.age * 8) * 3;
+}
+function flowStep(g,dt){const w=sharedWind(g.x,g.y);g.vx+=(w[0]-g.vx)*4*dt;g.vy+=(w[1]-g.vy)*4*dt;g.x+=g.vx*dt;g.y+=g.vy*dt;}
+function grain(x, y, o){
+  const recycled=grainPool.pop()||{};for(const key of Object.keys(recycled))delete recycled[key];const g=Object.assign(recycled, { uid:++uid,x,y,px:x,py:y,releaseTime:clock, vx:DIR*300*SPD(),settled:false,theta:0, omega:0, roll:0, rollVelocity:0, v0: 300 + rndG() * 200, v1: 900 + rndG() * 400, vy: -(100 + rndG() * 150), grav: 500, life: 0.5 + rndG() * 0.6, size: gsz(), col: dustCol() },o);if(g.bal||g.pour)g.vx=DIR*g.v0;
+  if (!g.bal && !g.pour && RV) {
+    g.riv = true; g.sf = 0.86 + rndG() * 0.3; g.ph = rndG() * 6.283; g.lift = (g.lift || 18 + rndG() * 40) * (portrait ? 0.6 : 1); g.life=Infinity;g.landFar=g.flake&&rndG()<.22; g.age = 0; g.u = DIR > 0 ? x : W - x;
+    riverAt(g.u); const wob = Math.sin(clock * 2.3 + g.u * 0.007) * H * 0.02 * clamp(g.u / (W * 0.6), 0, 1);
+    g.eta=(y-rvY-wob-Math.sin(g.ph)*3)/rvW;g.vx=DIR*g.v0*.45;g.vy=-(g.lift||20);
+    for (let a = 0; a < (g.catchUp || 0); a += 1 / 60) { g.age += 1 / 60; flowStep(g, 1 / 60); }
+  }
+  addGrain(g);
+}
+function eraseTo(t, spawn){
+  const k = cast; if (!k) return;
+  const cs2 = cs * 0.75, sp = SPD();
+  while (k.ptr < k.total && k.cells[k.ptr][2] <= t) {
+    const cl=k.cells[k.ptr++];if(gpu&&spawn&&k.ptr%17===1)gpu.release({x:(k.bx+cl[0])/W,y:(k.by+cl[1])/H,width:cs/W,height:cs/H},{fraction:.0023,seed:seed+k.ptr});
+    for (const c of [k.bc, k.rc]) { c.globalCompositeOperation = 'destination-out'; c.beginPath(); c.arc(cl[0], cl[1], cs2, 0, 6.283); c.fill(); c.globalCompositeOperation = 'source-over'; }
+    k.vc.fillStyle = '#000'; k.vc.beginPath(); k.vc.arc(cl[0], cl[1], cs2 + 0.4, 0, 6.283); k.vc.fill();
+    if (spawn && !reduced && rndG() < (cl[3] ? 0.10 : 0.06)) {
+      const age = Math.max(0, t - cl[2]), big = cl[3] ? 1.4 : 1, v0 = (300 + rndG() * 200) * sp, v1 = (900 + rndG() * 400) * sp;
+      grain(k.bx + cl[0], k.by + cl[1], { v0, v1, vy: -(100 + rndG() * 150) * sp, size: gsz() * big, catchUp: age, lift: cl[3] ? 30 + rndG() * 60 : 0 });
+    }
+  }
+}
+function eraseAny(t, spawn){ if (MAT === 'paper') tearTo(t, spawn); else eraseTo(t, spawn); }
+function burst(x, y, n, o){ for (let i = 0; i < n; i++) { const a = rndG() * 6.283, sp = (600 + rndG() * 300) * SPD(); grain(x, y, Object.assign({ v0: sp * (0.4 + 0.6 * Math.max(0, Math.cos(a) * DIR)) , v1: 500 * SPD(), vy: Math.sin(a) * sp * 0.6, life: 0.5, size: gsz() * 1.2, dep: true }, o)); } }
+function addWisp(y, dist, dur, alpha){
+  const len = (portrait ? 110 : 220), vx = dist ? dist / dur : W * 0.9;
+  wisps.push({ x: DIR > 0 ? -len * 0.2 : W + len * 0.2, y, vx: DIR * vx, len, age: 0, life: 2.4, a: alpha });
+}
+
+// ---------- background ----------
+function drawBg(){
+  if (T.bg2) { if (!bgGrad) { bgGrad = ctx.createLinearGradient(0, 0, 0, H); bgGrad.addColorStop(0, T.bg2); bgGrad.addColorStop(1, T.bg); } ctx.fillStyle = bgGrad; } else ctx.fillStyle = T.bg;
+  ctx.fillRect(0, 0, W, H);
+  if (!stars) { stars = []; for (let i = 0; i < 25; i++) stars.push({ x: rndC() * W, y: rndC() * H * 0.5, s: 2 + rndC(), a: 0.4 + rndC() * 0.3, tw: i % 4 === 0, ph: rndC() * 6.283 }); }
+  ctx.fillStyle = '#f5f6ff';
+  for (const s of stars) { let a = s.a; if (s.tw && !reduced) a *= 0.65 + 0.35 * Math.sin(clock * 6.283 / 4 + s.ph);
+    ctx.globalAlpha = T.flat ? a : a * 0.75; if (T.flat) ctx.fillRect(Math.round(s.x), Math.round(s.y), s.s, s.s); else { ctx.beginPath(); ctx.arc(s.x, s.y, s.s * 0.6, 0, 6.283); ctx.fill(); } }
+  ctx.globalAlpha = 1;
+  if (!T.flat) { const r = Math.min(W, H) * 0.08, x = portrait ? W * 0.84 : W * 0.82, y = portrait ? H * 0.10 : H * 0.16;
+    const g = ctx.createRadialGradient(x, y, r * 0.2, x, y, r * 2.6); g.addColorStop(0, 'rgba(239,227,191,.4)'); g.addColorStop(0.4, 'rgba(239,227,191,.1)'); g.addColorStop(1, 'rgba(239,227,191,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - r * 3, y - r * 3, r * 6, r * 6); ctx.fillStyle = '#efe3bf'; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill(); }
+  const t = reduced ? 0 : clock, cols = [T.far, T.mid];
+  for (let L = 0; L < 2; L++) {
+    const base = H * (portrait ? 0.6 + L * 0.075 : 0.62 + L * 0.1), amp = H * (0.035 + L * 0.012), sp = (0.04 + L * 0.03) * (L ? -1 : 1);
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W + 12; x += 12) ctx.lineTo(x, base + Math.sin(x * 0.004 * (1 + L * 0.4) + t * sp * 3 + L * 2) * amp + Math.sin(x * 0.011 + t * sp * 5 + L) * amp * 0.35);
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fillStyle = cols[L]; ctx.fill();
+    if (T.flat) { ctx.lineWidth = portrait ? 2 : 3; ctx.strokeStyle = T.outline; ctx.stroke(); } else { ctx.lineWidth = 1.5; ctx.strokeStyle = T.rim; ctx.globalAlpha = 0.22; ctx.stroke(); ctx.globalAlpha = 1; }
+  }
+}
+function drawNear(){
+  ctx.beginPath(); ctx.moveTo(0, H + 4);
+  for (let x = 0; x <= W + 8; x += 8) ctx.lineTo(x, surface(x));
+  ctx.lineTo(W + 8, H + 4); ctx.closePath(); ctx.fillStyle = T.near; ctx.fill();
+  ctx.beginPath(); for (let x = 0; x <= W + 8; x += 8) x ? ctx.lineTo(x, surface(x)) : ctx.moveTo(x, surface(x));
+  if (T.flat) { ctx.lineWidth = portrait ? 2.5 : 3.5; ctx.strokeStyle = T.outline; ctx.stroke(); } else { ctx.lineWidth = 2; ctx.strokeStyle = T.rim; ctx.globalAlpha = 0.35; ctx.stroke(); ctx.globalAlpha = 1; }
+}
+
+// ---------- sequence ----------
+let antDone = false, stampDone = false, exitDone = false, landDone = false, accP = 0, accH = 0;
+function announce(msg){live.textContent=msg;}
+function fire(k, auto){
+  if(SCENES[k]){notebookStub=null;fireScene(k);if(reduced)skip();return;}
+  if(!KINDS[k])k='truth';notebookStub=null;if(k==='drawing'){MAT='paper';PAPER='tear';syncHud();}recycleAssets();scene=null;clearDebris();fireN++;layout(k);renderAssets();if(k==='drawing')notebookStub={...cast};
+  held=HOLDFLAG||auto===false||!!faceProvider; antDone = stampDone = exitDone = landDone = false; accP = accH = 0;
+  if (reduced) {tt=T_SET;if(!held){tt=T_THICK;if(cast.drawHidden)cast.drawHidden();announce(KINDS[k].say);}render();}
+}
+function reveal(hidden){if(hidden&&typeof hidden==='function'){if(!faceProvider)faceProvider={};faceProvider.hidden=hidden;}if(cast){held=false;cast.revealAuthorized=true;if(cast.drawHidden)cast.drawHidden();if(reduced){tt=T_THICK;render();}}}
+function pulse(){
+  if (reduced || tt < T_THICK) return 1;
+  if (tt < T_PEAK) return 1 + 0.06 * ease((tt - T_THICK) / (T_PEAK - T_THICK));
+  return 1 + 0.06 * (1 - sm(clamp((tt - T_PEAK) / 0.25, 0, 1)));
+}
+function update(dt){
+  clock+=dt;if(winAge>=0){winAge+=dt;if(winAge>7)winAge=-1;}if(tickAge>=0){tickAge+=dt;if(tickAge>2.4)tickAge=-1;}riverTick();
+  if (!reduced) { let r = dt; while (r > 1e-6) { const h = Math.min(1 / 60, r); stepGrains(h); r -= h; } }
+  if (!cast) for (let i = 0; i < dep.length; i++) dep[i] *= Math.exp(-dt / 8);
+  for (let i = wisps.length - 1; i >= 0; i--) { const w = wisps[i]; w.age += dt; w.x += w.vx * dt; if (w.age > w.life) wisps.splice(i, 1); }
+  if (scene) { sceneUpdate(dt); return; }
+  if (!cast) return;
+  const prev = tt; tt += dt; if (held && tt >= T_HOLD) tt = T_HOLD - 0.001;
+  const k = cast, L = k.L, sp = SPD();
+  if (reduced) { if (prev < T_HOLD && tt >= T_HOLD) announce(KINDS[k.kind].say); if (tt >= T_SHOWN + 0.3) { cast = null; tt = -1; } return; }
+  if (!antDone) { antDone = true; if (MAT === 'sand') for (let i = 0; i < 20; i++) { const x = DIR > 0 ? k.x - 20 - rndG() * 320 : k.x + k.w + 20 + rndG() * 320; grain(x, surface(x) - 3, { v0: 260 * sp, v1: 520 * sp, vy: -15, grav: 0, life: 0.55, bal: true }); } }
+  if (MAT === 'paper' && !landDone && tt >= T_RISE) { landDone = true; for (let i = 0; i < (portrait ? 14 : 24); i++) { const x = k.x + rndG() * k.w, v = (rndG() - 0.5) * 520 * sp; grain(x, surface(x) - 3, { v0: v, v1: v * 0.3, vy: -(120 + rndG() * 240) * sp, grav: 900, life: 0.6, pour: true, col: sandCol() }); } }
+  if (MAT === 'sand' && tt >= T_ANT && tt < T_RISE) { accP += 500 * dt; while (accP >= 1) { accP--; const sh = rndG() < 0.3, x = sh ? k.x + (rndG() < 0.5 ? rndG() * 0.1 : 1 - rndG() * 0.1) * k.w : k.x + rndG() * k.w;
+    grain(x, k.y + bodyDY() + (sh ? rndG() * 0.06 * k.h : rndG() * 4), { v0: (rndG() - 0.5) * 60, v1: (rndG() - 0.5) * 60, vy: 0, grav: portrait ? 800 : 1400, life: 1.6, pour: true }); } }
+  if (tt >= T_SET && tt < T_HOLD) {
+    if (MAT === 'sand') accH += 80 * dt; while (accH >= 1) { accH--; grain(DIR > 0 ? k.x + 4 : k.x + k.w - 4, k.y + rndG() * 10, { v0: 260 * sp, v1: 760 * sp, lift: 24 + rndG() * 34 }); }
+    wispT += dt; if (wispT >= 0.5) { wispT = 0; addWisp(k.y - 30 + rndG() * k.h * 0.5, 0, 0, 0.15); }
+  }
+  if (!windFired && tt >= T_HOLD) { windFired = true; announce(KINDS[k.kind].say); const dist = DIR > 0 ? k.x : W - (k.x + k.w); for (let i = 0; i < 5; i++) addWisp(k.y + (i + 0.5) / 5 * k.h, dist, 0.2, 0.3); }
+  if (tt >= T_HOLD) {if(k.drawHidden)k.drawHidden();eraseAny(tt, true);}
+  peakBurst = true;
+  if (!stampDone && L.stamp && tt >= T_THICK + 0.02) { stampDone = true; for (let i = 0; i < 12; i++) grain(k.x + L.stamp.x + (rndG() - 0.5) * L.stamp.w, k.y + L.stamp.y, { v0: 300 * sp, v1: 400 * sp, vy: -(80 + rndG() * 150) * sp, life: 0.45 }); }
+  if (!exitDone && tt >= T_SHOWN) { exitDone = true; if (MAT === 'sand') for (let i = 0; i < 20; i++) { const x = k.x + rndG() * k.w; grain(x, surface(x) - 2, { v0: 60, v1: 60, vy: -(150 + rndG() * 150), grav: 900, life: 0.5, pour: true }); } }
+  if (tt >= T_END + 0.5) { cast = null; tt = -1; }
+}
+
+// ---------- render ----------
+function paperPose(x){ // the paper card: a pendulum fall, a landing wobble, then wind flutter that dies as the tear starts
+  if (MAT !== 'paper' || reduced || !cast || tt < 0) return null;
+  const k = cast, t = tt, cxm = k.x + k.w / 2;
+  if (t < T_RISE) { const q = clamp((t - T_ANT) / (T_RISE - T_ANT), 0, 1), s = 1 - q;
+    return { px: cxm, py: k.y + bodyDY(), dx: (k.swing !== undefined ? k.swing : portrait ? 26 : 90 * k.u) * Math.sin(8.2 * q) * s, ang: 0.14 * Math.cos(8.2 * q) * s }; }
+  const a = t - T_RISE, e = x && x.e !== undefined ? x.e : ease((t - T_SET) / 0.9) * (1 - sm(clamp((t - (T_WIND - 0.1)) / 0.4, 0, 1)));
+  return { px: cxm, py: k.Yf + bodyDY(), dx: e * (portrait ? 1.2 : 2.4) * Math.sin(t * 27), ang: Math.exp(-a * 9) * Math.sin(a * 26) * 0.03 + e * 0.011 * (Math.sin(t * 19) + 0.6 * Math.sin(t * 31 + 1)) + (x && x.lean || 0) };
+}
+function cardShadow(dy, a){
+  const k = cast;
+  ctx.save(); ctx.globalAlpha = a;
+  if (T.flat) { const o = portrait ? 4 : 6 * k.u; ctx.fillStyle = INK; ctx.beginPath(); rr(ctx, k.x + o, k.y + dy + o, k.w, k.h, Math.min(k.w, k.h) * 0.07); ctx.fill(); }
+  else { ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 24 * DPR; ctx.shadowOffsetY = 8 * DPR; ctx.fillStyle = MAT === 'paper' ? T.paper.face : T.card; ctx.beginPath(); rr(ctx, k.x, k.y + dy, k.w, k.h, Math.min(k.w, k.h) * 0.07); ctx.fill(); }
+  ctx.restore();
+}
+function drawCard(dy, alpha){
+  const k = cast, L = k.L, cxm = k.x + k.w / 2, cym = k.y + k.h / 2 + dy, sc=pulse()*(reduced?1:1+.006*Math.sin(clock*2.2)), sh = MAT === 'paper' ? 1 : ease((tt - T_THICK) / 0.3), ac = T.accent[k.kind];
+  cardShadow(dy, alpha * sh);
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(cxm, cym); ctx.scale(sc, sc); ctx.drawImage(k.bmp, -k.w / 2, -k.h / 2, k.w, k.h); ctx.translate(-k.w / 2, -k.h / 2);
+  const ta = tt - T_THICK;
+  if (!reduced && ta >= 0) {
+    const p = L.plaque, q = clamp(ta / 0.2, 0, 1), uy = p.y + p.h / 2 + 0.014 * k.h, uh = portrait ? 5 : 8 * k.u, uw = p.w * 0.6 * ease(q), ux = p.x - p.w * 0.3;
+    if (q > 0) {
+      if (T.flat) { ctx.fillStyle = ac; ctx.strokeStyle = INK; ctx.lineWidth = portrait ? 2 : 3; ctx.beginPath(); rr(ctx, ux, uy, uw, uh, uh / 2); ctx.fill(); ctx.stroke(); }
+      else { ctx.fillStyle = ac; ctx.globalAlpha = alpha * 0.85; ctx.beginPath(); ctx.moveTo(ux, uy + uh * 0.4);
+        for (let i = 0; i <= 12; i++) ctx.lineTo(ux + uw * i / 12, uy + uh * (0.1 + 0.15 * Math.sin(i * 1.7)));
+        for (let i = 12; i >= 0; i--) ctx.lineTo(ux + uw * i / 12, uy + uh * (0.95 + 0.12 * Math.sin(i * 2.3)));
+        ctx.closePath(); ctx.fill(); ctx.globalAlpha = alpha; }
+    }
+    if (L.stamp) {
+      const s = L.stamp, a = clamp((tt - (T_THICK + 0.02)) / 0.15, 0, 1);
+      if (a > 0) { const z = 1 + 0.6 * (1 - ease(a)), rot = (-9 + 4 * ease(a)) * Math.PI / 180;
+        ctx.save(); ctx.translate(s.x, s.y); ctx.rotate(rot); ctx.scale(z, z); ctx.globalAlpha = alpha * Math.min(1, a * 3); ctx.fillStyle = ac; ctx.beginPath(); rr(ctx, -s.w / 2, -s.h / 2, s.w, s.h, s.h * 0.25); ctx.fill();
+        if (T.flat) { ctx.lineWidth = portrait ? 2.5 : 4; ctx.strokeStyle = INK; ctx.stroke(); }
+        ctx.fillStyle = T.flat ? INK : '#1d2a33'; ctx.font = `900 ${s.h * 0.55}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(KINDS.truth.tag, 0, 0); ctx.restore(); }
+    }
+    if (L.med && k.kind === 'door') {
+      const m = L.med, s = m.r * 0.95, a = clamp(ta / 0.25, 0, 1), ang = 25 * ease(a) * Math.PI / 180, hx = m.x - s * 0.6;
+      const arch = () => { ctx.beginPath(); ctx.moveTo(m.x - s * 0.6, m.y + s * 0.95); ctx.lineTo(m.x - s * 0.6, m.y - s * 0.2); ctx.arc(m.x, m.y - s * 0.2, s * 0.6, Math.PI, 0); ctx.lineTo(m.x + s * 0.6, m.y + s * 0.95); ctx.closePath(); };
+      ctx.save(); arch(); ctx.clip(); ctx.fillStyle = T.card; ctx.fillRect(m.x - s, m.y - s, 2 * s, 2.2 * s);
+      const g = ctx.createRadialGradient(m.x, m.y + s * 0.2, s * 0.05, m.x, m.y + s * 0.2, s * 0.9); g.addColorStop(0, ac); g.addColorStop(1, T.card); ctx.globalAlpha = alpha * ease(a); ctx.fillStyle = g; ctx.fillRect(m.x - s, m.y - s, 2 * s, 2.2 * s); ctx.restore();
+      ctx.save(); ctx.translate(hx, 0); ctx.scale(Math.cos(ang), 1); ctx.translate(-hx, 0); arch(); ctx.fillStyle = ac; ctx.fill(); ctx.lineWidth = T.flat ? (portrait ? 2 : 3) : 2; ctx.strokeStyle = T.flat ? INK : 'rgba(30,20,50,.5)'; ctx.stroke();
+      ctx.fillStyle = T.ink; ctx.beginPath(); ctx.arc(m.x + s * 0.32, m.y + s * 0.4, s * 0.07, 0, 6.283); ctx.fill(); ctx.restore();
+    }
+  }
+  ctx.restore(); ctx.globalAlpha = 1;
+}
+function drawNotebookArt(c,w,h){
+ c.save();c.strokeStyle='#a5b7d8';c.lineWidth=1.1;for(let y=h*.28;y<h*.92;y+=h*.075){c.beginPath();c.moveTo(w*.1,y);c.lineTo(w*.9,y);c.stroke();}
+ c.strokeStyle=T.accent.drawing;c.lineWidth=w*.015;c.lineCap='round';c.beginPath();c.moveTo(w*.14,h*.75);c.bezierCurveTo(w*.22,h*.39,w*.3,h*.48,w*.42,h*.7);c.bezierCurveTo(w*.55,h*.32,w*.6,h*.4,w*.66,h*.75);c.bezierCurveTo(w*.82,h*.44,w*.85,h*.52,w*.9,h*.72);c.stroke();
+ c.fillStyle=T.accent.night;c.beginPath();c.arc(w*.68,h*.3,w*.09,0,6.283);c.fill();c.fillStyle=T.card;c.beginPath();c.arc(w*.72,h*.27,w*.075,0,6.283);c.fill();c.restore();
+}
+function drawNotebookStub(k){
+ const x=DIR>0?k.x-11:k.x+k.w-17,w=28;ctx.save();ctx.fillStyle=T.paper.back;ctx.fillRect(x,k.y,w,k.h);ctx.strokeStyle=T.ink;ctx.lineWidth=2;
+ for(let y=k.y+15;y<k.y+k.h-5;y+=24){ctx.fillStyle=T.bg;ctx.beginPath();ctx.arc(x+w/2,y,4,0,6.283);ctx.fill();ctx.beginPath();ctx.ellipse(x+w/2-5,y,10,5,0,Math.PI*.3,Math.PI*1.7);ctx.stroke();}ctx.restore();
+}
+function drawPaperStress(k,dy){
+ if(reduced||MAT!=='paper'||tt<T_HOLD-.28||tt>T_THICK+.15)return;
+ const progress=clamp((tt-(T_HOLD-.28))/.7,0,1),x=DIR>0?k.x:k.x+k.w,y=k.y+dy,edge=DIR>0?1:-1,size=Math.min(k.w*.16,portrait?34:70)*Math.sin(progress*Math.PI*.75);
+ ctx.save();ctx.fillStyle=T.paper.back;ctx.strokeStyle=T.paper.rim;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y+size);ctx.quadraticCurveTo(x+edge*size*.2,y-size*.35,x+edge*size,y);ctx.lineTo(x,y+size);ctx.fill();ctx.stroke();
+ ctx.strokeStyle=T.paper.ink;ctx.globalAlpha=.55;ctx.beginPath();ctx.moveTo(x+edge*size*.25,y+size*.6);ctx.lineTo(x+edge*(size*.8),y+size*1.15);ctx.stroke();
+ for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(x+edge*i*3,y+size);ctx.lineTo(x+edge*(i*3+4),y+size+4+i);ctx.stroke();}ctx.restore();
+}
+function drawCast(dy){
+  const k = cast, ov = k.ov, alpha = reduced ? 1 - clamp((tt - T_HOLD) / 0.3, 0, 1) : 1;
+  if (alpha <= 0) return;
+  const relA = reduced ? 1 : clamp(0.35 + 0.65 * (tt - 0.85) / 0.3, 0.35, 1), th = (MAT === 'sand' && !reduced && tt >= 0.85 && tt < T_SET) ? 1 - 0.01 * Math.sin(Math.PI * (tt - 0.85) / 0.3) : 1;
+  ctx.save(); ctx.translate(k.x + k.w / 2, k.Yf + dy); ctx.scale(th, th); ctx.translate(-(k.x + k.w / 2), -(k.Yf + dy));
+  ctx.globalAlpha=alpha;
+  const crease=MAT==='paper'&&!reduced?Math.sin(Math.PI*clamp((tt-(T_HOLD-.18))/.9,0,1))*.012*k.h:0;
+  if(crease>.1){const n=10,sw=k.bw/n;for(let i=0;i<n;i++){const u=(i+.5)/n,offset=crease*Math.sin(u*Math.PI*2+.7)*(.3+.7*(DIR>0?1-u:u));ctx.drawImage(k.base,i*sw*DPR,0,Math.min(sw*DPR+1,k.base.width-i*sw*DPR),k.base.height,k.bx+i*sw,k.by+dy+offset,sw+1/DPR,k.bh);}}
+  else ctx.drawImage(k.base,k.bx,k.by+dy,k.bw,k.bh);
+  if (MAT === 'sand') { ctx.globalAlpha = alpha * relA; ctx.drawImage(k.rel, k.bx, k.by + dy, k.bw, k.bh); }
+  if (MAT === 'sand' && !reduced && tt >= 0.85 && tt < T_SET) {
+    const s = (tt - 0.85) / 0.3, sw = k.sw || (k.sw = mk(k.bw, k.bh)), c = sw[1];
+    c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'source-over'; c.clearRect(0, 0, sw[0].width, sw[0].height); c.setTransform(DPR, 0, 0, DPR, 0, 0);
+    const mx = k.bw * (1 - s), my = k.bh * s, b = k.bw * 0.18, g = c.createLinearGradient(mx + b, my - b, mx - b, my + b);
+    g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(255,255,255,.55)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = g; c.fillRect(0, 0, k.bw, k.bh); c.globalCompositeOperation = 'destination-in'; c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(k.base, 0, 0); c.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = Math.sin(Math.PI * s); ctx.drawImage(sw[0], k.bx, k.by + dy, k.bw, k.bh);
+  }
+  ctx.restore();ctx.globalAlpha=1;drawPaperStress(k,dy);
+}
+function drawBody(){
+  const k = cast, dy = bodyDY(), full = reduced ? tt >= T_HOLD : (k.ptr >= k.total && tt >= T_THICK), pz = paperPose();
+  if (pz) { ctx.save(); ctx.translate(pz.px + pz.dx, pz.py); ctx.rotate(pz.ang); ctx.translate(-pz.px, -pz.py); }
+  if (MAT === 'paper' && !reduced && !full) cardShadow(dy, 1);
+  if (full) { let a = 1; if (reduced) { a = clamp((tt - T_HOLD) / 0.3, 0, 1) * (tt >= T_SHOWN ? 1 - clamp((tt - T_SHOWN) / 0.3, 0, 1) : 1); } drawCard(dy, a); }
+  else if (!reduced && k.ptr > 0) {
+    const t = k.tmp || (k.tmp = mk(k.bw, k.bh)[0]), tc = t.getContext('2d');
+    tc.setTransform(1, 0, 0, 1, 0, 0); tc.globalCompositeOperation = 'source-over'; tc.clearRect(0, 0, t.width, t.height); tc.setTransform(DPR, 0, 0, DPR, 0, 0); tc.drawImage(k.bmp, k.ov, k.ov, k.w, k.h);
+    tc.setTransform(1, 0, 0, 1, 0, 0); tc.globalCompositeOperation = 'destination-in'; tc.drawImage(k.rev, 0, 0); tc.globalCompositeOperation = 'source-over';
+    ctx.drawImage(t, k.bx, k.by + dy, k.bw, k.bh);
+  }
+  if (!full || (reduced && tt < T_HOLD + 0.3) || (!reduced && k.ptr < k.total)) drawCast(dy);
+  if (pz) ctx.restore();
+}
+function render(){
+  ctx.clearRect(0,0,W,H);const foreground=ctx;ctx=bgCtx;drawBg();ctx=foreground;
+  gpuCanvas.style.visibility=reduced||!gpu?'hidden':'visible';
+  if(gpu&&!reduced){gpu.draw(interpolation,{interpolation:true,colors:T.sand.map(hex=>[parseInt(hex.slice(1,3),16)/255,parseInt(hex.slice(3,5),16)/255,parseInt(hex.slice(5,7),16)/255])});}
+  drawDebris();
+  if(notebookStub)drawNotebookStub(notebookStub);
+  if(reduced)drawReducedEvent();
+  if (scene) sceneDraw(); else if (cast) drawBody();
+  drawNear();
+}
+function drawReducedEvent(){
+ if(winAge<0&&tickAge<0)return;ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=T.flat?LIGHT:T.card;
+ if(winAge>=0){const size=Math.min(H*.22,W*.32),cx=W*.5,cy=H*.39;ctx.fillStyle=T.accent.truth;ctx.strokeStyle=T.paper.rim;ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=120;i++){const a=i/120*Math.PI*2,x=cx+16*Math.sin(a)**3/18*size,y=cy-(13*Math.cos(a)-5*Math.cos(2*a)-2*Math.cos(3*a)-Math.cos(4*a))/18*size;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);}ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle=T.card;ctx.font=`900 ${portrait?30:72*S}px ${FONT}`;ctx.fillText('A LITTLE VICTORY',W*.5,H*.61);}
+ else{ctx.strokeStyle=T.accent.door;ctx.lineWidth=4;ctx.beginPath();ctx.arc(W*.5,H*.4,Math.min(W*.28,H*.2),Math.PI*1.1,Math.PI*1.9);ctx.stroke();ctx.font=`800 ${portrait?26:60*S}px ${FONT}`;ctx.fillText('A FRESH BREEZE',W*.5,H*.57);}
+ ctx.restore();
+}
+function drawDebris(){
+  ctx.lineCap = 'round'; ctx.strokeStyle = T.ui; ctx.lineWidth = 2;
+  for (const w of wisps) { ctx.globalAlpha = w.a * (1 - clamp((w.age / w.life - 0.75) / 0.25, 0, 1)); const x2 = w.x - DIR * w.len; ctx.beginPath(); ctx.moveTo(w.x, w.y); ctx.quadraticCurveTo((w.x + x2) / 2, w.y + 6, x2, w.y - 2); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  if (!reduced) {
+    const cap = portrait ? 12 : 18;
+    for(const g of grains){const drawX=g.px+(g.x-g.px)*interpolation,drawY=g.py+(g.y-g.py)*interpolation;
+      if (g.flake) { FL.push(g); continue; }
+      if (g.scrap) { SC.push(g); continue; }
+      if (g.riv) { // river grains: a streak along the local flow, so the trail bends with the river
+        const sp = Math.hypot(g.vx, g.vy) || 1, len = clamp(sp * 0.024, g.size, Math.min(3.2 * g.size, cap)), ci = g.col, key = ci + '|' + (g.size < 4 ? 0 : g.size < 6 ? 1 : 2);
+        let b = STREAKS.get(key); if (!b) { b = { col: ci, w: g.size < 4 ? 3 : g.size < 6 ? 5 : 7, p: [] }; STREAKS.set(key, b); }
+        const fd = 1;
+        b.p.push(drawX,drawY,drawX-g.vx/sp*len*fd,drawY-g.vy/sp*len*fd);
+        continue;
+      }
+      const f = 0, a = g.settled ? .85 : 1, len = clamp(Math.abs(g.vx) * 0.02, g.size, Math.min(3 * g.size, cap));
+      ctx.globalAlpha = a; ctx.fillStyle = g.col; ctx.fillRect(DIR>0?drawX-len:drawX,drawY,len,g.size);
+    }
+    ctx.globalAlpha = 1; ctx.lineCap = T.flat ? 'butt' : 'round'; if (!T.flat) ctx.globalAlpha = 0.94;
+    for (const b of STREAKS.values()) {
+      if (!b.p.length) continue;
+      ctx.strokeStyle = b.col; ctx.lineWidth = b.w * (portrait ? 0.55 : Math.max(0.7, H / 1080)); ctx.beginPath();
+      for (let i = 0; i < b.p.length; i += 4) { ctx.moveTo(b.p[i], b.p[i + 1]); ctx.lineTo(b.p[i + 2], b.p[i + 3]); }
+      ctx.stroke(); b.p.length = 0;
+    }
+    ctx.globalAlpha = 1; ctx.lineCap = 'round';
+    if (FL.length || SC.length) drawPaperBits();
+  }
+}
+
+// ---------- scene: several cards at once (Fake-Out answers, a round change) ----------
+let scene = null;
+Object.assign(KINDS, {
+  ansA: { title: 'A', big: ['Pink'], sub: [] }, ansB: { title: 'B', big: ['Orange'], sub: [] }, ansC: { title: 'C', big: ['Grey'], sub: [] }, ansD: { title: 'D', big: ['White'], sub: [] },
+  rndOld: { title: 'ROUND 3', big: ['Which animal', 'sleeps standing up?'], sub: [] }, rndNew: { title: 'ROUND 4', big: ['Baby flamingos', 'are born…?'], sub: [] },
+  ansN1: { title: 'A', big: ['Ana'], sub: [] }, ansN2: { title: 'B', big: ['Ben'], sub: [] }, ansN3: { title: 'C', big: ['Cleo'], sub: [] }, ansN4: { title: 'D', big: ['Dev'], sub: [] } });
+Object.assign(THEMES.pop.accent, { ansA: '#ff5d8f', ansB: '#4cc9f0', ansC: '#ffd166', ansD: '#b388ff', rndOld: '#4cc9f0', rndNew: '#ff5d8f', ansN1: '#ff5d8f', ansN2: '#4cc9f0', ansN3: '#ffd166', ansN4: '#b388ff' });
+Object.assign(THEMES.gouache.accent, { ansA: '#c9788f', ansB: '#7a9ad0', ansC: '#d9b46a', ansD: '#8f8fd0', rndOld: '#7a9ad0', rndNew: '#c9788f', ansN1: '#c9788f', ansN2: '#7a9ad0', ansN3: '#d9b46a', ansN4: '#8f8fd0' });
+const SCENES = {
+  fakeout: { row: ['ansA', 'ansB', 'ansC', 'ansD'], s0: [0, 0.14, 0.28, 0.42], stay: 2, order: [0, 1, 3], ws: [2.3, 2.55, 2.85], stamp: true,
+    q: ['Baby flamingos', 'are born…?'], q2: ['Baby flamingos', 'are born grey.'], say: 'The truth: grey. The other answers blow away.' },
+  dawn: { row: ['ansN1', 'ansN2', 'ansN3', 'ansN4'], s0: [0, 0.14, 0.28, 0.42], stay: -1, order: [2], ws: [2.4], stamp: false,
+    q: ['Night falls…'], q2: ['Cleo did not', 'wake up.'], say: 'Dawn: Cleo did not wake up. Her card crumbles.' },
+  round: { row: ['rndOld', 'rndNew'], s0: [0, 2.75], stay: 1, order: [0], ws: [2.35], same: true, stamp: false, q: ['Round 3 → Round 4'], q2: ['Next question'], say: 'Next round: the old question shreds as the new one arrives.' }
+};
+function withCard(c, fn){ const sc = cast, st = tt; cast = c; tt = c.t; try { return fn(); } finally { cast = sc; tt = st; } }
+function makeCard(kd, cx, cw, ch, Yf, u, sid){
+  const ov = portrait ? 4 : 6, foot = Math.round(ch * 0.07), rimIn = 0.04 * cw, rimT = portrait ? 5 : Math.round(12 * u), inner = cw - 2 * (rimIn + rimT), spec = KINDS[kd], cy = Yf - ch;
+  const isAns = kd.startsWith('ans'), tSize = isAns ? (portrait ? Math.max(24, cw * .23) : 120 * u) : portrait ? Math.max(11, ch * 0.055) : 40 * u;
+  let bigSize = portrait ? 30 : 70 * u; for (const l of spec.big) bigSize = fitSize(l, inner * 0.86, bigSize, 900, portrait ? 20 : 28 * u);
+  const L = { rimIn, rimT, inner, stripY: 0.085 * ch, stripH: Math.max(4, 0.012 * ch + 2), titleY: (isAns ? 0.29 : 0.17) * ch, tSize, med: null, bigSize, subSize: 18,
+    plaque: { x: cw / 2, y: 0.56 * ch, w: inner * 0.9, h: bigSize * (spec.big.length * 1.15 + 0.5) }, subs: [], stamp: null };
+  return { kind: kd, ans: true, sid, x: cx, y: cy, w: cw, h: ch, ov, foot, bx: cx - ov, by: cy - ov, bw: cw + 2 * ov, bh: ch + 2 * ov + foot, Yf, L, u,
+    cells: [], ptr: 0, total: 0, eroded: 0, noSink: true, swing: portrait ? 6 : 22 * u, t: -1, g: 0, alpha: 1, ws: NaN, s0: 0, gone: -1, landed: false, acc: 0 };
+}
+function buildScene(type){
+  const sc = SCENES[type], n = sc.row.length, u = portrait ? 1 : H / 1080, Yf = Math.round(nearMean() - 0.02 * H), cards = [];
+  let cw, ch, gap;
+  if (sc.same) { cw = Math.round(portrait ? W * 0.84 : 900 * u); ch = Math.round(portrait ? Math.min(H * 0.5, cw * 0.95) : 600 * u); gap = 0; }
+  else if (portrait) { gap=14;cw=Math.floor((W*.92-gap)/2);ch=Math.round(Math.min(cw*1.24,H*.235)); }
+  else { cw = Math.round(380 * u); ch = Math.round(560 * u); gap = Math.round(44 * u); }
+  const xs=Math.round((W-(sc.same?cw:portrait?2*cw+gap:n*cw+(n-1)*gap))/2);
+  sc.row.forEach((kd,i)=>{let x=sc.same?xs:xs+(portrait?i%2:i)*(cw+gap),yf=portrait&&!sc.same?H*.39+Math.floor(i/2)*(ch+gap):Yf;
+    if(sc.same){cw=Math.round(portrait?W*.86:W*.4);ch=Math.round(portrait?H*.27:H*.48);x=portrait?(W-cw)/2:W*(i?.54:.06);yf=portrait?H*(i?.76:.44):H*.72;}
+    const c=makeCard(kd,x,cw,ch,yf,u,i+1);c.s0=sc.s0[i];cards.push(c);});
+  (DIR > 0 ? sc.order : sc.order.slice().reverse()).forEach((ci, j) => { cards[ci].ws = sc.ws[j]; });
+  scene = { type, sc, cards, S: 0, Yf, cw, ch, u, wisps: false, sT: -1, allGone: -1, acc: 0 };
+  for (const c of cards) withCard(c, () => { if (MAT === 'sand') buildCells(); renderAssets(); });
+}
+function ansEngrave(c, k, o, lit, dark, face){
+  const L = k.L, p = L.plaque, big = KINDS[k.kind].big, nl = big.length; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `900 ${L.bigSize}px ${FONT}`;
+  big.forEach((ln, i) => { const y = p.y + (i - (nl - 1) / 2) * L.bigSize * 1.15; c.fillStyle = lit; c.fillText(ln, p.x + o * 0.7, y + o * 0.7); c.fillStyle = dark; c.fillText(ln, p.x - o * 0.6, y - o * 0.6); c.fillStyle = face; c.fillText(ln, p.x, y); });
+}
+function ansPrint(c, k, ink){
+  const L = k.L, p = L.plaque, big = KINDS[k.kind].big, nl = big.length; c.fillStyle = ink; c.globalAlpha = 1; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `900 ${L.bigSize}px ${FONT}`;
+  big.forEach((ln, i) => c.fillText(ln, p.x, p.y + (i - (nl - 1) / 2) * L.bigSize * 1.15));
+}
+function fireScene(type){
+  recycleAssets();clearDebris();fireN++;cast=null;tt=-1;grains=[]; wisps = []; wispT = 0; buildRiver(); buildScene(type);
+  if (reduced) { scene.S = 0.3; scene.cards.forEach(c => { c.t = T_SET; c.g = 1; }); }
+}
+function restoreScene(){ // after a resize or a theme change: rebuild the cards and replay what is already gone
+  const S0 = scene.S, ty = scene.type, keep = { wisps: scene.wisps, sT: scene.sT, allGone: scene.allGone }, old = scene.cards;
+  buildScene(ty); Object.assign(scene, keep); scene.S = S0;
+  scene.cards.forEach((c, i) => { c.gone = old[i].gone; c.landed = old[i].landed; if (!reduced && isFinite(c.ws) && S0 > c.ws) withCard(c, () => eraseAny(T_WIND + (S0 - c.ws) * 1.15, false)); });
+  sceneClock(0);
+}
+const S_WIND = 2.15, S_SINK = 7.0, S_END = 7.6;
+function sceneClock(dt){
+  const s = scene, S = (s.S += dt), sk = 1 - clamp((S - S_SINK) / 0.5, 0, 1);
+  for (const c of s.cards) {
+    c.t = reduced ? T_SET : S - c.s0;
+    let g = c.t < 0 ? 0 : reduced ? 1 : clamp(riseP(c.t), 0, 1);
+    if (reduced) { c.alpha = clamp((S - c.s0) / 0.3, 0, 1) * (isFinite(c.ws) ? 1 - clamp((S - S_WIND) / 0.4, 0, 1) : 1); if (isFinite(c.ws) && S > S_WIND && c.alpha <= 0 && c.gone < 0) c.gone = S; }
+    if (c.gone >= 0) g *= 1 - clamp((S - c.gone) / 0.6, 0, 1);
+    c.g = g * sk;
+  }
+}
+function sceneUpdate(dt){
+  const s = scene, sc = s.sc, sp = SPD(), tr = s.cards[sc.stay]; sceneClock(dt); const S = s.S;
+  if (S >= S_END) { scene = null; return; }
+  if (!s.wisps && S >= S_WIND) { s.wisps = true; announce(sc.say); if (!reduced) { const c0 = s.cards[0], dist = DIR > 0 ? c0.x : W - (c0.x + c0.w); for (let i = 0; i < 5; i++) addWisp(s.Yf - s.ch + (i + 0.5) / 5 * s.ch, dist, 0.2, 0.3); } }
+  if (!reduced && S > 1.2 && S < S_WIND) { wispT += dt; if (wispT >= 0.5) { wispT = 0; addWisp(s.Yf - s.ch + rndG() * s.ch * 0.5, 0, 0, 0.15); } }
+  let lies = 0, gone = 0;
+  for (const c of s.cards) {
+    if (isFinite(c.ws)) { lies++; if (c.gone >= 0) gone++; }
+    if (reduced) continue;
+    withCard(c, () => {
+      if (MAT === 'sand' && c.t >= T_ANT && c.t < T_RISE) { c.acc += 170 * dt * (portrait ? 0.6 : 1); while (c.acc >= 1) { c.acc--; const sd = rndG() < 0.3, x = sd ? c.x + (rndG() < 0.5 ? rndG() * 0.1 : 1 - rndG() * 0.1) * c.w : c.x + rndG() * c.w;
+        grain(x, c.y + bodyDY() + (sd ? rndG() * 0.06 * c.h : rndG() * 4), { v0: (rndG() - 0.5) * 60, v1: (rndG() - 0.5) * 60, vy: 0, grav: portrait ? 800 : 1400, life: 1.2, pour: true }); } }
+      if (MAT === 'paper' && !c.landed && c.t >= T_RISE) { c.landed = true; for (let i = 0; i < (portrait ? 5 : 10); i++) { const x = c.x + rndG() * c.w, v = (rndG() - 0.5) * 420 * sp; grain(x, surface(x) - 3, { v0: v, v1: v * 0.3, vy: -(120 + rndG() * 240) * sp, grav: 900, life: 0.6, pour: true, col: sandCol() }); } }
+      if (isFinite(c.ws) && S >= c.ws && c.gone < 0) { eraseAny(T_WIND + (S - c.ws) * 1.15, true); if (c.ptr >= c.total) c.gone = S; }
+    });
+  }
+  if (gone === lies && s.allGone < 0) s.allGone = S;
+  if (!reduced && sc.stamp && MAT === 'sand' && S >= 2.25 && S < 3.7) { s.acc = (s.acc || 0) + 70 * dt; while (s.acc >= 1) { s.acc--; grain(tr.x + rndG() * tr.w, tr.y + rndG() * 8, { v0: 300 * sp, v1: 900 * sp, vy: -(60 + rndG() * 80) * sp, lift: 20 + rndG() * 40 }); } }
+  if ((sc.stamp || sc.q2) && s.sT < 0 && s.allGone >= 0 && S >= s.allGone + 0.12) { s.sT = S;
+    if (sc.stamp && !reduced) for (let i = 0; i < 12; i++) grain(tr.x + tr.w / 2 + (rndG() - 0.5) * tr.w * 0.7, tr.y + tr.h * 0.86, { v0: 300 * sp, v1: 400 * sp, vy: -(80 + rndG() * 150) * sp, life: 0.45 }); }
+}
+function drawBanner(s){
+  const S = s.S, sc = s.sc, u = s.u, a0 = ease((S - 0.15) / 0.4) * (1 - clamp((S - S_SINK) / 0.4, 0, 1)), mix=s.sT>=0?(reduced?1:clamp((S-s.sT)/.3,0,1)):0;
+  const fs = portrait ? Math.max(24,Math.min(31,W*.072)) : 72*u, y0=portrait?H*.12:H*.18;
+  const put = (lines, a, dy) => { if (a <= 0.01) return; const ln = portrait ? lines : [lines.join(' ')];
+    ctx.save(); ctx.globalAlpha = a; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `900 ${fs}px ${FONT}`; ctx.lineJoin = 'round';
+    ln.forEach((t, i) => { const y = y0 + dy + (i - (ln.length - 1) / 2) * fs * 1.2;
+      if (T.flat) { ctx.lineWidth = fs * 0.16; ctx.strokeStyle = INK; ctx.strokeText(t, W / 2, y); } else { ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 12 * DPR; }
+      ctx.fillStyle = T.flat ? LIGHT : T.card; ctx.fillText(t, W / 2, y); });
+    ctx.restore(); };
+  const mx = ease(mix), sl = reduced ? 0 : fs * 0.8, ao = 1-mx, an = mx; put(sc.q, a0 * ao, -mx * sl); if (sc.q2) put(sc.q2, a0 * an, (1 - mx) * sl);
+}
+function drawStamp(c, dy, a, mul){
+  if (a <= 0) return; const w = c.w * 0.84, h = Math.max(16, c.h * 0.13), z = 1 + 0.6 * (1 - ease(a)), rot = (-9 + 4 * ease(a)) * Math.PI / 180;
+  ctx.save(); ctx.translate(c.x + c.w / 2, c.y + c.h * 0.86 + dy); ctx.rotate(rot); ctx.scale(z, z); ctx.globalAlpha = mul * Math.min(1, a * 3); ctx.fillStyle = T.accent.truth; ctx.beginPath(); rr(ctx, -w / 2, -h / 2, w, h, h * 0.25); ctx.fill();
+  if (T.flat) { ctx.lineWidth = portrait ? 2.5 : 4; ctx.strokeStyle = INK; ctx.stroke(); }
+  ctx.fillStyle = T.flat ? INK : '#1d2a33'; ctx.font = `900 ${h * 0.6}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(KINDS.truth.tag, 0, 0); ctx.restore();
+}
+function drawSceneCard(c, S, sink){
+  const s = scene, isT = c === s.cards[s.sc.stay], lie = isFinite(c.ws), dy = bodyDY() + sink, wind = sm(clamp((S - S_WIND) / 0.4, 0, 1)), brace = wind * (1 - sm(clamp((S - 3.8) / 0.5, 0, 1)));
+  const fl = ease((c.t - T_SET) / 0.9), pz = paperPose(lie ? { e: fl * (1 + 3 * wind) } : { e: fl * (1 + 2.5 * brace), lean: DIR * 0.03 * brace });
+  ctx.save();
+  if (isT && s.sT >= 0) { const z=1+.045*Math.sin(Math.PI*clamp((S-s.sT)/.5,0,1))+.006*Math.sin((S-s.sT)*2.5), cx = c.x + c.w / 2, cy = c.y + c.h / 2 + dy; ctx.translate(cx, cy); ctx.scale(z, z); ctx.translate(-cx, -cy); }
+  if (pz) { ctx.translate(pz.px + pz.dx, pz.py); ctx.rotate(pz.ang); ctx.translate(-pz.px, -pz.py); }
+  if (MAT === 'paper') { if (T.flat) { ctx.shadowColor = INK; ctx.shadowBlur = 0; ctx.shadowOffsetX = ctx.shadowOffsetY = (portrait ? 4 : 6 * c.u) * DPR; } else { ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 24 * DPR; ctx.shadowOffsetY = 8 * DPR; } }
+  drawCast(dy);
+  ctx.shadowColor = 'rgba(0,0,0,0)'; ctx.shadowBlur = 0; ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+  if (isT && s.sc.stamp && s.sT >= 0) drawStamp(c, dy, (S - s.sT) / 0.15, 1);
+  ctx.restore();
+}
+function sceneDraw(){
+  const s = scene, S = s.S, sc = s.sc, tr = s.cards[sc.stay] || s.cards[0], sk = clamp((S - S_SINK) / (S_END - S_SINK), 0, 1), sink = reduced ? 0 : sk * sk * (s.ch + tr.foot + 0.04 * H), fade = reduced ? 1 - sk : 1;
+  if (sc.q) drawBanner(s);
+  if (sc.stamp && s.sT >= 0) { const a = ease((S - s.sT) / 0.4) * (1 - sk), cx = tr.x + tr.w / 2, cy = tr.y + tr.h / 2 + sink, r = tr.h * 0.85, g = ctx.createRadialGradient(cx, cy, r * 0.2, cx, cy, r);
+    g.addColorStop(0, T.accent.truth); g.addColorStop(1, T.accent.truth + '00'); ctx.save(); ctx.globalAlpha = a * (reduced ? 0.5 : 0.46 + 0.06 * Math.sin(S * 3.2)); ctx.fillStyle = g; ctx.fillRect(cx - r, cy - r, 2 * r, 2 * r); ctx.restore(); }
+  for (const c of s.cards) {
+    if (c.t < 0 || c.gone >= 0 || c.alpha <= 0) continue;
+    if (!reduced) { withCard(c, () => drawSceneCard(c, S, sink)); continue; }
+    ctx.save(); ctx.globalAlpha = c.alpha * fade; ctx.drawImage(c.base, c.bx, c.by, c.bw, c.bh); if (MAT === 'sand') ctx.drawImage(c.rel, c.bx, c.by, c.bw, c.bh);
+    if (c === tr && sc.stamp && s.sT >= 0) drawStamp(c, 0, (S - s.sT) / 0.15, c.alpha * fade);
+    ctx.restore();
+  }
+}
+function sceneLeft(){
+  const out = scene.cards.filter(c => isFinite(c.ws) && c.gone >= 0).map(c => { const lim = Math.round((c.ov + c.h - 1) * DPR), cnt = k => { const d = k.getContext('2d').getImageData(0, 0, k.width, lim).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 8) n++; return n; }; return { kind: c.kind, base: cnt(c.base), rel: cnt(c.rel) }; });
+  return { scene: scene.type, S: +scene.S.toFixed(2), gone: out };
+}
+
+
+// ---------- boot: fixed simulation ticks, interpolated debris, no reduced-motion loop ----------
+let last=0,fpsN=0,fpsT=0;
+function stop(){paused=true;if(raf)cancelAnimationFrame(raf);raf=0;last=0;}
+function resume(){if(reduced)return;paused=false;last=0;if(!raf)raf=requestAnimationFrame(frame);}
+function frame(now){raf=0;if(paused||reduced)return;
+ const dt=last?Math.max(0,(now-last)/1000):0;last=now;if(dt>0){frameTimes.push(dt*1000);if(frameTimes.length>600)frameTimes.shift();}
+ accumulator+=Math.min(dt,.1);while(accumulator>=1/60){update(1/60);if(gpu)gpu.update(1/60,clock,eventState());accumulator-=1/60;}
+ interpolation=accumulator*60;render();frames++;fpsN++;if(now-fpsT>1000){window.__fps=fpsN*1000/(now-fpsT);fpsN=0;fpsT=now;}raf=requestAnimationFrame(frame);
+}
+function setTheme(name){if(!THEMES[name])return;themeName=name;T=THEMES[name];bgGrad=null;document.documentElement.style.setProperty('--ui',T.ui);
+ if(cast){const prior={revealAuthorized:cast.revealAuthorized,hiddenReady:cast.hiddenReady,bmp:cast.bmp},t=tt;renderAssets();cast.revealAuthorized=prior.revealAuthorized;if(prior.hiddenReady){if(faceProvider){cast.bmp=prior.bmp;cast.hiddenReady=true;}else if(cast.drawHidden)cast.drawHidden();}tt=t;eraseAny(t,false);}if(scene)restoreScene();collectUnusedAssets();render();
+}
+function coverage(){const k=cast;return k?{ptr:k.ptr,total:k.total,eroded:k.total?k.ptr/k.total:0,cardDrawn:k.hiddenReady&&k.ptr>=k.total}:null;}
+function event(type='idle'){if(type==='win'){tickAge=-1;scene=cast=null;notebookStub=null;tt=-1;clearDebris();winAge=0;announce('The wind gathers a heart, then returns to the dunes.');}else if(type==='tick'){winAge=-1;tickAge=0;announce('A ripple of wind crosses the dunes.');}else{scene=null;cast=null;notebookStub=null;tt=-1;tickAge=winAge=-1;clearDebris();initAmbient();}render();if(!reduced&&!paused)resume();}
+function skip(){if(cast&&faceProvider&&!cast.revealAuthorized){tt=T_SET;render();return;}clearDebris();if(scene){scene.S=4.6;scene.cards.forEach(c=>{if(isFinite(c.ws)){c.gone=4.4;c.ptr=c.total;}else{c.t=T_THICK;c.g=1;}});scene.sT=4.5;scene.allGone=4.4;announce(scene.sc.say);}else if(cast){reveal();tt=T_THICK;eraseAny(99,false);announce(KINDS[cast.kind].say);}render();}
+function reset(nextSeed=seed){stop();seed=Number(nextSeed)>>>0;rnd=prng(seed);for(let i=0;i<nTab.length;i++)nTab[i]=rnd();rndG=prng(seed^0x9e3779b9);rndD=prng(seed^0x51ed270b);rndC=prng(seed^0x2c1b3c6d);scene=null;cast=null;notebookStub=null;tt=-1;clock=0;fireN=0;uid=0;windOverride=null;tickAge=winAge=-1;clearDebris();recycleAssets();accumulator=0;frameTimes.length=0;frames=0;for(const k of Object.keys(metrics))metrics[k]=0;bgGrad=stars=null;dep.fill(0);if(field){field.setSeed(seed);field.setViewport(W,H);field.setGround(portrait?.74:.84);}if(gpu)gpu.reset(seed);initAmbient();render();}
+function step(seconds){stop();const n=Math.min(1800,Math.max(0,Math.round(seconds*60)));if(!reduced)for(let i=0;i<n;i++){update(1/60);if(gpu)gpu.update(1/60,clock,eventState());}interpolation=1;render();return clock;}
+function state(){return{scene:scene&&{type:scene.type,S:scene.S,sT:scene.sT,allGone:scene.allGone,cards:scene.cards.map(c=>({fontSize:c.L.bigSize,titleSize:c.L.tSize,stamp:{x:c.x+c.w*.08,y:c.y+c.h*.795,w:c.w*.84,h:c.h*.13},kind:c.kind,t:c.t,ptr:c.ptr,total:c.total,gone:c.gone,alpha:c.alpha,x:c.x,y:c.y,w:c.w,h:c.h,ws:Number.isFinite(c.ws)?c.ws:null}))},tt,clock,mat:MAT,material:MAT,paper:PAPER,kind:cast&&cast.kind,held,ptr:cast?cast.ptr:0,total:cast?cast.total:0,grains:grains.length,dep:Math.max(0,...dep),portrait,reduced,dir:DIR,cell:cs,renderer:gpu?'webgl2':'canvas2d',gpuReason,gpuParticles:gpu&&!reduced?gpu.count:0,width:W,height:H,seed,frames,winAge,tickAge,paused,frameTimes:frameTimes.slice(),metrics:{...metrics},pooledCanvases:[...canvasPool.values()].reduce((n,a)=>n+a.length,0),hiddenReady:!!cast&&cast.hiddenReady,cast:cast&&{x:cast.x,y:cast.y,w:cast.w,h:cast.h,Yf:cast.Yf,foot:cast.foot},L:cast&&cast.L};}
+addEventListener('resize',()=>{resize();collectUnusedAssets();render();});
+document.querySelectorAll('#hud [data-k]').forEach(b=>b.onclick=()=>fire(b.dataset.k));
+document.getElementById('bTheme').onclick=()=>setTheme(themeName==='pop'?'gouache':'pop');
+const bMat=document.getElementById('bMat'),bPaper=document.getElementById('bPaper');
+function syncHud(){bMat.textContent=MAT;bPaper.textContent=PAPER;bPaper.style.display=MAT==='paper'?'':'none';}
+function again(){syncHud();fire(scene?scene.type:cast?cast.kind:kind||'truth');render();}
+bMat.onclick=()=>{MAT=MAT==='sand'?'paper':'sand';again();};bPaper.onclick=()=>{PAPER=PAPER==='tear'?'shred':'tear';again();};document.getElementById('bSkip').onclick=skip;
+addEventListener('keydown',e=>{if(e.key==='Escape')skip();});
+motionMedia.addEventListener('change',e=>{if(Q.get('motion')==='0'||Q.get('motion')==='1')return;reduced=e.matches;if(reduced){stop();clearDebris();if(scene){scene.S=4.6;scene.cards.forEach(c=>{c.t=T_THICK;c.g=1;if(Number.isFinite(c.ws))c.gone=4.4;});scene.sT=4.5;}else if(cast){tt=faceProvider&&!cast.revealAuthorized?T_SET:T_THICK;if(cast.drawHidden&&tt===T_THICK)cast.drawHidden();}}render();if(!reduced)resume();});
+syncHud();document.documentElement.style.setProperty('--ui',T.ui);resize();
+// GPU factory is inserted before this IIFE. No hardware renderer means a reduced CPU visual fallback.
+try{if(!Q.has('nogpu')&&window.PartyboxWindGPU){field=new window.PartyboxWindGPU.WindField(seed,DIR);field.setViewport(W,H);field.setGround(portrait?.74:.84);gpu=new window.PartyboxWindGPU.GpuSand(gpuCanvas,{phone:portrait,seed,dir:DIR,field});gpu.resize(W,H,DPR);gpuReason='';}}catch(e){gpuReason=String(e.message||e);gpu=null;}
+if(!field&&window.PartyboxWindGPU){field=new window.PartyboxWindGPU.WindField(seed,DIR);field.setViewport(W,H);field.setGround(portrait?.74:.84);}
+if(!gpu)gpuReason=gpuReason==='initializing'?'WebGL2 unavailable':gpuReason;
+gpuCanvas.addEventListener('webglcontextlost',e=>{e.preventDefault();gpu=null;gpuReason='WebGL context lost';gpuCanvas.style.visibility='hidden';initAmbient();render();});
+// Eager warm-up makes scenes use the same canvas pool; independent RNG/state and no caller callbacks.
+function warmAll(){
+ if(reduced||Q.get('warm')==='0')return;
+ const save={rnd,rndG,rndD,rndC,fireN,faceProvider,kind,clock,uid,RV,wisps,grains,wispT,windFired,peakBurst,poofDone,held,antDone,stampDone,exitDone,landDone,accP,accH,tt,cast,scene};faceProvider=null;
+ const oldMetrics={...metrics};
+ for(const mode of ['truth','fakeout','round','dawn']){rnd=prng(11);rndG=prng(12);rndD=prng(13);rndC=prng(14);fire(mode);for(const b of activeCanvases)b.getContext('2d').getImageData(0,0,1,1);}
+ clearDebris();recycleAssets();({rnd,rndG,rndD,rndC,fireN,faceProvider,kind,clock,uid,RV,wisps,grains,wispT,windFired,peakBurst,poofDone,held,antDone,stampDone,exitDone,landDone,accP,accH,tt,cast,scene}=save);Object.assign(metrics,oldMetrics);metrics.warmups+=4;
+}
+warmAll();initAmbient();
+window.__sand={fire:(k,auto)=>{fire(k,auto);render();},reveal,theme:setTheme,coverage,fps:()=>window.__fps,grains:()=>reduced?0:grains.length+(gpu?gpu.count:0),material:(m,p)=>{if(m)MAT=m==='paper'?'paper':'sand';if(p)PAPER=p==='shred'?'shred':'tear';syncHud();},faces:(cover,hidden)=>{if(cover===null){faceProvider=null;return;}faceProvider={cover,hidden};},event,win:()=>event('win'),tick:()=>event('tick'),skip,pause:stop,resume,reset,step,state,diagnostics:state,wind:(u,v,t=clock,strength=gpuStrength(),e=eventState())=>field?field.sample(u,v,t,strength,e):[sharedWind(u*W,v*H,t,strength)[0]/W,sharedWind(u*W,v*H,t,strength)[1]/H],windGPU:(u,v,t=clock,strength=gpuStrength(),e=eventState())=>gpu?gpu.windProbe(u,v,t,strength,e):null,ground:u=>field?field.ground(u):.8,advancePaper:(body,dt,windUV)=>advancePaper({...body},dt,[windUV[0]*W,windUV[1]*H]),particles:()=>gpu?{...gpu.readback(),count:gpu.count}:{count:grains.length,positions:Float32Array.from(grains.flatMap(g=>[g.x/W,g.y/H,0,1])),velocities:Float32Array.from(grains.flatMap(g=>[g.vx/W,g.vy/H,0,1]))},windStrength:value=>{windOverride=value===null?null:clamp(Number(value),0,1.5);},paperGeometry:()=>grains.filter(g=>g.flake).map(paperGeometry),coverPixels:()=>cast?{width:cast.bc.canvas.width,height:cast.bc.canvas.height,pixels:Array.from(cast.bc.getImageData(0,0,cast.bc.canvas.width,cast.bc.canvas.height).data)}:null,debris:()=>grains.map(g=>({uid:g.uid,releaseTime:g.releaseTime,settleAge:g.settleAge,size:g.size,x:g.x,y:g.y,vx:g.vx,vy:g.vy,theta:g.theta,omega:g.omega,roll:g.roll,settled:g.settled,flake:!!g.flake,scrap:!!g.scrap,age:g.age})),cardDrawn:()=>scene?scene.sT>=0:!!cast&&cast.hiddenReady&&cast.ptr>=cast.total,baseURL:()=>cast?cast.base.toDataURL('image/png'):null,leftover:()=>{if(scene)return sceneLeft();const k=cast;if(!k)return null;const count=c=>{const d=c.getImageData(0,0,c.canvas.width,Math.round((k.ov+k.h-1)*DPR)).data;let n=0;for(let i=3;i<d.length;i+=4)if(d[i]>8)n++;return{n};};return{base:count(k.bc),rel:count(k.rc),ptr:k.ptr,total:k.total,tt};},phase:()=>scene?'scene':!cast?'idle':tt<T_RISE?'rise':tt<T_HOLD?'cast':tt<T_THICK?'wind':tt<T_SHOWN?'shown':'sink'};
+if(Q.get('fire'))fire(Q.get('fire'),!HOLDFLAG);else if(Q.get('event'))event(Q.get('event'));render();if(!reduced)resume();
+
+})();
+</script></body></html>

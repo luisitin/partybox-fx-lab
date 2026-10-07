@@ -1,0 +1,40 @@
+{
+  "expectedSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+  "sha256Before": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+  "helperSha256": "d406afa97542243e64821aea682a704d300efeb13e1948f3854e79da9c9f5623",
+  "commandArgv": [
+    "python3",
+    "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py",
+    "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+    "--output",
+    "/workspace/.partybox-tools/fx-validation/F02/3bbeffdb7c94-mandatory",
+    "--views",
+    "tv,phone",
+    "--motion",
+    "no-preference",
+    "--capture",
+    "6",
+    "--transport",
+    "routed",
+    "--require-performance",
+    "--events",
+    "idle,win,tick",
+    "--seconds",
+    "8",
+    "--warmup",
+    "2"
+  ],
+  "standaloneFileOpened": false,
+  "label": "mandatory",
+  "sha256After": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+  "exitCode": 1,
+  "frozenSourceConfirmed": true,
+  "captureSha256": {
+    "phone-idle-normal.webm": "041b409eb635b3528fb461bc108c56fe1c7b4b85fff8035ba1beb47d8aa98d42",
+    "phone-tick-normal.webm": "9b6404f8ad587bb8c3f6805d0611cda4990a1f0d16b22c1a0636d055af1114b5",
+    "phone-win-normal.webm": "251edda27dc4245c068fd0a5a1989f9846e0a274bc2e4bf325dbfb81f76c7d4f",
+    "tv-idle-normal.webm": "bb9317de550d6ba332f5e7ef4d43a8ea972b28adb9402d8e43a31b02f467b534",
+    "tv-tick-normal.webm": "743b8dadbdbad66f95e8bf85e482936a783e4e1a3c71dd2514fc7dcc4805f31a",
+    "tv-win-normal.webm": "b68d42b696986b59e7254388e6d4776c6d507a031e8fc412e619df18528424ac"
+  }
+}

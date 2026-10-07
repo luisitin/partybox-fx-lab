@@ -1,42 +1,46 @@
-# F02 handoff — implementation in progress
+# F02 handoff — GPU implementation milestone, not accepted
 
-Branch job/F02-wind-sand-paper, nickname codex-flock.
-Claim acquired on main b292be1 after reading current CLAIMS.md; F01 is BLOCKED.
-Read root README.md, RULES.md, JOBS.md and all21 ranked baseline leftovers.
-Use this isolated checkout; preserve other claims and source changes.
+Branch job/F02-wind-sand-paper, nickname codex-flock. Claim acquired on main
+b292be1; preserve other claims and refresh main at every push. No PR, green CI
+or KEEP GOING rounds: required performance fails on the available renderer.
+Read README.md, RULES.md, JOBS.md and all21 ranked baseline leftovers.
 
-## Work in progress
+## Tested source and work remaining
 
-- Page owner wind_build is preserving baseline modes and implementing all21
-  leftovers in order. GPU-module author flock_build works outside the checkout
-  at /workspace/.partybox-tools/fx_tools/F02-gpu; page owner integrates inline.
-- Research owner onboard_existing writes SOURCES/CONFLICTS/ASSUMPTIONS only.
-- Check owner flock_checks writes check.py and per-job workflow only.
-- browser_validation owns serialized browser frame/capture evidence; baseline
-  comparison is read-only. Parent owns delivery/docs/main claim refreshes.
+Frozen index.html SHA3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6.
+Actual startup uses20,736TV/3,136phone GPU grains. TVidle/win/tick6.79/4.33/5.94fps;
+phoneCPU4x25.49/24.50/27.24fps. All mandatory60-Hz cases fail on ANGLESwiftShader.
+Six original captures and raw arrivals/provenance are committed and hashed.
+Hardware throughput is unverified; this is not an accepted60-fps implementation.
 
-Do not confuse working code with passing checks. Freeze a source SHA before
-functional, pixel/layout, reduced-motion, determinism, physics and offline tests.
-Measure native RAF at1920x1080 and390x844 CPU4x; record p95/p99/max and repeated
-cold/warm fires. Keep videos under10MB and hash every data/media file.
-Direct file:// is policy-blocked on this managed browser; an explicitly logged
-local-byte harness can test function but cannot satisfy the disk-opening rule.
-No hardware GPU is available; measure F02 rather than infer its result from F01.
+Full-page functional suite is written but unrun at this milestone. The checker
+owns the browser lane after browser_validation finishes cold/warm heavyprofiles.
+Freeze one source revision per check; preserve failures and rerun affected scope.
+The isolatedGPU module and mockedDOM checks passed within documented scopes;
+those do not establish page visuals or full integration. See VERIFY.md.
 
-Refresh main claim each push and push at least every30minutes. Open a PR only
-when every mandatory check passes, confirm green CI, then KEEP GOING until
-three rounds give no player-noticeable gain. No PR or rounds have happened.
+Direct file:// remains blocked by managed Chromium policy. Explicitly logged
+local-byte fulfillment can validate functions but cannot pass the disk rule.
+Resolve required performance/disk checks, review all21 fixes at real-time speed,
+then openPR only when every check passes, obtain greenCI and do KEEP GOING.
 
-## Baseline milestone
+## All21 implementation mechanisms — acceptance pending
 
-Research and immutable starter comparison are delivered. Source SHA e7353f2b,
-TV0.87fps / phoneCPU4x7.57fps on SwiftShader, first phone fire CPU304.5ms.
-Raw frames and two six-second captures are preserved and hashed; these are
-starter references, not the new implementation or21-fix acceptance.
+1Potentialtaper/gentleflow;2staggeredseamrelease;3phone2x2/largertextstamp;
+4debrisbehindcards;5cornerlift/crack/fray;6seededsegmentphases;7largerTVbanner;
+8coupledangularforce/frontback/edges/shadows;9freshtextdrawnafterdebris;
+10per-owned-polygonerasurewithoutfinalsweep;11separateroundslots/continuousbanner;
+12originalnotebookdrawing/stubholes;13puffsettlement/heldflex;14fixed60step+
+interpolation/exitmetrics;15deferredcover/hiddencallbacks;16canvas/grainpools;
+17phoneDPR1/cheaperfibresatlas;18isolatedfour-scenewarmup;19fardunepersistence
+andtickre-entrainment;20attachedsegmentedcrumple;21segmentedcurlingribbons.
+These are code mechanisms, not proof of every perceptual or performance outcome.
 
 ## Re-verify when web works
 
-Primary curl, paper and sand sources plus official OpenStax GitHub curriculum
-were read. Full APS force-equation PDF routes returnedHTTP401; they are optional
-deeper calibration, not a research-only blocker. Observe actual falling-paper
-footage, collect physical-device measurements and compare motion when available.
+Primarycurl/paper/sand sources and officialOpenStax GitHubcurriculum were read.
+FullAPS equationPDF routes returnedHTTP401; deeperphysicalcalibration/observed
+footage remains unverified. No source code/art/film is copied. The inherited
+flamingo/grey fixture is fromknowledge,unverified: check species-qualified
+wording with two independent zoo sources when animals.sandiegozoo.org and
+nationalzoo.si.edu are reachable. Research-only403 is not a job blocker.
