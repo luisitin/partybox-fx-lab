@@ -13,11 +13,20 @@ phoneCPU4x25.49/24.50/27.24fps. All mandatory60-Hz cases fail on ANGLESwiftShade
 Six original captures and raw arrivals/provenance are committed and hashed.
 Hardware throughput is unverified; this is not an accepted60-fps implementation.
 
-Full-page functional suite is written but unrun at this milestone. The checker
-owns the browser lane after browser_validation finishes cold/warm heavyprofiles.
+First full-page functional suite ran on3bbeffdb: four groups pass, five fail.
+Raw failures/diagnoses and matching cold/warm heavy measurements are preserved.
+Three page defects are being fixed: one cover pixel, no actual paper backs,
+and reset-history-dependent CPU PRNG state. The two harness issues are corrected
+(wait for resize; test static reduced pixels during idle, not manual repaint).
+The revised suite adds all216 TV/phone/theme/material/direction scene cases,
+absolute refresh-clock and responsive GPU-count/retained-atlas checks.
+The page author is applying grouped fixes; source is not currently frozen.
+After a new freeze the checker owns the sole browser lane for the full rerun.
 Freeze one source revision per check; preserve failures and rerun affected scope.
 The isolatedGPU module and mockedDOM checks passed within documented scopes;
 those do not establish page visuals or full integration. See VERIFY.md.
+Heavy-scene phone5.20/5.83fps is below starter7.57fps; cold/warm tails are mixed.
+No visible-hitch or overall phone-speed fix is established by these measurements.
 
 Direct file:// remains blocked by managed Chromium policy. Explicitly logged
 local-byte fulfillment can validate functions but cannot pass the disk rule.

@@ -1,0 +1,179 @@
+{
+  "before": {
+    "state": {
+      "scene": null,
+      "tt": 1.15,
+      "clock": 4.999999999999988,
+      "mat": "sand",
+      "material": "sand",
+      "paper": "tear",
+      "kind": "truth",
+      "held": true,
+      "ptr": 0,
+      "total": 7891,
+      "grains": 0,
+      "dep": 0,
+      "portrait": true,
+      "reduced": true,
+      "dir": 1,
+      "cell": 4,
+      "renderer": "webgl2",
+      "gpuReason": "",
+      "gpuParticles": 0,
+      "width": 412,
+      "height": 915,
+      "seed": 123456,
+      "frames": 0,
+      "winAge": -1,
+      "tickAge": -1,
+      "paused": true,
+      "frameTimes": [],
+      "metrics": {
+        "exits": 384,
+        "settled": 160,
+        "reentrained": 0,
+        "midairRemovals": 0,
+        "maxTurn": 0.9999732983197709,
+        "denied": 0,
+        "coverCalls": 1,
+        "hiddenCalls": 0,
+        "warmups": 0
+      },
+      "pooledCanvases": 26,
+      "hiddenReady": false,
+      "cast": {
+        "x": 33,
+        "y": 313,
+        "w": 346,
+        "h": 346,
+        "Yf": 659,
+        "foot": 24
+      },
+      "L": {
+        "rimIn": 13.84,
+        "rimT": 8,
+        "inner": 302.32,
+        "stripY": 29.410000000000004,
+        "stripH": 6.152,
+        "titleY": 53.63,
+        "tSize": 15.57,
+        "med": null,
+        "bigSize": 37,
+        "subSize": 18,
+        "plaque": {
+          "x": 173,
+          "y": 159.16,
+          "w": 278.1344,
+          "h": 98.05
+        },
+        "subs": [],
+        "stamp": {
+          "x": 173,
+          "y": 281.99,
+          "w": 117.64000000000001,
+          "h": 51.9
+        }
+      }
+    },
+    "pixels": {
+      "width": 412,
+      "height": 915,
+      "alpha": 224762,
+      "ink": 224762,
+      "colors": 15,
+      "hash": 101780805
+    }
+  },
+  "difference": {
+    "changedChannels": 302,
+    "maxChannelDelta": 7,
+    "sumChannelDelta": 707,
+    "totalChannels": 1507920
+  },
+  "after": {
+    "state": {
+      "scene": null,
+      "tt": 1.15,
+      "clock": 4.999999999999988,
+      "mat": "sand",
+      "material": "sand",
+      "paper": "tear",
+      "kind": "truth",
+      "held": true,
+      "ptr": 0,
+      "total": 7891,
+      "grains": 0,
+      "dep": 0,
+      "portrait": true,
+      "reduced": true,
+      "dir": 1,
+      "cell": 4,
+      "renderer": "webgl2",
+      "gpuReason": "",
+      "gpuParticles": 0,
+      "width": 412,
+      "height": 915,
+      "seed": 123456,
+      "frames": 0,
+      "winAge": -1,
+      "tickAge": -1,
+      "paused": true,
+      "frameTimes": [],
+      "metrics": {
+        "exits": 384,
+        "settled": 160,
+        "reentrained": 0,
+        "midairRemovals": 0,
+        "maxTurn": 0.9999732983197709,
+        "denied": 0,
+        "coverCalls": 1,
+        "hiddenCalls": 0,
+        "warmups": 0
+      },
+      "pooledCanvases": 26,
+      "hiddenReady": false,
+      "cast": {
+        "x": 33,
+        "y": 313,
+        "w": 346,
+        "h": 346,
+        "Yf": 659,
+        "foot": 24
+      },
+      "L": {
+        "rimIn": 13.84,
+        "rimT": 8,
+        "inner": 302.32,
+        "stripY": 29.410000000000004,
+        "stripH": 6.152,
+        "titleY": 53.63,
+        "tSize": 15.57,
+        "med": null,
+        "bigSize": 37,
+        "subSize": 18,
+        "plaque": {
+          "x": 173,
+          "y": 159.16,
+          "w": 278.1344,
+          "h": 98.05
+        },
+        "subs": [],
+        "stamp": {
+          "x": 173,
+          "y": 281.99,
+          "w": 117.64000000000001,
+          "h": 51.9
+        }
+      }
+    },
+    "pixels": {
+      "width": 412,
+      "height": 915,
+      "alpha": 224762,
+      "ink": 224762,
+      "colors": 15,
+      "hash": 3852915760
+    }
+  },
+  "sha": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6"
+}

@@ -90,3 +90,28 @@ The originalGPU blendFunc incorrectly squared outputalpha; final blendFuncSepara
 preserves premultiplied composition. Final inlineGPUmodule bytes match reviewed
 f8e143586e4210c93a6417fd23ca3c81cb80044d45c3ddc719801f67a70577de exactly.
 Full graphical regression checks remain pending; static fixes are not passes.
+
+## Heavy-scene cold/warm comparison on3bbeffdb (FAIL)
+
+```sh
+python3 /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html --output /workspace/.partybox-tools/fx-validation/F02/3bbeffdb7c94-heavy-cold --views tv,phone --motion no-preference --capture 6 --transport routed --require-performance --events idle --query 'warm=0&theme=gouache&mat=paper&paper=tear&seed=1' --seconds 18 --warmup 0 --capture-script /workspace/.partybox-tools/fx-validation/F02/baseline-capture.js --hitch-fire fakeout --hitch-repeats 3 --hitch-gap 6 --hitch-window 3
+```
+
+```sh
+python3 /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html --output /workspace/.partybox-tools/fx-validation/F02/3bbeffdb7c94-heavy-warm --views tv,phone --motion no-preference --capture 6 --transport routed --require-performance --events idle --query 'theme=gouache&mat=paper&paper=tear&seed=1' --seconds 18 --warmup 0 --capture-script /workspace/.partybox-tools/fx-validation/F02/baseline-capture.js --hitch-fire fakeout --hitch-repeats 3 --hitch-gap 6 --hitch-window 3
+```
+
+Both strict runs exit1 for performance. First phone fire CPUcall169.0→37.9ms with four warmups, but first-windowp95305.40→438.18ms worsens. TVp99/max also worsen; new heavy phone5.20/5.83fps is below starter7.57fps. No visible-hitch or whole-phone-speed fix is claimed. Zero runtime requests/errors. Four six-second captures under1.58MB. Raw frame arrivals/provenance and full mixed comparison are committed; encoding25fps does not measure application fps. These checks catch cold/warm stalls rather than infer their cause.
+
+## First full-page functional run and diagnosis (3bbeffdb)
+
+```sh
+python jobs/F02-wind-sand-paper/check.py --chromium /usr/bin/chromium --allow-policy-harness --report /tmp/F02-functional-3bbeffdb.json
+python /tmp/F02-diagnose.py
+python /tmp/F02-diagnose-details.py
+python /tmp/F02-diagnose-reduced.py
+```
+
+Full suite:FAIL, exit1,123.710s. Four groups pass (wind,sandTV,sandPhone,paperPhysics); five fail (scenes,paperGeometry,facesReduced,queriesFallback,refreshWarm). This was54 phone scene cases, not the later216-case suite. Diagnoses all exit0 and preserve observations in validation/3bbeffdb-functional-failed/. Actual shared GPU/CPU field agrees within Float32 tolerance; sand readback proves20,736/3,136 finite moving particles, heart/reform, tick and re-entrainment.
+
+Three real defects: one residual cover pixel in dawn/shred; zero paper backs among48,345 sampled segments; reset history changes CPU fragment PRNG state through stale river state. Two harness defects: querying before resize completes; comparing antialias-edge pixels after an explicitly requested diagnostic redraw instead of measuring idle reduced-motion freezing. The corrected suite waits for actual viewport state, demands exact static pixels during idle, separately demands unchanged simulation state on manual reduced step, and keeps strict zero remaining-cover pixels. Final source fixes and expanded suite remain pending. These checks catch actual buffer/model, force-coupling, cleanup, authorization, reduced-motion, responsive sizing and deterministic scheduling failures; they do not prove60-fps throughput.

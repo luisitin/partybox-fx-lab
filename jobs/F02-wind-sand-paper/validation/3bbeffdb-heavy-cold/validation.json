@@ -1,0 +1,932 @@
+{
+  "source": "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+  "chromium": "/usr/bin/chromium",
+  "flags": [
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+    "--autoplay-policy=no-user-gesture-required",
+    "--disable-background-networking",
+    "--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE localhost",
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader"
+  ],
+  "hardwareGpuNodes": [],
+  "transport": "routed",
+  "standaloneFileOpened": false,
+  "extraQuery": {
+    "warm": "0",
+    "theme": "gouache",
+    "mat": "paper",
+    "paper": "tear",
+    "seed": "1"
+  },
+  "hitchConfiguration": {
+    "fire": "fakeout",
+    "repeats": 3,
+    "gapSeconds": 6.0,
+    "windowSeconds": 3.0,
+    "meaning": "cold=first explicit fire on fresh page, after initial document load; warm=repeated fire on same page; browser startup itself is not sampled"
+  },
+  "transportExplanation": "routed mode fulfills the top document from local disk bytes without any server or socket. This environment's Chromium enterprise URL policy blocks file://. Use --transport file in a browser with disk access.",
+  "method": "Actual performance.now arrival intervals sampled with native rAF; page rAF callback CPU time measured separately. CPU throttling via CDP. Performance without video recording. HTTP(S) and other nonlocal runtime requests blocked and logged.",
+  "cases": [
+    {
+      "view": "tv",
+      "event": "idle",
+      "motion": "no-preference",
+      "cpuThrottle": 1,
+      "performance": {
+        "elapsedMs": 18005.099999999627,
+        "fps": 1.3329556625623016,
+        "arrivalIntervals": {
+          "count": 24,
+          "meanMs": 750.2124999999845,
+          "p50Ms": 361.14999999990687,
+          "p95Ms": 2797.919999999785,
+          "p99Ms": 3148.552000000244,
+          "maxMs": 3235.4000000003725
+        },
+        "scheduledIntervals": {
+          "count": 24,
+          "meanMs": 749.9708333333333,
+          "p50Ms": 358.35000000000014,
+          "p95Ms": 2806.584999999998,
+          "p99Ms": 3148.8819999999996,
+          "maxMs": 3233.2000000000003
+        },
+        "callbackWork": {
+          "count": 25,
+          "meanMs": 2.187999999970198,
+          "p50Ms": 1.099999999627471,
+          "p95Ms": 8.320000000670538,
+          "p99Ms": 10.820000000037249,
+          "maxMs": 11.299999999813735
+        },
+        "missedRefreshes": 1056,
+        "missedRefreshFraction": 0.9777777777777777,
+        "longTasks": [
+          {
+            "start": 2818.5,
+            "duration": 100
+          }
+        ],
+        "meets60FpsTolerance": false,
+        "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+      },
+      "hitchProfiles": [
+        {
+          "label": "cold-fire",
+          "scheduledAtMs": 300,
+          "firedAt": 2820.2000000001863,
+          "firedAtMs": 597,
+          "callDurationMs": 97.79999999981374,
+          "error": null,
+          "windowSeconds": 3.0,
+          "windowComplete": true,
+          "availableAfterFireMs": 17408.099999999627,
+          "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+          "arrivalIntervals": {
+            "count": 5,
+            "meanMs": 973.6599999999628,
+            "p50Ms": 352.09999999962747,
+            "p95Ms": 2729.0800000002605,
+            "p99Ms": 3134.13600000035,
+            "maxMs": 3235.4000000003725
+          },
+          "over33ms": 5,
+          "over50ms": 5,
+          "over100ms": 5,
+          "over250ms": 5
+        },
+        {
+          "label": "warm-fire-1",
+          "scheduledAtMs": 6300,
+          "firedAt": 8617.700000000186,
+          "firedAtMs": 6394.5,
+          "callDurationMs": 23.700000000186265,
+          "error": null,
+          "windowSeconds": 3.0,
+          "windowComplete": true,
+          "availableAfterFireMs": 11610.599999999627,
+          "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+          "arrivalIntervals": {
+            "count": 5,
+            "meanMs": 836.4599999999627,
+            "p50Ms": 370.20000000018626,
+            "p95Ms": 2108.7999999998133,
+            "p99Ms": 2388.6399999996647,
+            "maxMs": 2458.5999999996275
+          },
+          "over33ms": 5,
+          "over50ms": 5,
+          "over100ms": 5,
+          "over250ms": 5
+        },
+        {
+          "label": "warm-fire-2",
+          "scheduledAtMs": 12300,
+          "firedAt": 14704.400000000373,
+          "firedAtMs": 12481.200000000186,
+          "callDurationMs": 16.899999999441206,
+          "error": null,
+          "windowSeconds": 3.0,
+          "windowComplete": true,
+          "availableAfterFireMs": 5523.899999999441,
+          "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+          "arrivalIntervals": {
+            "count": 5,
+            "meanMs": 1206.7,
+            "p50Ms": 1092.1000000005588,
+            "p95Ms": 2509.3599999997764,
+            "p99Ms": 2788.1119999998064,
+            "maxMs": 2857.7999999998137
+          },
+          "over33ms": 5,
+          "over50ms": 5,
+          "over100ms": 5,
+          "over250ms": 5
+        }
+      ],
+      "inspection": {
+        "title": "Wind, Sand and Paper \u2014 PartyBox",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "document": {
+          "scrollWidth": 1920,
+          "scrollHeight": 1080
+        },
+        "reducedMotion": false,
+        "canvases": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "clientWidth": 1920,
+            "clientHeight": 1080,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 1920,
+              "height": 1080,
+              "top": 0,
+              "right": 1920,
+              "bottom": 1080,
+              "left": 0
+            }
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "clientWidth": 1920,
+            "clientHeight": 1080,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 1920,
+              "height": 1080,
+              "top": 0,
+              "right": 1920,
+              "bottom": 1080,
+              "left": 0
+            }
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "clientWidth": 1920,
+            "clientHeight": 1080,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 1920,
+              "height": 1080,
+              "top": 0,
+              "right": 1920,
+              "bottom": 1080,
+              "left": 0
+            }
+          }
+        ],
+        "externalReferences": [],
+        "appDiagnostics": {
+          "scene": {
+            "type": "fakeout",
+            "S": 0.6000000000000002,
+            "sT": -1,
+            "allGone": -1,
+            "cards": [
+              {
+                "fontSize": 70,
+                "titleSize": 120,
+                "stamp": {
+                  "x": 164.4,
+                  "y": 771.2,
+                  "w": 319.2,
+                  "h": 72.8
+                },
+                "kind": "ansA",
+                "t": 0.6000000000000002,
+                "ptr": 0,
+                "total": 12,
+                "gone": -1,
+                "alpha": 1,
+                "x": 134,
+                "y": 326,
+                "w": 380,
+                "h": 560,
+                "ws": 2.3
+              },
+              {
+                "fontSize": 70,
+                "titleSize": 120,
+                "stamp": {
+                  "x": 588.4,
+                  "y": 771.2,
+                  "w": 319.2,
+                  "h": 72.8
+                },
+                "kind": "ansB",
+                "t": 0.4600000000000002,
+                "ptr": 0,
+                "total": 12,
+                "gone": -1,
+                "alpha": 1,
+                "x": 558,
+                "y": 326,
+                "w": 380,
+                "h": 560,
+                "ws": 2.55
+              },
+              {
+                "fontSize": 70,
+                "titleSize": 120,
+                "stamp": {
+                  "x": 1012.4,
+                  "y": 771.2,
+                  "w": 319.2,
+                  "h": 72.8
+                },
+                "kind": "ansC",
+                "t": 0.3200000000000002,
+                "ptr": 0,
+                "total": 12,
+                "gone": -1,
+                "alpha": 1,
+                "x": 982,
+                "y": 326,
+                "w": 380,
+                "h": 560,
+                "ws": null
+              },
+              {
+                "fontSize": 70,
+                "titleSize": 120,
+                "stamp": {
+                  "x": 1436.4,
+                  "y": 771.2,
+                  "w": 319.2,
+                  "h": 72.8
+                },
+                "kind": "ansD",
+                "t": 0.18000000000000022,
+                "ptr": 0,
+                "total": 12,
+                "gone": -1,
+                "alpha": 1,
+                "x": 1406,
+                "y": 326,
+                "w": 380,
+                "h": 560,
+                "ws": 2.85
+              }
+            ]
+          },
+          "tt": -1,
+          "clock": 2.583333333333329,
+          "mat": "paper",
+          "material": "paper",
+          "paper": "tear",
+          "kind": null,
+          "held": false,
+          "ptr": 0,
+          "total": 0,
+          "grains": 0,
+          "dep": 0,
+          "portrait": false,
+          "reduced": false,
+          "dir": 1,
+          "cell": 6,
+          "renderer": "webgl2",
+          "gpuReason": "",
+          "gpuParticles": 20736,
+          "width": 1920,
+          "height": 1080,
+          "seed": 1,
+          "frames": 27,
+          "winAge": -1,
+          "tickAge": -1,
+          "paused": false,
+          "frameTimes": [
+            733.3,
+            83.40000000000009,
+            249.9000000000001,
+            350.0999999999999,
+            299.9000000000001,
+            266.6999999999998,
+            716.5999999999999,
+            3233.2000000000003,
+            333.3000000000002,
+            283.39999999999964,
+            349.89999999999964,
+            316.7000000000007,
+            316.6999999999989,
+            366.60000000000036,
+            716.7000000000007,
+            2466.5,
+            383.2999999999993,
+            433.39999999999964,
+            316.60000000000036,
+            1083.300000000001,
+            416.59999999999854,
+            550,
+            1116.6000000000022,
+            2866.5999999999985,
+            316.59999999999854,
+            250.1000000000022
+          ],
+          "metrics": {
+            "exits": 0,
+            "settled": 0,
+            "reentrained": 0,
+            "midairRemovals": 0,
+            "maxTurn": 0,
+            "denied": 0,
+            "coverCalls": 0,
+            "hiddenCalls": 0,
+            "warmups": 0
+          },
+          "pooledCanvases": 16,
+          "hiddenReady": false,
+          "cast": null,
+          "L": null
+        }
+      },
+      "errors": [],
+      "runtimeNetworkAttempts": [],
+      "harnessDocumentLoads": [
+        {
+          "url": "http://partybox.invalid/index.html?warm=0&theme=gouache&mat=paper&paper=tear&seed=1&view=tv&event=idle",
+          "source": "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+          "delivery": "route.fulfill local bytes; no socket"
+        }
+      ],
+      "capture": {
+        "path": "/workspace/.partybox-tools/fx-validation/F02/3bbeffdb7c94-heavy-cold/tv-idle-normal.webm",
+        "bytes": 1575640,
+        "under10MB": true,
+        "requestedSeconds": 6.0,
+        "recording": {
+          "encoder": "/usr/bin/ffmpeg",
+          "method": "CDP viewport JPEG frames, resampled at 25 fps; VP8 WebM",
+          "frames": 150,
+          "changedScreens": 5,
+          "captureWallSeconds": 6.909803342000487,
+          "note": "Capture frame rate is not used as performance evidence"
+        },
+        "errors": [],
+        "runtimeNetworkAttempts": [],
+        "harnessDocumentLoads": [
+          {
+            "url": "http://partybox.invalid/index.html?warm=0&theme=gouache&mat=paper&paper=tear&seed=1&view=tv&event=idle",
+            "source": "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+            "delivery": "route.fulfill local bytes; no socket"
+          }
+        ],
+        "metadata": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp8",
+              "width": 1920,
+              "height": 1080,
+              "r_frame_rate": "25/1"
+            }
+          ],
+          "format": {
+            "duration": "6.000000"
+          }
+        }
+      }
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "motion": "no-preference",
+      "cpuThrottle": 4,
+      "performance": {
+        "elapsedMs": 18071.900000000373,
+        "fps": 5.2014453377895,
+        "arrivalIntervals": {
+          "count": 94,
+          "meanMs": 192.2542553191529,
+          "p50Ms": 132.74999999953434,
+          "p95Ms": 393.26499999975783,
+          "p99Ms": 934.5880000005188,
+          "maxMs": 1054
+        },
+        "scheduledIntervals": {
+          "count": 94,
+          "meanMs": 192.368085106383,
+          "p50Ms": 133.30000000000064,
+          "p95Ms": 389.1450000000006,
+          "p99Ms": 925.9379999999994,
+          "maxMs": 1049.999999999999
+        },
+        "callbackWork": {
+          "count": 95,
+          "meanMs": 8.887368421001653,
+          "p50Ms": 6.6000000005587935,
+          "p95Ms": 20.380000000260765,
+          "p99Ms": 37.98400000052528,
+          "maxMs": 44
+        },
+        "missedRefreshes": 991,
+        "missedRefreshFraction": 0.9142066420664207,
+        "longTasks": [
+          {
+            "start": 1259.4000000003725,
+            "duration": 176
+          },
+          {
+            "start": 7180.700000000186,
+            "duration": 93
+          },
+          {
+            "start": 13261.400000000373,
+            "duration": 82
+          }
+        ],
+        "meets60FpsTolerance": false,
+        "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+      },
+      "hitchProfiles": [
+        {
+          "label": "cold-fire",
+          "scheduledAtMs": 300,
+          "firedAt": 1265.2000000001863,
+          "firedAtMs": 538.2000000001863,
+          "callDurationMs": 169,
+          "error": null,
+          "windowSeconds": 3.0,
+          "windowComplete": true,
+          "availableAfterFireMs": 17533.700000000186,
+          "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+          "arrivalIntervals": {
+            "count": 21,
+            "meanMs": 160.21904761902988,
+            "p50Ms": 112.29999999981374,
+            "p95Ms": 305.40000000037253,
+            "p99Ms": 757.6399999994788,
+            "maxMs": 870.6999999992549
+          },
+          "over33ms": 20,
+          "over50ms": 20,
+          "over100ms": 14,
+          "over250ms": 3
+        },
+        {
+          "label": "warm-fire-1",
+          "scheduledAtMs": 6300,
+          "firedAt": 7219.100000000559,
+          "firedAtMs": 6492.100000000559,
+          "callDurationMs": 53.09999999962747,
+          "error": null,
+          "windowSeconds": 3.0,
+          "windowComplete": true,
+          "availableAfterFireMs": 11579.799999999814,
+          "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+          "arrivalIntervals": {
+            "count": 14,
+            "meanMs": 242.10714285714286,
+            "p50Ms": 154.45000000018626,
+            "p95Ms": 608.6199999998787,
+            "p99Ms": 964.9239999999753,
+            "maxMs": 1054
+          },
+          "over33ms": 14,
+          "over50ms": 14,
+          "over100ms": 11,
+          "over250ms": 4
+        },
+        {
+          "label": "warm-fire-2",
+          "scheduledAtMs": 12300,
+          "firedAt": 13268,
+          "firedAtMs": 12541,
+          "callDurationMs": 68.40000000037253,
+          "error": null,
+          "windowSeconds": 3.0,
+          "windowComplete": true,
+          "availableAfterFireMs": 5530.9000000003725,
+          "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+          "arrivalIntervals": {
+            "count": 14,
+            "meanMs": 239.1500000000399,
+            "p50Ms": 135.70000000018626,
+            "p95Ms": 580.3850000001953,
+            "p99Ms": 856.5570000004857,
+            "maxMs": 925.6000000005588
+          },
+          "over33ms": 14,
+          "over50ms": 14,
+          "over100ms": 11,
+          "over250ms": 5
+        }
+      ],
+      "inspection": {
+        "title": "Wind, Sand and Paper \u2014 PartyBox",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "document": {
+          "scrollWidth": 390,
+          "scrollHeight": 844
+        },
+        "reducedMotion": false,
+        "canvases": [
+          {
+            "width": 390,
+            "height": 844,
+            "clientWidth": 390,
+            "clientHeight": 844,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 844,
+              "top": 0,
+              "right": 390,
+              "bottom": 844,
+              "left": 0
+            }
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "clientWidth": 390,
+            "clientHeight": 844,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 844,
+              "top": 0,
+              "right": 390,
+              "bottom": 844,
+              "left": 0
+            }
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "clientWidth": 390,
+            "clientHeight": 844,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 844,
+              "top": 0,
+              "right": 390,
+              "bottom": 844,
+              "left": 0
+            }
+          }
+        ],
+        "externalReferences": [],
+        "appDiagnostics": {
+          "scene": {
+            "type": "fakeout",
+            "S": 2.799999999999995,
+            "sT": -1,
+            "allGone": -1,
+            "cards": [
+              {
+                "fontSize": 30,
+                "titleSize": 39.56,
+                "stamp": {
+                  "x": 29.759999999999998,
+                  "y": 288.57000000000005,
+                  "w": 144.48,
+                  "h": 25.740000000000002
+                },
+                "kind": "ansA",
+                "t": 2.799999999999995,
+                "ptr": 4,
+                "total": 9,
+                "gone": -1,
+                "alpha": 1,
+                "x": 16,
+                "y": 131.16000000000003,
+                "w": 172,
+                "h": 198,
+                "ws": 2.3
+              },
+              {
+                "fontSize": 30,
+                "titleSize": 39.56,
+                "stamp": {
+                  "x": 215.76,
+                  "y": 288.57000000000005,
+                  "w": 144.48,
+                  "h": 25.740000000000002
+                },
+                "kind": "ansB",
+                "t": 2.659999999999995,
+                "ptr": 2,
+                "total": 9,
+                "gone": -1,
+                "alpha": 1,
+                "x": 202,
+                "y": 131.16000000000003,
+                "w": 172,
+                "h": 198,
+                "ws": 2.55
+              },
+              {
+                "fontSize": 30,
+                "titleSize": 39.56,
+                "stamp": {
+                  "x": 29.759999999999998,
+                  "y": 500.57000000000005,
+                  "w": 144.48,
+                  "h": 25.740000000000002
+                },
+                "kind": "ansC",
+                "t": 2.519999999999995,
+                "ptr": 0,
+                "total": 9,
+                "gone": -1,
+                "alpha": 1,
+                "x": 16,
+                "y": 343.1600000000001,
+                "w": 172,
+                "h": 198,
+                "ws": null
+              },
+              {
+                "fontSize": 30,
+                "titleSize": 39.56,
+                "stamp": {
+                  "x": 215.76,
+                  "y": 500.57000000000005,
+                  "w": 144.48,
+                  "h": 25.740000000000002
+                },
+                "kind": "ansD",
+                "t": 2.379999999999995,
+                "ptr": 0,
+                "total": 9,
+                "gone": -1,
+                "alpha": 1,
+                "x": 202,
+                "y": 343.1600000000001,
+                "w": 172,
+                "h": 198,
+                "ws": 2.85
+              }
+            ]
+          },
+          "tt": -1,
+          "clock": 9.316666666666709,
+          "mat": "paper",
+          "material": "paper",
+          "paper": "tear",
+          "kind": null,
+          "held": false,
+          "ptr": 0,
+          "total": 0,
+          "grains": 47,
+          "dep": 0,
+          "portrait": true,
+          "reduced": false,
+          "dir": 1,
+          "cell": 4,
+          "renderer": "webgl2",
+          "gpuReason": "",
+          "gpuParticles": 3136,
+          "width": 390,
+          "height": 844,
+          "seed": 1,
+          "frames": 98,
+          "winAge": -1,
+          "tickAge": -1,
+          "paused": false,
+          "frameTimes": [
+            366.6,
+            33.39999999999998,
+            216.59999999999997,
+            183.30000000000007,
+            116.69999999999993,
+            116.70000000000005,
+            299.9000000000001,
+            33.299999999999955,
+            300.0999999999999,
+            883.3,
+            83.30000000000018,
+            83.29999999999973,
+            83.30000000000018,
+            133.4000000000001,
+            66.69999999999982,
+            133.20000000000027,
+            100,
+            116.69999999999982,
+            83.30000000000018,
+            150.0999999999999,
+            116.59999999999991,
+            116.59999999999991,
+            116.70000000000027,
+            116.69999999999982,
+            100,
+            116.60000000000036,
+            116.79999999999927,
+            100,
+            116.5,
+            200,
+            133.40000000000055,
+            133.30000000000018,
+            200,
+            216.69999999999982,
+            233.30000000000018,
+            400,
+            333.2999999999993,
+            283.3000000000002,
+            350,
+            250,
+            200,
+            366.60000000000036,
+            1049.999999999999,
+            100,
+            116.60000000000036,
+            83.39999999999964,
+            133.3000000000011,
+            66.60000000000036,
+            116.79999999999927,
+            266.60000000000036,
+            183.39999999999964,
+            133.29999999999927,
+            116.60000000000036,
+            166.60000000000036,
+            116.79999999999927,
+            116.60000000000036,
+            100,
+            166.70000000000073,
+            116.60000000000036,
+            133.29999999999927,
+            216.70000000000073,
+            16.599999999998545,
+            150.10000000000036,
+            200,
+            183.3000000000011,
+            249.89999999999964,
+            300.10000000000036,
+            383.1999999999989,
+            283.39999999999964,
+            299.90000000000146,
+            400.09999999999854,
+            383.3000000000011,
+            916.6000000000004,
+            100,
+            116.69999999999891,
+            100,
+            133.3000000000011,
+            116.59999999999854,
+            116.70000000000073,
+            116.60000000000036,
+            133.5,
+            133.29999999999927,
+            133.3000000000011,
+            99.89999999999782,
+            116.70000000000073,
+            116.70000000000073,
+            100,
+            133.29999999999927,
+            150,
+            116.60000000000218,
+            133.39999999999782,
+            150,
+            200,
+            216.60000000000218,
+            266.6999999999971,
+            233.3000000000029,
+            300
+          ],
+          "metrics": {
+            "exits": 6,
+            "settled": 54,
+            "reentrained": 0,
+            "midairRemovals": 0,
+            "maxTurn": 1.5040446264593446,
+            "denied": 0,
+            "coverCalls": 0,
+            "hiddenCalls": 0,
+            "warmups": 0
+          },
+          "pooledCanvases": 12,
+          "hiddenReady": false,
+          "cast": null,
+          "L": null
+        }
+      },
+      "errors": [],
+      "runtimeNetworkAttempts": [],
+      "harnessDocumentLoads": [
+        {
+          "url": "http://partybox.invalid/index.html?warm=0&theme=gouache&mat=paper&paper=tear&seed=1&view=phone&event=idle",
+          "source": "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+          "delivery": "route.fulfill local bytes; no socket"
+        }
+      ],
+      "capture": {
+        "path": "/workspace/.partybox-tools/fx-validation/F02/3bbeffdb7c94-heavy-cold/phone-idle-normal.webm",
+        "bytes": 956180,
+        "under10MB": true,
+        "requestedSeconds": 6.0,
+        "recording": {
+          "encoder": "/usr/bin/ffmpeg",
+          "method": "CDP viewport JPEG frames, resampled at 25 fps; VP8 WebM",
+          "frames": 150,
+          "changedScreens": 26,
+          "captureWallSeconds": 6.171303488999911,
+          "note": "Capture frame rate is not used as performance evidence"
+        },
+        "errors": [],
+        "runtimeNetworkAttempts": [],
+        "harnessDocumentLoads": [
+          {
+            "url": "http://partybox.invalid/index.html?warm=0&theme=gouache&mat=paper&paper=tear&seed=1&view=phone&event=idle",
+            "source": "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+            "delivery": "route.fulfill local bytes; no socket"
+          }
+        ],
+        "metadata": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp8",
+              "width": 390,
+              "height": 844,
+              "r_frame_rate": "25/1"
+            }
+          ],
+          "format": {
+            "duration": "6.000000"
+          }
+        }
+      }
+    }
+  ],
+  "gpu": {
+    "devices": [
+      {
+        "vendorId": 65535,
+        "deviceId": 65535,
+        "vendorString": "Google Inc. (Google)",
+        "deviceString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+        "driverVendor": "SwANGLE",
+        "driverVersion": "5.0.0"
+      }
+    ],
+    "featureStatus": {
+      "2d_canvas": "enabled",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "enabled",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "enabled_on",
+      "rasterization": "enabled_force",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "disabled_off",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "enabled",
+      "video_encode": "disabled_software",
+      "vulkan": "disabled_off",
+      "webgl": "enabled",
+      "webgpu": "unavailable_software",
+      "webgpu_on_vk_via_gl_interop": "disabled_off",
+      "webnn": "disabled_off"
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+    "vendor": "Google Inc. (Google)"
+  },
+  "allCasesMeetFrameTolerance": false,
+  "noRuntimeNetworkAttempts": true,
+  "noPageErrors": true,
+  "noHitchTriggerErrors": true,
+  "allHitchWindowsComplete": true,
+  "allCapturesUnder10MB": true
+}

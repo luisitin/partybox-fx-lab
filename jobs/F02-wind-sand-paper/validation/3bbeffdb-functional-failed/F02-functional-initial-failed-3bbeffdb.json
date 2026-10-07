@@ -1,0 +1,983 @@
+{
+  "html": "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+  "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+  "requestedGroups": [
+    "wind",
+    "sandTV",
+    "sandPhone",
+    "paperPhysics",
+    "scenes",
+    "paperGeometry",
+    "facesReduced",
+    "queriesFallback",
+    "refreshWarm"
+  ],
+  "completedGroups": [
+    "wind",
+    "sandTV",
+    "sandPhone",
+    "paperPhysics"
+  ],
+  "results": {
+    "wind": {
+      "wallSeconds": 4.606,
+      "evidence": [
+        {
+          "seed": 1,
+          "time": 0.37,
+          "event": "idle",
+          "divergenceResidual": [
+            3.507862749113983e-05,
+            8.728177101177553e-06
+          ],
+          "boundaryFluxRatio": 6.906203248541547e-07,
+          "gpuCpuMaxError": 6.983024948670202e-06,
+          "temporalRms": 0.01607091393119453
+        },
+        {
+          "seed": 1,
+          "time": 1.41,
+          "event": "tick",
+          "divergenceResidual": [
+            9.996747660171275e-05,
+            2.4994172578215412e-05
+          ],
+          "boundaryFluxRatio": 8.088533262913639e-07,
+          "gpuCpuMaxError": 1.5145723462173244e-05,
+          "temporalRms": 0.005202095921749431
+        },
+        {
+          "seed": 1,
+          "time": 3.27,
+          "event": "win",
+          "divergenceResidual": [
+            3.896404811391052e-05,
+            9.715148623029281e-06
+          ],
+          "boundaryFluxRatio": 4.7456485439593937e-07,
+          "gpuCpuMaxError": 4.033341600268112e-06,
+          "temporalRms": 0.023873786599512007
+        },
+        {
+          "seed": 2,
+          "time": 0.37,
+          "event": "idle",
+          "divergenceResidual": [
+            3.401603638460697e-05,
+            8.499646058480012e-06
+          ],
+          "boundaryFluxRatio": 2.1803183193442115e-07,
+          "gpuCpuMaxError": 2.2141010800280636e-05,
+          "temporalRms": 0.0026414289827426953
+        },
+        {
+          "seed": 2,
+          "time": 1.41,
+          "event": "tick",
+          "divergenceResidual": [
+            9.808853246045984e-05,
+            2.4525017007526775e-05
+          ],
+          "boundaryFluxRatio": 8.149026951083187e-08,
+          "gpuCpuMaxError": 6.392605167972187e-06,
+          "temporalRms": 0.014942581344016962
+        },
+        {
+          "seed": 2,
+          "time": 3.27,
+          "event": "win",
+          "divergenceResidual": [
+            3.94318381556827e-05,
+            9.83971639383816e-06
+          ],
+          "boundaryFluxRatio": 2.0448311466290988e-07,
+          "gpuCpuMaxError": 1.3657304554715033e-05,
+          "temporalRms": 0.015906240744605626
+        },
+        {
+          "seed": 3,
+          "time": 0.37,
+          "event": "idle",
+          "divergenceResidual": [
+            3.3121269884249074e-05,
+            8.211818321556982e-06
+          ],
+          "boundaryFluxRatio": 9.960835450631995e-07,
+          "gpuCpuMaxError": 7.4486390124195445e-06,
+          "temporalRms": 0.01602968510165941
+        },
+        {
+          "seed": 3,
+          "time": 1.41,
+          "event": "tick",
+          "divergenceResidual": [
+            9.787222164770454e-05,
+            2.447017472122566e-05
+          ],
+          "boundaryFluxRatio": 7.811141201137926e-07,
+          "gpuCpuMaxError": 8.584592804408708e-06,
+          "temporalRms": 0.01975115629125538
+        },
+        {
+          "seed": 3,
+          "time": 3.27,
+          "event": "win",
+          "divergenceResidual": [
+            2.6702494902741407e-05,
+            6.679769217823914e-06
+          ],
+          "boundaryFluxRatio": 2.0331429806897925e-08,
+          "gpuCpuMaxError": 2.2187118330629918e-05,
+          "temporalRms": 0.0067774204916237965
+        }
+      ]
+    },
+    "sandTV": {
+      "wallSeconds": 24.394,
+      "evidence": {
+        "view": "tv",
+        "count": 20736,
+        "idleRms": 0.07789956067748285,
+        "seedReplay": "bit-identical",
+        "tickRms": 0.4089516263132762,
+        "heartFraction": 0.9951783992285439,
+        "reformedHeartFraction": 0.4064609450337512,
+        "renderedGrainPixels": 29739,
+        "surfacePixels": [
+          {
+            "u": 0.07692307692307693,
+            "expected": 918.3096149129234,
+            "rendered": 916,
+            "error": 2.3096149129233936
+          },
+          {
+            "u": 0.15384615384615385,
+            "expected": 923.0980794795105,
+            "rendered": 921,
+            "error": 2.0980794795104885
+          },
+          {
+            "u": 0.23076923076923078,
+            "expected": 924.2550028901853,
+            "rendered": 922,
+            "error": 2.255002890185324
+          },
+          {
+            "u": 0.3076923076923077,
+            "expected": 914.764706151647,
+            "rendered": 913,
+            "error": 1.764706151647033
+          },
+          {
+            "u": 0.38461538461538464,
+            "expected": 899.0350670837123,
+            "rendered": 897,
+            "error": 2.035067083712306
+          },
+          {
+            "u": 0.46153846153846156,
+            "expected": 888.9101760657333,
+            "rendered": 887,
+            "error": 1.9101760657332534
+          },
+          {
+            "u": 0.5384615384615384,
+            "expected": 889.9724599706942,
+            "rendered": 888,
+            "error": 1.9724599706942172
+          },
+          {
+            "u": 0.6153846153846154,
+            "expected": 895.914403744646,
+            "rendered": 894,
+            "error": 1.9144037446460516
+          },
+          {
+            "u": 0.6923076923076923,
+            "expected": 898.0668962585956,
+            "rendered": 896,
+            "error": 2.066896258595648
+          },
+          {
+            "u": 0.7692307692307693,
+            "expected": 897.126443092672,
+            "rendered": 895,
+            "error": 2.126443092672048
+          },
+          {
+            "u": 0.8461538461538461,
+            "expected": 901.4098778732716,
+            "rendered": 899,
+            "error": 2.4098778732716255
+          },
+          {
+            "u": 0.9230769230769231,
+            "expected": 914.1501316138556,
+            "rendered": 912,
+            "error": 2.150131613855592
+          }
+        ],
+        "accelerationOracle": {
+          "samples": 11725,
+          "maxVelocityError": 1.5518585091411907e-06,
+          "maxPositionError": 6.840472626789412e-08
+        },
+        "settled": 9309,
+        "newlySettled": 744,
+        "stableSettled": 9309,
+        "liftedByGust": 6589
+      }
+    },
+    "sandPhone": {
+      "wallSeconds": 6.585,
+      "evidence": {
+        "view": "phone",
+        "count": 3136,
+        "idleRms": 0.07057491256156832,
+        "seedReplay": "bit-identical",
+        "tickRms": 0.39328742149746704,
+        "heartFraction": 0.9987244897959183,
+        "reformedHeartFraction": 0.36415816326530615,
+        "renderedGrainPixels": 4648,
+        "surfacePixels": [
+          {
+            "u": 0.07692307692307693,
+            "expected": 633.2419885046322,
+            "rendered": 632,
+            "error": 1.2419885046322179
+          },
+          {
+            "u": 0.15384615384615385,
+            "expected": 636.9840848881503,
+            "rendered": 635,
+            "error": 1.984084888150278
+          },
+          {
+            "u": 0.23076923076923078,
+            "expected": 637.8881991090851,
+            "rendered": 636,
+            "error": 1.8881991090851216
+          },
+          {
+            "u": 0.3076923076923077,
+            "expected": 630.4717079541533,
+            "rendered": 629,
+            "error": 1.4717079541533167
+          },
+          {
+            "u": 0.38461538461538464,
+            "expected": 618.1792863121747,
+            "rendered": 616,
+            "error": 2.1792863121746677
+          },
+          {
+            "u": 0.46153846153846156,
+            "expected": 610.2668714796058,
+            "rendered": 609,
+            "error": 1.2668714796058111
+          },
+          {
+            "u": 0.5384615384615384,
+            "expected": 611.0970266794087,
+            "rendered": 610,
+            "error": 1.0970266794087138
+          },
+          {
+            "u": 0.6153846153846154,
+            "expected": 615.7405457027562,
+            "rendered": 614,
+            "error": 1.740545702756208
+          },
+          {
+            "u": 0.6923076923076923,
+            "expected": 617.4226787414354,
+            "rendered": 616,
+            "error": 1.4226787414354476
+          },
+          {
+            "u": 0.7692307692307693,
+            "expected": 616.6877320080655,
+            "rendered": 615,
+            "error": 1.6877320080654954
+          },
+          {
+            "u": 0.8461538461538461,
+            "expected": 620.0351569662377,
+            "rendered": 619,
+            "error": 1.0351569662376505
+          },
+          {
+            "u": 0.9230769230769231,
+            "expected": 629.9914293338792,
+            "rendered": 629,
+            "error": 0.9914293338791822
+          }
+        ],
+        "accelerationOracle": {
+          "samples": 1769,
+          "maxVelocityError": 3.255014677211454e-06,
+          "maxPositionError": 5.901444286200708e-08
+        },
+        "settled": 1475,
+        "newlySettled": 170,
+        "stableSettled": 1475,
+        "liftedByGust": 1038
+      }
+    },
+    "paperPhysics": {
+      "wallSeconds": 1.432,
+      "evidence": {
+        "angularTranslationDifference": 1.487370041381767,
+        "galileanVelocityError": 0.0,
+        "normalTangentDragRatio": 4.545454545454546
+      }
+    }
+  },
+  "failures": {
+    "scenes": {
+      "type": "AssertionError",
+      "message": "erased scene bitmaps retain alpha before cleanup: dawn",
+      "wallSeconds": 41.267
+    },
+    "paperGeometry": {
+      "type": "AssertionError",
+      "message": "paper never exposes both faces and edge-on geometry",
+      "wallSeconds": 13.041
+    },
+    "facesReduced": {
+      "type": "AssertionError",
+      "message": "reduced motion changes actual canvas pixels",
+      "wallSeconds": 6.495
+    },
+    "queriesFallback": {
+      "type": "AssertionError",
+      "message": "fallback resize leaves stale viewport",
+      "wallSeconds": 17.613
+    },
+    "refreshWarm": {
+      "type": "AssertionError",
+      "message": "120 Hz refresh changes fixed simulation ticks or particle identities",
+      "wallSeconds": 6.045
+    }
+  },
+  "standaloneFileOpened": false,
+  "performanceAccepted": false,
+  "performanceScope": "Functional checks do not establish 60 fps TV or CPU-throttled phone performance.",
+  "records": [
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "completedWindCases": [
+        {
+          "seed": 1,
+          "time": 0.37,
+          "event": "idle",
+          "divergenceResidual": [
+            3.507862749113983e-05,
+            8.728177101177553e-06
+          ],
+          "boundaryFluxRatio": 6.906203248541547e-07,
+          "gpuCpuMaxError": 6.983024948670202e-06,
+          "temporalRms": 0.01607091393119453
+        },
+        {
+          "seed": 1,
+          "time": 1.41,
+          "event": "tick",
+          "divergenceResidual": [
+            9.996747660171275e-05,
+            2.4994172578215412e-05
+          ],
+          "boundaryFluxRatio": 8.088533262913639e-07,
+          "gpuCpuMaxError": 1.5145723462173244e-05,
+          "temporalRms": 0.005202095921749431
+        },
+        {
+          "seed": 1,
+          "time": 3.27,
+          "event": "win",
+          "divergenceResidual": [
+            3.896404811391052e-05,
+            9.715148623029281e-06
+          ],
+          "boundaryFluxRatio": 4.7456485439593937e-07,
+          "gpuCpuMaxError": 4.033341600268112e-06,
+          "temporalRms": 0.023873786599512007
+        },
+        {
+          "seed": 2,
+          "time": 0.37,
+          "event": "idle",
+          "divergenceResidual": [
+            3.401603638460697e-05,
+            8.499646058480012e-06
+          ],
+          "boundaryFluxRatio": 2.1803183193442115e-07,
+          "gpuCpuMaxError": 2.2141010800280636e-05,
+          "temporalRms": 0.0026414289827426953
+        },
+        {
+          "seed": 2,
+          "time": 1.41,
+          "event": "tick",
+          "divergenceResidual": [
+            9.808853246045984e-05,
+            2.4525017007526775e-05
+          ],
+          "boundaryFluxRatio": 8.149026951083187e-08,
+          "gpuCpuMaxError": 6.392605167972187e-06,
+          "temporalRms": 0.014942581344016962
+        },
+        {
+          "seed": 2,
+          "time": 3.27,
+          "event": "win",
+          "divergenceResidual": [
+            3.94318381556827e-05,
+            9.83971639383816e-06
+          ],
+          "boundaryFluxRatio": 2.0448311466290988e-07,
+          "gpuCpuMaxError": 1.3657304554715033e-05,
+          "temporalRms": 0.015906240744605626
+        },
+        {
+          "seed": 3,
+          "time": 0.37,
+          "event": "idle",
+          "divergenceResidual": [
+            3.3121269884249074e-05,
+            8.211818321556982e-06
+          ],
+          "boundaryFluxRatio": 9.960835450631995e-07,
+          "gpuCpuMaxError": 7.4486390124195445e-06,
+          "temporalRms": 0.01602968510165941
+        },
+        {
+          "seed": 3,
+          "time": 1.41,
+          "event": "tick",
+          "divergenceResidual": [
+            9.787222164770454e-05,
+            2.447017472122566e-05
+          ],
+          "boundaryFluxRatio": 7.811141201137926e-07,
+          "gpuCpuMaxError": 8.584592804408708e-06,
+          "temporalRms": 0.01975115629125538
+        },
+        {
+          "seed": 3,
+          "time": 3.27,
+          "event": "win",
+          "divergenceResidual": [
+            2.6702494902741407e-05,
+            6.679769217823914e-06
+          ],
+          "boundaryFluxRatio": 2.0331429806897925e-08,
+          "gpuCpuMaxError": 2.2187118330629918e-05,
+          "temporalRms": 0.0067774204916237965
+        }
+      ]
+    },
+    {
+      "view": "tv",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "partialEvidence": {
+        "renderedPixels": {
+          "gpuOpaquePixels": 29739,
+          "surface": [
+            {
+              "u": 0.07692307692307693,
+              "expected": 918.3096149129234,
+              "rendered": 916,
+              "error": 2.3096149129233936
+            },
+            {
+              "u": 0.15384615384615385,
+              "expected": 923.0980794795105,
+              "rendered": 921,
+              "error": 2.0980794795104885
+            },
+            {
+              "u": 0.23076923076923078,
+              "expected": 924.2550028901853,
+              "rendered": 922,
+              "error": 2.255002890185324
+            },
+            {
+              "u": 0.3076923076923077,
+              "expected": 914.764706151647,
+              "rendered": 913,
+              "error": 1.764706151647033
+            },
+            {
+              "u": 0.38461538461538464,
+              "expected": 899.0350670837123,
+              "rendered": 897,
+              "error": 2.035067083712306
+            },
+            {
+              "u": 0.46153846153846156,
+              "expected": 888.9101760657333,
+              "rendered": 887,
+              "error": 1.9101760657332534
+            },
+            {
+              "u": 0.5384615384615384,
+              "expected": 889.9724599706942,
+              "rendered": 888,
+              "error": 1.9724599706942172
+            },
+            {
+              "u": 0.6153846153846154,
+              "expected": 895.914403744646,
+              "rendered": 894,
+              "error": 1.9144037446460516
+            },
+            {
+              "u": 0.6923076923076923,
+              "expected": 898.0668962585956,
+              "rendered": 896,
+              "error": 2.066896258595648
+            },
+            {
+              "u": 0.7692307692307693,
+              "expected": 897.126443092672,
+              "rendered": 895,
+              "error": 2.126443092672048
+            },
+            {
+              "u": 0.8461538461538461,
+              "expected": 901.4098778732716,
+              "rendered": 899,
+              "error": 2.4098778732716255
+            },
+            {
+              "u": 0.9230769230769231,
+              "expected": 914.1501316138556,
+              "rendered": 912,
+              "error": 2.150131613855592
+            }
+          ]
+        },
+        "acceleration": {
+          "samples": 11725,
+          "maxVelocityError": 1.5518585091411907e-06,
+          "maxPositionError": 6.840472626789412e-08
+        },
+        "idleRms": 0.07789956067748285,
+        "seedReplay": "bit-identical",
+        "tickRms": 0.4089516263132762,
+        "heartFraction": 0.9951783992285439
+      }
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "partialEvidence": {
+        "renderedPixels": {
+          "gpuOpaquePixels": 4648,
+          "surface": [
+            {
+              "u": 0.07692307692307693,
+              "expected": 633.2419885046322,
+              "rendered": 632,
+              "error": 1.2419885046322179
+            },
+            {
+              "u": 0.15384615384615385,
+              "expected": 636.9840848881503,
+              "rendered": 635,
+              "error": 1.984084888150278
+            },
+            {
+              "u": 0.23076923076923078,
+              "expected": 637.8881991090851,
+              "rendered": 636,
+              "error": 1.8881991090851216
+            },
+            {
+              "u": 0.3076923076923077,
+              "expected": 630.4717079541533,
+              "rendered": 629,
+              "error": 1.4717079541533167
+            },
+            {
+              "u": 0.38461538461538464,
+              "expected": 618.1792863121747,
+              "rendered": 616,
+              "error": 2.1792863121746677
+            },
+            {
+              "u": 0.46153846153846156,
+              "expected": 610.2668714796058,
+              "rendered": 609,
+              "error": 1.2668714796058111
+            },
+            {
+              "u": 0.5384615384615384,
+              "expected": 611.0970266794087,
+              "rendered": 610,
+              "error": 1.0970266794087138
+            },
+            {
+              "u": 0.6153846153846154,
+              "expected": 615.7405457027562,
+              "rendered": 614,
+              "error": 1.740545702756208
+            },
+            {
+              "u": 0.6923076923076923,
+              "expected": 617.4226787414354,
+              "rendered": 616,
+              "error": 1.4226787414354476
+            },
+            {
+              "u": 0.7692307692307693,
+              "expected": 616.6877320080655,
+              "rendered": 615,
+              "error": 1.6877320080654954
+            },
+            {
+              "u": 0.8461538461538461,
+              "expected": 620.0351569662377,
+              "rendered": 619,
+              "error": 1.0351569662376505
+            },
+            {
+              "u": 0.9230769230769231,
+              "expected": 629.9914293338792,
+              "rendered": 629,
+              "error": 0.9914293338791822
+            }
+          ]
+        },
+        "acceleration": {
+          "samples": 1769,
+          "maxVelocityError": 3.255014677211454e-06,
+          "maxPositionError": 5.901444286200708e-08
+        },
+        "idleRms": 0.07057491256156832,
+        "seedReplay": "bit-identical",
+        "tickRms": 0.39328742149746704,
+        "heartFraction": 0.9987244897959183
+      }
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "completedSceneCases": [
+        {
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 626,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 865,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 816,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 1370,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 1317,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 2916,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 2104,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 2830,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "paper",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4351,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 2047,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 2483,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 2230,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 2159,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 2141,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 3971,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 2404,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 3990,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4330,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "shred",
+          "mode": "truth",
+          "shownPixelColors": 1991,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "shred",
+          "mode": "sh",
+          "shownPixelColors": 2133,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "shred",
+          "mode": "night",
+          "shownPixelColors": 2129,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "shred",
+          "mode": "imp",
+          "shownPixelColors": 2159,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "shred",
+          "mode": "door",
+          "shownPixelColors": 2141,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "shred",
+          "mode": "fakeout",
+          "shownPixelColors": 3928,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "paper": "shred",
+          "mode": "round",
+          "shownPixelColors": 2404,
+          "checkedAtSeconds": 5.3
+        }
+      ],
+      "currentSceneCase": {
+        "theme": "pop",
+        "material": "paper",
+        "paper": "shred",
+        "mode": "dawn"
+      }
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": null,
+      "reducedMotion": false,
+      "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    }
+  ],
+  "wallSeconds": 123.71,
+  "browserVersion": "151.0.7922.173",
+  "transport": "policy-harness",
+  "standaloneFileBlocker": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html?view=phone&seed=123456&event=idle",
+  "harnessDisclosure": "Exact top-document bytes fulfilled by test route; disk opening remains unverified.",
+  "functionalPassed": false
+}

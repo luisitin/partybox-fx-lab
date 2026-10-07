@@ -1,0 +1,41 @@
+{
+  "paper": {
+    "front": 48345,
+    "back": 0,
+    "edge": 24,
+    "min": 0.14951094640638501,
+    "max": 1,
+    "maxRoll": 1.1288195054207788,
+    "samples": 48345,
+    "settled": 3000
+  },
+  "reduced": {
+    "changedChannels": 2346,
+    "maxChannelDelta": 255,
+    "sumChannelDelta": 398327,
+    "totalChannels": 1316640
+  },
+  "sha": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+  "records": [
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness"
+    }
+  ]
+}
