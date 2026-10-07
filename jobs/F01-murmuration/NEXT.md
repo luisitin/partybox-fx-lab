@@ -1,6 +1,6 @@
 # F01 handoff
 
-Branch: job/F01-murmuration. Nickname: codex-flock. Status: active functional
+Branch: job/F01-murmuration. Nickname: codex-flock. Status: BLOCKED functional
 milestone; mandatory performance has failed on the available SwiftShader backend.
 No PR, green CI or KEEP GOING rounds are claimed.
 
@@ -24,10 +24,12 @@ normal-motion state evolves through GPU computation. Canvas fallback is separate
 
 ## Outstanding work
 
-1. A nonsemantic shader optimization is being investigated outside the checkout:
+1. A nonsemantic shader optimization was tested outside the checkout:
    /workspace/.partybox-tools/fx_tools/F01-optimization/index.html. It stores
    nearest-neighbour IDs/distances rather than copying temporary vector arrays.
-   Promote it only after measured gains and relevant functional revalidation.
+   Six readback cases were identical (286,464 components), but TV idle measured
+   only 0.856 fps across seven intervals. Timings were mixed; it was not promoted.
+   Reviewed c289 is unchanged. Repeat on a GPU-capable browser before promotion.
 2. Required 60 fps failed: TV 0.74–1.17 fps; phone with CPU4x 5.40–6.41 fps.
    All six modes, raw frame arrivals, captures and source provenance are in
    validation/. The host has no GPU device and uses ANGLE SwiftShader. Investigate

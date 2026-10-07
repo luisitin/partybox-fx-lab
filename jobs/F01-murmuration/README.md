@@ -1,6 +1,6 @@
 # F01 — Murmuration round 5
 
-Functional milestone; performance, disk navigation and CI are not signed off.
+Blocked functional milestone; performance, disk navigation and CI are unsigned.
 See VERIFY.md and NEXT.md for measured results and the current handoff.
 
 ## Run

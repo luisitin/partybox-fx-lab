@@ -1,0 +1,19 @@
+{
+  "candidatePromoted": false,
+  "reason": "Both measured TV frame rates below 1 fps; seven candidate intervals cannot establish a reliable performance gain. Reviewed c289 milestone retained.",
+  "candidateTVIdle": {
+    "fps": 0.8561853274297023,
+    "frameMeanMs": 1167.9714285714686,
+    "p95Ms": 1812.9999999999998,
+    "intervals": 7
+  },
+  "mainTVIdleRecorded": {
+    "fps": 0.7357900545710958,
+    "frameMeanMs": 1359.0833333333333,
+    "p95Ms": 1974.5499999999302,
+    "intervals": 6
+  },
+  "readbackByteEquivalent": true,
+  "componentsCompared": 286464,
+  "notes": "One nonsemantic experiment only. Same seed20260928, populations20736/3136, 32 candidates, seven selected, boundary/tie ordering, guide, field, event and steering remain unchanged. Need GPU-capable measurement before any performance claim."
+}
