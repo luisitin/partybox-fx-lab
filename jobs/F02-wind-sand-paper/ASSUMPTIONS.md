@@ -1,0 +1,16 @@
+# Assumptions and scope
+
+- This is a visual-effects job: the browser deliverable is one self-contained offline HTML page, with original code-made art. Research motivates motion; the page is not a calibrated fluid solver.
+- “Same rules as F01” carries GPU computation for at least 20,000 TV particles, graceful 3,000 phone particles, measured 60 fps targets, explicit TV/phone views, and win/tick/idle hooks. Win's heart-and-reform and tick's ripple adapt to sand/paper. The bird-specific seven-topological-neighbor model is inapplicable.
+- TV validation uses 1920×1080; phone layout uses 390×844 portrait and Chrome CPU throttling at 4× for the required emulation. Only measurements on actual hardware can be called real-TV or real-phone evidence.
+- All baseline leftovers 1–21 are required, including items labeled “delight”; implementation completion and checks are recorded by the parent in VERIFY.md/NEXT.md, not inferred from these assumptions.
+- Preserve sand/tear/shred, Pop/Gouache, both wind directions, the five single-card reveals, fakeout/round/dawn, protected truth and TRUE stamp, seeded behavior, ragged shared tear seams/rims, visible front/back faces, gradual plaque erosion, clean exits, reduced motion and live announcements.
+- Shared wind means both materials sample the same seeded spatial/time field. Different inertia, drag and deformation responses are expected. Screen-space coefficient choices are artistic settings and need boundedness/stability checks; no published physical coefficient is silently imported.
+- Release staggering, clearance routes, corner stress, fraying, bending/crumple, ribbon curl, dunes and game choreography are original animation choices. Studies of rigid falling plates do not calibrate these effects.
+- No source code, dataset, photograph, video, logo or source illustration is copied into the deliverable. Public academic material was read for mechanics and equations. Existing baseline code is covered by this repository's MIT licence. No secrets, tracking or runtime network access are needed.
+- Hidden-face integration must defer the face provider/bitmap generation until explicit reveal authorization. Reduced motion must preserve the reveal information and announcements while suppressing wind/particles.
+- Existing isolated cloud checkouts are used; no Git worktree is created. Parent owns claims, commits, pushes, PRs and queue transitions.
+- The baseline report is historical evidence; the current build must earn its own validation. Desktop viewport emulation is distinct from physical-device measurement, and green CI is distinct from visual or hardware validation.
+- Source independence is scoped: the sand review cites original models; the Pessa study re-analyzes Howison data. They are separate publications, not independent repetitions of every measured result. Full APS equations remain unread because the PDF routes returned HTTP 401; optional deeper checks can be retained under NEXT.md “Re-verify when web works.”
+
+- The inherited flamingo/grey demo answer is an illustrative, unverified fixture. Visual regression tests do not validate it as a species-qualified zoological fact; its two-source re-verification remains outstanding.

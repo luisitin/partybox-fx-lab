@@ -1,0 +1,569 @@
+{
+  "source": "/workspace/partybox-fx-lab/start/wind-sand-paper/index.html",
+  "chromium": "/usr/bin/chromium",
+  "flags": [
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+    "--autoplay-policy=no-user-gesture-required",
+    "--disable-background-networking",
+    "--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE localhost",
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader"
+  ],
+  "hardwareGpuNodes": [],
+  "transport": "routed",
+  "standaloneFileOpened": false,
+  "extraQuery": {
+    "warm": "0",
+    "theme": "gouache",
+    "mat": "paper",
+    "paper": "tear",
+    "seed": "1"
+  },
+  "transportExplanation": "routed mode fulfills the top document from local disk bytes without any server or socket. This environment's Chromium enterprise URL policy blocks file://. Use --transport file in a browser with disk access.",
+  "method": "Actual performance.now arrival intervals sampled with native rAF; page rAF callback CPU time measured separately. CPU throttling via CDP. Performance without video recording. HTTP(S) and other nonlocal runtime requests blocked and logged.",
+  "cases": [
+    {
+      "view": "tv",
+      "event": "idle",
+      "motion": "no-preference",
+      "cpuThrottle": 1,
+      "performance": {
+        "elapsedMs": 18291.400000000373,
+        "fps": 0.8747280142580488,
+        "arrivalIntervals": {
+          "count": 16,
+          "meanMs": 1143.2125000000233,
+          "p50Ms": 575.2999999998137,
+          "p95Ms": 4100.47499999986,
+          "p99Ms": 5028.975000000419,
+          "maxMs": 5261.100000000559
+        },
+        "scheduledIntervals": {
+          "count": 16,
+          "meanMs": 1142.6625,
+          "p50Ms": 599.95,
+          "p95Ms": 4083.1250000000005,
+          "p99Ms": 5003.105,
+          "maxMs": 5233.1
+        },
+        "callbackWork": {
+          "count": 17,
+          "meanMs": 2.570588235195507,
+          "p50Ms": 1.699999999254942,
+          "p95Ms": 8.299999999441201,
+          "p99Ms": 12.779999999441205,
+          "maxMs": 13.899999999441206
+        },
+        "missedRefreshes": 1081,
+        "missedRefreshFraction": 0.9854147675478578,
+        "longTasks": [
+          {
+            "start": 2278.100000000559,
+            "duration": 57
+          }
+        ],
+        "meets60FpsTolerance": false,
+        "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+      },
+      "hitchProfiles": [
+        {
+          "label": "cold-fire",
+          "scheduledAtMs": 300,
+          "firedAt": 2281.9000000003725,
+          "firedAtMs": 1718.5,
+          "callDurationMs": 53.200000000186265,
+          "error": null,
+          "windowSeconds": 3.0,
+          "arrivalIntervals": {
+            "count": 5,
+            "meanMs": 1307.1199999999255,
+            "p50Ms": 1069.7000000001863,
+            "p95Ms": 3306.0799999997016,
+            "p99Ms": 3632.095999999642,
+            "maxMs": 3713.5999999996275
+          },
+          "over33ms": 4,
+          "over50ms": 4,
+          "over100ms": 3,
+          "over250ms": 3
+        },
+        {
+          "label": "warm-fire-1",
+          "scheduledAtMs": 6300,
+          "firedAt": 7141.5,
+          "firedAtMs": 6578.0999999996275,
+          "callDurationMs": 17.5,
+          "error": null,
+          "windowSeconds": 3.0,
+          "arrivalIntervals": {
+            "count": 5,
+            "meanMs": 2101.240000000037,
+            "p50Ms": 642.3999999994412,
+            "p95Ms": 4951.600000000371,
+            "p99Ms": 5199.200000000522,
+            "maxMs": 5261.100000000559
+          },
+          "over33ms": 5,
+          "over50ms": 5,
+          "over100ms": 5,
+          "over250ms": 5
+        },
+        {
+          "label": "warm-fire-2",
+          "scheduledAtMs": 12300,
+          "firedAt": 13934.100000000559,
+          "firedAtMs": 13370.700000000186,
+          "callDurationMs": 32,
+          "error": null,
+          "windowSeconds": 3.0,
+          "arrivalIntervals": {
+            "count": 5,
+            "meanMs": 1962.8400000000372,
+            "p50Ms": 1004.2000000001863,
+            "p95Ms": 4665.660000000335,
+            "p99Ms": 5142.0120000005145,
+            "maxMs": 5261.100000000559
+          },
+          "over33ms": 5,
+          "over50ms": 5,
+          "over100ms": 5,
+          "over250ms": 5
+        }
+      ],
+      "inspection": {
+        "title": "Wind and Sand",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "document": {
+          "scrollWidth": 1920,
+          "scrollHeight": 1080
+        },
+        "reducedMotion": false,
+        "canvases": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "clientWidth": 1920,
+            "clientHeight": 1080,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 1920,
+              "height": 1080,
+              "top": 0,
+              "right": 1920,
+              "bottom": 1080,
+              "left": 0
+            }
+          }
+        ],
+        "externalReferences": [],
+        "appDiagnostics": {
+          "scene": {
+            "type": "fakeout",
+            "S": 2.35,
+            "sT": -1,
+            "allGone": -1,
+            "cards": [
+              {
+                "kind": "ansA",
+                "t": 2.35,
+                "g": 1,
+                "ptr": 0,
+                "total": 12,
+                "gone": -1,
+                "alpha": 1
+              },
+              {
+                "kind": "ansB",
+                "t": 2.21,
+                "g": 1,
+                "ptr": 0,
+                "total": 12,
+                "gone": -1,
+                "alpha": 1
+              },
+              {
+                "kind": "ansC",
+                "t": 2.07,
+                "g": 1,
+                "ptr": 0,
+                "total": 12,
+                "gone": -1,
+                "alpha": 1
+              },
+              {
+                "kind": "ansD",
+                "t": 1.93,
+                "g": 1,
+                "ptr": 0,
+                "total": 12,
+                "gone": -1,
+                "alpha": 1
+              }
+            ]
+          },
+          "tt": -1,
+          "mat": "paper",
+          "paper": "tear",
+          "kind": null,
+          "held": false,
+          "ptr": 0,
+          "total": 0,
+          "grains": 30,
+          "dep": 0,
+          "portrait": false,
+          "reduced": false,
+          "dir": 1,
+          "cell": 6,
+          "cast": null,
+          "L": null,
+          "surfaceAtCast": null,
+          "dy": 0
+        }
+      },
+      "errors": [],
+      "runtimeNetworkAttempts": [],
+      "harnessDocumentLoads": [
+        {
+          "url": "http://partybox.invalid/index.html?warm=0&theme=gouache&mat=paper&paper=tear&seed=1&view=tv&event=idle",
+          "source": "/workspace/partybox-fx-lab/start/wind-sand-paper/index.html",
+          "delivery": "route.fulfill local bytes; no socket"
+        }
+      ],
+      "capture": {
+        "path": "/workspace/.partybox-tools/fx-validation/F02/baseline-gouache-tear-fakeout/tv-idle-normal.webm",
+        "bytes": 1245268,
+        "under10MB": true,
+        "requestedSeconds": 6.0,
+        "recording": {
+          "encoder": "/usr/bin/ffmpeg",
+          "method": "CDP viewport JPEG frames, resampled at 25 fps; VP8 WebM",
+          "frames": 150,
+          "changedScreens": 9,
+          "captureWallSeconds": 6.242730411999219,
+          "note": "Capture frame rate is not used as performance evidence"
+        },
+        "errors": [],
+        "runtimeNetworkAttempts": [],
+        "harnessDocumentLoads": [
+          {
+            "url": "http://partybox.invalid/index.html?warm=0&theme=gouache&mat=paper&paper=tear&seed=1&view=tv&event=idle",
+            "source": "/workspace/partybox-fx-lab/start/wind-sand-paper/index.html",
+            "delivery": "route.fulfill local bytes; no socket"
+          }
+        ],
+        "metadata": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp8",
+              "width": 1920,
+              "height": 1080,
+              "r_frame_rate": "25/1"
+            }
+          ],
+          "format": {
+            "duration": "6.000000"
+          }
+        }
+      }
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "motion": "no-preference",
+      "cpuThrottle": 4,
+      "performance": {
+        "elapsedMs": 18108,
+        "fps": 7.565716810249614,
+        "arrivalIntervals": {
+          "count": 137,
+          "meanMs": 132.17518248175182,
+          "p50Ms": 97.6000000005588,
+          "p95Ms": 257.56000000014865,
+          "p99Ms": 1028.9919999995036,
+          "maxMs": 1365.0999999996275
+        },
+        "scheduledIntervals": {
+          "count": 137,
+          "meanMs": 132.23357664233575,
+          "p50Ms": 100.0,
+          "p95Ms": 286.6399999999992,
+          "p99Ms": 837.9479999999998,
+          "maxMs": 1366.5999999999995
+        },
+        "callbackWork": {
+          "count": 138,
+          "meanMs": 5.147101449260515,
+          "p50Ms": 3.6000000000931323,
+          "p95Ms": 14.474999999580907,
+          "p99Ms": 28.987000000020466,
+          "maxMs": 32.89999999944121
+        },
+        "missedRefreshes": 950,
+        "missedRefreshFraction": 0.8747697974217311,
+        "longTasks": [
+          {
+            "start": 861.1000000005588,
+            "duration": 314
+          },
+          {
+            "start": 12899,
+            "duration": 104
+          }
+        ],
+        "meets60FpsTolerance": false,
+        "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+      },
+      "hitchProfiles": [
+        {
+          "label": "cold-fire",
+          "scheduledAtMs": 300,
+          "firedAt": 869.4000000003725,
+          "firedAtMs": 308,
+          "callDurationMs": 304.5,
+          "error": null,
+          "windowSeconds": 3.0,
+          "arrivalIntervals": {
+            "count": 19,
+            "meanMs": 169.45263157892776,
+            "p50Ms": 102.5,
+            "p95Ms": 426.1899999999424,
+            "p99Ms": 1007.1579999995421,
+            "maxMs": 1152.3999999994412
+          },
+          "over33ms": 17,
+          "over50ms": 17,
+          "over100ms": 10,
+          "over250ms": 2
+        },
+        {
+          "label": "warm-fire-1",
+          "scheduledAtMs": 6300,
+          "firedAt": 7106.600000000559,
+          "firedAtMs": 6545.200000000186,
+          "callDurationMs": 31.199999999254942,
+          "error": null,
+          "windowSeconds": 3.0,
+          "arrivalIntervals": {
+            "count": 11,
+            "meanMs": 302.2454545454715,
+            "p50Ms": 181.79999999981374,
+            "p95Ms": 900.0,
+            "p99Ms": 1272.0799999997023,
+            "maxMs": 1365.0999999996275
+          },
+          "over33ms": 10,
+          "over50ms": 10,
+          "over100ms": 10,
+          "over250ms": 4
+        },
+        {
+          "label": "warm-fire-2",
+          "scheduledAtMs": 12300,
+          "firedAt": 12923.700000000186,
+          "firedAtMs": 12362.299999999814,
+          "callDurationMs": 76.79999999981374,
+          "error": null,
+          "windowSeconds": 3.0,
+          "arrivalIntervals": {
+            "count": 27,
+            "meanMs": 120.85925925926615,
+            "p50Ms": 87.90000000037253,
+            "p95Ms": 213.51000000024203,
+            "p99Ms": 664.5459999997719,
+            "maxMs": 809.5999999996275
+          },
+          "over33ms": 27,
+          "over50ms": 27,
+          "over100ms": 6,
+          "over250ms": 2
+        }
+      ],
+      "inspection": {
+        "title": "Wind and Sand",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "document": {
+          "scrollWidth": 390,
+          "scrollHeight": 844
+        },
+        "reducedMotion": false,
+        "canvases": [
+          {
+            "width": 390,
+            "height": 844,
+            "clientWidth": 390,
+            "clientHeight": 844,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 844,
+              "top": 0,
+              "right": 390,
+              "bottom": 844,
+              "left": 0
+            }
+          }
+        ],
+        "externalReferences": [],
+        "appDiagnostics": {
+          "scene": {
+            "type": "fakeout",
+            "S": 5.45,
+            "sT": 3.6163999999999987,
+            "allGone": 3.3998,
+            "cards": [
+              {
+                "kind": "ansA",
+                "t": 5.45,
+                "g": 0,
+                "ptr": 9,
+                "total": 9,
+                "gone": 2.7831999999999995,
+                "alpha": 1
+              },
+              {
+                "kind": "ansB",
+                "t": 5.31,
+                "g": 0,
+                "ptr": 9,
+                "total": 9,
+                "gone": 3.0498,
+                "alpha": 1
+              },
+              {
+                "kind": "ansC",
+                "t": 5.17,
+                "g": 1,
+                "ptr": 0,
+                "total": 9,
+                "gone": -1,
+                "alpha": 1
+              },
+              {
+                "kind": "ansD",
+                "t": 5.03,
+                "g": 0,
+                "ptr": 9,
+                "total": 9,
+                "gone": 3.2998,
+                "alpha": 1
+              }
+            ]
+          },
+          "tt": -1,
+          "mat": "paper",
+          "paper": "tear",
+          "kind": null,
+          "held": false,
+          "ptr": 0,
+          "total": 0,
+          "grains": 14,
+          "dep": 0,
+          "portrait": true,
+          "reduced": false,
+          "dir": 1,
+          "cell": 4,
+          "cast": null,
+          "L": null,
+          "surfaceAtCast": null,
+          "dy": 0
+        }
+      },
+      "errors": [],
+      "runtimeNetworkAttempts": [],
+      "harnessDocumentLoads": [
+        {
+          "url": "http://partybox.invalid/index.html?warm=0&theme=gouache&mat=paper&paper=tear&seed=1&view=phone&event=idle",
+          "source": "/workspace/partybox-fx-lab/start/wind-sand-paper/index.html",
+          "delivery": "route.fulfill local bytes; no socket"
+        }
+      ],
+      "capture": {
+        "path": "/workspace/.partybox-tools/fx-validation/F02/baseline-gouache-tear-fakeout/phone-idle-normal.webm",
+        "bytes": 749789,
+        "under10MB": true,
+        "requestedSeconds": 6.0,
+        "recording": {
+          "encoder": "/usr/bin/ffmpeg",
+          "method": "CDP viewport JPEG frames, resampled at 25 fps; VP8 WebM",
+          "frames": 150,
+          "changedScreens": 55,
+          "captureWallSeconds": 6.170553769000435,
+          "note": "Capture frame rate is not used as performance evidence"
+        },
+        "errors": [],
+        "runtimeNetworkAttempts": [],
+        "harnessDocumentLoads": [
+          {
+            "url": "http://partybox.invalid/index.html?warm=0&theme=gouache&mat=paper&paper=tear&seed=1&view=phone&event=idle",
+            "source": "/workspace/partybox-fx-lab/start/wind-sand-paper/index.html",
+            "delivery": "route.fulfill local bytes; no socket"
+          }
+        ],
+        "metadata": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp8",
+              "width": 390,
+              "height": 844,
+              "r_frame_rate": "25/1"
+            }
+          ],
+          "format": {
+            "duration": "6.000000"
+          }
+        }
+      }
+    }
+  ],
+  "gpu": {
+    "devices": [
+      {
+        "vendorId": 65535,
+        "deviceId": 65535,
+        "vendorString": "Google Inc. (Google)",
+        "deviceString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+        "driverVendor": "SwANGLE",
+        "driverVersion": "5.0.0"
+      }
+    ],
+    "featureStatus": {
+      "2d_canvas": "enabled",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "enabled",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "enabled_on",
+      "rasterization": "enabled_force",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "disabled_off",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "enabled",
+      "video_encode": "disabled_software",
+      "vulkan": "disabled_off",
+      "webgl": "enabled",
+      "webgpu": "unavailable_software",
+      "webgpu_on_vk_via_gl_interop": "disabled_off",
+      "webnn": "disabled_off"
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+    "vendor": "Google Inc. (Google)"
+  },
+  "allCasesMeetFrameTolerance": false,
+  "noRuntimeNetworkAttempts": true,
+  "noPageErrors": true,
+  "noHitchTriggerErrors": true,
+  "allCapturesUnder10MB": true
+}
