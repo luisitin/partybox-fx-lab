@@ -35,3 +35,6 @@ One workflow per job: .github/workflows/<ID>.yml, on pull_request with a paths f
 
 ## KEEP GOING
 After the PR is green: re-read the job, list the 5 biggest weaknesses, fix the worst, measure, log it in LOOP.md, push. Repeat until three rounds in a row gain nothing a player would notice. Then go back to RUN-ALL step 1.
+
+## When the web is blocked (cloud egress allowlist)
+Never stop a job only because a source site returns 403. Try in order: GitHub (raw files, repos that quote or implement the rules or ship the dataset), package registries (npm/PyPI packages that bundle the data or rules), then your own knowledge. Anything not read from a live source is marked "from knowledge, unverified" in SOURCES.md, and the point to re-check goes to NEXT.md under "Re-verify when web works". Data jobs that truly need a blocked API: build and test the whole pipeline on a 30-row sample you can reach, write BLOCKED.md listing only the hosts needed, and move on. A job with BLOCKED.md for research reasons only may be re-claimed by the next chat with this rule.
