@@ -1,7 +1,7 @@
 # F01 handoff
 
-Status: blocked before build; the research-first prerequisite is incomplete.
-Read `BLOCKED.md`, `SOURCES.md`, root `RULES.md`, `JOBS.md` and
+Status: resumed under updated main RULES.md research fallback. GPU implementation and independent browser checks are in progress. Research-only blocking has been removed.
+Read `SOURCES.md`, root `RULES.md`, `JOBS.md` and
 `start/murmuration/REPORT.md` before resuming. Use the existing isolated checkout;
 do not create a worktree unless explicitly requested.
 
@@ -31,5 +31,27 @@ do not create a worktree unless explicitly requested.
    milestones, refresh the claim, open a PR after checks pass, verify CI, then
    run KEEP GOING until three consecutive rounds have no player-visible gain.
 
-No code, media, physical-device measurement or KEEP GOING result exists in this
-milestone. Do not label F01 complete or green based on this research ledger.
+Implementation and validation will be logged below when actually run. No physical-device measurement, green CI or KEEP GOING result is claimed.
+
+## Re-verify when web works
+
+The new `RULES.md` fallback supersedes the earlier research-blocked status above.
+GitHub, then the npm registry (`boids@2.0.0`, archive SHA-512 verified), were
+consulted; knowledge-based physics and film-inspired choices are marked
+"from knowledge, unverified" in `SOURCES.md`. Continue implementation and checks;
+this research limitation alone does not block F01.
+
+- Read Ballerini et al. (2008), DOI 10.1073/pnas.0711437105, and Young et al.
+  (2013), DOI 10.1371/journal.pcbi.1002894. Confirm approximate neighbour count,
+  the definitions of topological interaction, and the limitations of the
+  empirical and theoretical results using the two independent papers.
+- Watch actual real-bird film, beginning with https://vimeo.com/31158841 or an
+  accessible natural-history alternative. Record timestamped observations of
+  sheets, turning propagation, lobes, density/contrast and split/rejoin behaviour.
+  No footage has been watched in this environment; do not report timings as
+  observed before this check. Use film only as research unless its asset licence
+  separately permits redistribution.
+- Compare the implemented neighbour search with its description. If it uses
+  bounded candidates, preserve the explicit "seven nearest within candidates"
+  approximation and quantify representative candidate misses before claiming
+  exact spatial neighbours. Retest visual dynamics after any correction.

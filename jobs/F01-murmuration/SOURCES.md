@@ -1,7 +1,9 @@
 # Research ledger — F01
 
-Research performed on 2026-10-07 UTC. This is an unfinished research milestone,
-not a finished effect. No third-party code, artwork or footage has been copied
+Research performed on 2026-10-07 UTC. The updated `RULES.md` section "When the
+web is blocked" permits proceeding after GitHub, package-registry and knowledge
+fallbacks, with unread claims explicitly marked and scheduled for re-verification.
+No third-party code, artwork or footage has been copied
 into this job. The repository's existing `start/murmuration/index.html` and
 `REPORT.md` were read, along with root `README.md`, `RULES.md` and `JOBS.md`.
 
@@ -16,6 +18,8 @@ into this job. The repository's existing `start/murmuration/index.html` and
 | Simon Green, NVIDIA, *Particle Simulation using CUDA*, May 2010 | https://developer.download.nvidia.com/assets/cuda/files/particles.pdf | Pages 4–6 explain double buffering, local interactions and a uniform spatial grid. The loose grid assigns particles by centre and visits 27 neighbouring cells in 3D; grid construction uses atomics or sorting. This is architectural research, not a WebGL portability or device-performance guarantee. |
 | three.js licence | https://raw.githubusercontent.com/mrdoob/three.js/r180/LICENSE | MIT terms read. No source incorporated into this milestone. |
 | WebGPU Samples licence | https://raw.githubusercontent.com/webgpu/webgpu-samples/main/LICENSE.txt | BSD three-clause terms read. No source incorporated into this milestone. |
+| npm `boids` registry metadata, version 2.0.0 | https://registry.npmjs.org/boids | Live package README documents metric separation/alignment/cohesion, attractors, and speed/acceleration limits. Its published benchmark numbers were not adopted as measurements for this job. |
+| npm `boids@2.0.0` source archive | https://registry.npmjs.org/boids/-/boids-2.0.0.tgz | Retrieved and checked SHA-512 against live registry integrity; read `package/index.js`, README and package metadata without executing/installing it. The code has an all-particle inner loop and uses metric distance thresholds. No code was copied and this package is not a runtime dependency. |
 
 Independent support for the state-update design: three.js, WebGPU Samples and
 NVIDIA all separate old and new particle state. Independent evidence for why an
@@ -32,8 +36,44 @@ respectively. A 20,000-bird implementation requires its own measured validation.
 | tralev, murmuration README | https://raw.githubusercontent.com/tralev/murmuration/main/README.md | Identified a simulated GIF and listed scientific papers. The GIF is computer-generated and does not satisfy the request to research real film footage. |
 
 These two project accounts cite overlapping underlying papers. They do **not**
-satisfy the binding requirement for two independent sources for a physical fact.
-No numerical claim about real starling dynamics is treated as verified here.
+establish independent primary confirmation of a physical fact. The following
+knowledge-based model is permitted by the updated fallback rule; its scientific
+and footage claims remain explicitly unverified.
+
+## From knowledge, unverified — physical model and film-inspired choices
+
+The literature references below identify what to check later. Their contents
+were **not** read live in this environment, and no film was watched here.
+
+| Claim/choice | Status and remembered basis | Consequence for this job |
+| --- | --- | --- |
+| Starling interaction is approximately topological, with about six or seven closest neighbours rather than a fixed metric radius. | **From knowledge, unverified.** Remembered empirical result of Ballerini et al. (2008), DOI 10.1073/pnas.0711437105; accessible project READMEs also describe it, but the primary article is blocked. | Use seven neighbour headings/positions for the flock's alignment/cohesion inspiration. Do not describe seven as a universal biological law or this visual simulation as a validated physical reconstruction. |
+| A limited-neighbour consensus graph can balance communication cost and robustness; preferred count can depend on flock geometry. | **From knowledge, unverified.** Remembered result of Young et al. (2013), DOI 10.1371/journal.pcbi.1002894; the independent paper must be read later. | Keep the neighbour-count choice configurable during development; do not assert that seven is optimal for every shape. |
+| Large murmurations can appear as rolling sheets, ribbons and lobes with coherent turns, occasional splits/rejoins, and darkening caused by overlapping depth. | **From knowledge, unverified.** Memory of real murmuration films, including the intended film reference https://vimeo.com/31158841. No new observation, timing or physical measurement was made here. | Create original layered bird geometry and coherent turn-wave/density variation. Treat shape, contrast and timings as artistic choices pending footage review. |
+| A flock should avoid instant individual direction reversals and abrupt density collapse. | **From knowledge, unverified** as a naturalistic judgement, not a measured flight limit. | Bound acceleration/turn rate and speed; soften cohesion briefly on event release; reform through two streaming lobes rather than a uniformly shrinking hole. Tune the limits by browser tests, without attaching unverified real-world units. |
+
+A workable computational model uses velocity alignment toward the mean unit
+heading of the selected neighbours, cohesion toward their centroid, and separate
+short-range metric repulsion. Clamp the total acceleration and speed, integrate
+at a stable simulation step, and add a weak shared smooth flow field to guide
+large-scale form. Heart targets, colour laps, ring lanes and event timings are
+original artistic controls; they are not claims about natural starling behaviour.
+
+"Seven nearest" must describe the actual implemented search. If a WebGL2
+implementation considers only a bounded local candidate set, call it **seven
+nearest within the candidate set**, an approximate topological graph; do not
+claim an exact global nearest-seven result. A fixed seven-index adjacency graph
+is another approximation and must be labelled if used. Evaluate candidate
+quality against a full nearest-neighbour reference on representative small
+samples if the implementation claims spatial accuracy.
+
+For scale, a direct all-pairs search requires roughly N×(N−1) distance tests
+per step (about 400 million at N=20,000). This is a count derived from the
+algorithm, not a hardware benchmark. Double-buffered GPU state is supported by
+the retrieved official sources. Candidate pruning or a spatial index is an
+engineering requirement to investigate and measure, not an assumed performance
+guarantee. WebGL2 lacks general compute-shader storage-buffer atomics; avoid
+silently substituting WebGPU requirements into an offline WebGL2 deliverable.
 
 ## Required primary research unavailable in this environment
 
@@ -56,5 +96,9 @@ GitHub repository searches for `starling topological`, `Cavagna flocking`,
 `Bialek flock`, `StarDisplay`, and quoted paper/footage terms found accessible
 simulation projects and bibliographic references. They did not yield a verified
 primary-paper mirror or accessible actual film footage. Listing an unavailable
-URL is not evidence that its contents were read. Scientific and footage research
-remain incomplete; see `BLOCKED.md` and `NEXT.md`.
+URL is not evidence that its contents were read. After those GitHub attempts,
+the npm registry and verified `boids@2.0.0` archive were consulted as the package
+fallback. The project may now proceed under the updated explicit knowledge
+fallback. Primary scientific and actual film verification remain pending in
+`NEXT.md` under "Re-verify when web works"; this research limitation alone is
+not a reason to mark the job blocked.
