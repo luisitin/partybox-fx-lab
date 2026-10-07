@@ -1,0 +1,2937 @@
+{
+  "html": "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+  "htmlSha256": "7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21",
+  "checkSha256": "219f84bd84968dbbe45445c259a9f1b0fdfccb59f32027a541178171bb7cd4c1",
+  "requestedGroups": [
+    "scenes",
+    "paperGeometry",
+    "refreshWarm",
+    "responsive"
+  ],
+  "completedGroups": [
+    "paperGeometry",
+    "refreshWarm",
+    "responsive"
+  ],
+  "results": {
+    "paperGeometry": {
+      "wallSeconds": 8.906,
+      "evidence": {
+        "pretearPixelChange": true,
+        "segmentedSamples": 1454,
+        "maxRibbonCurvature": 0.3132475411009738,
+        "frontBackAndEdge": true,
+        "releaseSpan": 0.7333333333333307,
+        "offscreenExits": 119,
+        "reentrainedPaper": 20,
+        "stubPixels": {
+          "width": 20,
+          "height": 312,
+          "alpha": 6240,
+          "ink": 4888,
+          "colors": 60,
+          "hash": 3046228941
+        },
+        "spiralHoleContrasts": [
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166
+        ]
+      }
+    },
+    "refreshWarm": {
+      "wallSeconds": 18.05,
+      "evidence": {
+        "schedules": [
+          {
+            "hz": 60,
+            "clock": 3.4999999999999925,
+            "maxStateDifference": 0
+          },
+          {
+            "hz": 120,
+            "clock": 3.4999999999999925,
+            "maxStateDifference": 0
+          },
+          {
+            "hz": 144,
+            "clock": 3.4999999999999925,
+            "maxStateDifference": 0
+          }
+        ],
+        "halfTickVertexMovement": 2.0281932582966076,
+        "coldWarmEquivalent": true,
+        "scope": "Functional state/interpolation equivalence; cold and gouache CPU4 frame costs require separate performance evidence."
+      }
+    },
+    "responsive": {
+      "wallSeconds": 17.809,
+      "evidence": {
+        "initialCount": 20736,
+        "phoneCount": 3136,
+        "restoredCount": 20736,
+        "retainedAirborneGPUIdentities": 2884,
+        "retainedPaperIdentities": 166,
+        "boundedNewAirborneGPUCopies": 16188,
+        "originalDprAtlasCrops": 573,
+        "scope": "Eager warm-up disabled to isolate responsive count/atlas behavior; default DPR2 warm startup separately timed out at30s on revision00230a9b."
+      }
+    }
+  },
+  "failures": {
+    "scenes": {
+      "type": "AssertionError",
+      "message": "erased scene bitmap alpha: {'view': 'tv', 'direction': 1, 'theme': 'pop', 'material': 'sand', 'paper': 'tear', 'mode': 'dawn'}; counts=[{'kind': 'ansN3', 'base': {'count': 1, 'residuals': [{'x': 390, 'y': 552, 'rgba': [198, 113, 28, 9]}], 'width': 392, 'height': 611, 'exposedRows': 565}, 'rel': {'count': 0, 'residuals': [], 'width': 392, 'height': 611, 'exposedRows': 565}}]",
+      "wallSeconds": 103.15
+    }
+  },
+  "standaloneFileOpened": false,
+  "performanceAccepted": false,
+  "performanceScope": "Functional checks do not establish 60 fps TV or CPU-throttled phone performance.",
+  "records": [
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21",
+      "extraQuery": {
+        "nogpu": "1",
+        "dir": "1"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=phone&seed=123456&event=idle&nogpu=1&dir=1"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 1.006,
+      "windDirection": 1,
+      "completedSceneCases": [
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 1306,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 1554,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 1491,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 1550,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 1451,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 3037,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 2546,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 2848,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4999,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 2446,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 2541,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 2535,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 2586,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 2572,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 4147,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 2860,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 4055,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4999,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "truth",
+          "shownPixelColors": 2446,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "sh",
+          "shownPixelColors": 2541,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "night",
+          "shownPixelColors": 2535,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "imp",
+          "shownPixelColors": 2586,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "door",
+          "shownPixelColors": 2572,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "fakeout",
+          "shownPixelColors": 4147,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "round",
+          "shownPixelColors": 2860,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "dawn",
+          "shownPixelColors": 4055,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4999,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 1999,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 2314,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 2267,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 2311,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 2206,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 4139,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 3262,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 3734,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 5435,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 2847,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 3257,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 3307,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 3409,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 3253,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 5566,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 3579,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 5188,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 5435,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "truth",
+          "shownPixelColors": 2847,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "sh",
+          "shownPixelColors": 3257,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "night",
+          "shownPixelColors": 3307,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "imp",
+          "shownPixelColors": 3409,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "door",
+          "shownPixelColors": 3253,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "fakeout",
+          "shownPixelColors": 5566,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "round",
+          "shownPixelColors": 3579,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "dawn",
+          "shownPixelColors": 5188,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 5435,
+          "checkedAtSeconds": 5.3
+        }
+      ],
+      "currentSceneCase": {
+        "view": "phone",
+        "direction": 1,
+        "theme": "gouache",
+        "material": "paper",
+        "paper": "shred",
+        "mode": "drawing"
+      },
+      "lastBitmapAlpha": [
+        {
+          "kind": "ansN1",
+          "base": {
+            "count": 33806,
+            "residuals": [
+              {
+                "x": 11,
+                "y": 4,
+                "rgba": [
+                  225,
+                  210,
+                  165,
+                  17
+                ]
+              },
+              {
+                "x": 12,
+                "y": 4,
+                "rgba": [
+                  221,
+                  202,
+                  168,
+                  105
+                ]
+              },
+              {
+                "x": 13,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  185
+                ]
+              },
+              {
+                "x": 14,
+                "y": 4,
+                "rgba": [
+                  221,
+                  203,
+                  170,
+                  220
+                ]
+              },
+              {
+                "x": 15,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  243
+                ]
+              },
+              {
+                "x": 16,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              },
+              {
+                "x": 17,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  255
+                ]
+              },
+              {
+                "x": 18,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              }
+            ],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        },
+        {
+          "kind": "ansN2",
+          "base": {
+            "count": 33806,
+            "residuals": [
+              {
+                "x": 11,
+                "y": 4,
+                "rgba": [
+                  225,
+                  210,
+                  165,
+                  17
+                ]
+              },
+              {
+                "x": 12,
+                "y": 4,
+                "rgba": [
+                  221,
+                  202,
+                  168,
+                  105
+                ]
+              },
+              {
+                "x": 13,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  185
+                ]
+              },
+              {
+                "x": 14,
+                "y": 4,
+                "rgba": [
+                  221,
+                  203,
+                  170,
+                  220
+                ]
+              },
+              {
+                "x": 15,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  243
+                ]
+              },
+              {
+                "x": 16,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              },
+              {
+                "x": 17,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  255
+                ]
+              },
+              {
+                "x": 18,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              }
+            ],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        },
+        {
+          "kind": "ansN3",
+          "base": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        },
+        {
+          "kind": "ansN4",
+          "base": {
+            "count": 33806,
+            "residuals": [
+              {
+                "x": 11,
+                "y": 4,
+                "rgba": [
+                  225,
+                  210,
+                  165,
+                  17
+                ]
+              },
+              {
+                "x": 12,
+                "y": 4,
+                "rgba": [
+                  221,
+                  202,
+                  168,
+                  105
+                ]
+              },
+              {
+                "x": 13,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  185
+                ]
+              },
+              {
+                "x": 14,
+                "y": 4,
+                "rgba": [
+                  221,
+                  203,
+                  170,
+                  220
+                ]
+              },
+              {
+                "x": 15,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  243
+                ]
+              },
+              {
+                "x": 16,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              },
+              {
+                "x": 17,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  255
+                ]
+              },
+              {
+                "x": 18,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              }
+            ],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        }
+      ]
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21",
+      "extraQuery": {
+        "nogpu": "1",
+        "dir": "-1"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=phone&seed=123456&event=idle&nogpu=1&dir=-1"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 0.981,
+      "windDirection": -1,
+      "completedSceneCases": [
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 1320,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 1610,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 1548,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 1607,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 1510,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 3019,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 2534,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 2829,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4961,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 2446,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 2541,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 2535,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 2586,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 2572,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 4127,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 2868,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 4035,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4961,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "truth",
+          "shownPixelColors": 2446,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "sh",
+          "shownPixelColors": 2541,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "night",
+          "shownPixelColors": 2535,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "imp",
+          "shownPixelColors": 2586,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "door",
+          "shownPixelColors": 2572,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "fakeout",
+          "shownPixelColors": 4127,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "round",
+          "shownPixelColors": 2868,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "dawn",
+          "shownPixelColors": 4035,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4961,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 2020,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 2385,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 2342,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 2382,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 2274,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 4162,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 3256,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 3755,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "sand",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4947,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 2843,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 3253,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 3303,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 3405,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 3249,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 5547,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 3592,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 5169,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4947,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "truth",
+          "shownPixelColors": 2843,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "sh",
+          "shownPixelColors": 3253,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "night",
+          "shownPixelColors": 3303,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "imp",
+          "shownPixelColors": 3405,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "door",
+          "shownPixelColors": 3249,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "fakeout",
+          "shownPixelColors": 5547,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "round",
+          "shownPixelColors": 3592,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "dawn",
+          "shownPixelColors": 5169,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": -1,
+          "theme": "gouache",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4947,
+          "checkedAtSeconds": 5.3
+        }
+      ],
+      "currentSceneCase": {
+        "view": "phone",
+        "direction": -1,
+        "theme": "gouache",
+        "material": "paper",
+        "paper": "shred",
+        "mode": "drawing"
+      },
+      "lastBitmapAlpha": [
+        {
+          "kind": "ansN1",
+          "base": {
+            "count": 33806,
+            "residuals": [
+              {
+                "x": 11,
+                "y": 4,
+                "rgba": [
+                  225,
+                  210,
+                  165,
+                  17
+                ]
+              },
+              {
+                "x": 12,
+                "y": 4,
+                "rgba": [
+                  221,
+                  202,
+                  168,
+                  105
+                ]
+              },
+              {
+                "x": 13,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  185
+                ]
+              },
+              {
+                "x": 14,
+                "y": 4,
+                "rgba": [
+                  221,
+                  203,
+                  170,
+                  220
+                ]
+              },
+              {
+                "x": 15,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  243
+                ]
+              },
+              {
+                "x": 16,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              },
+              {
+                "x": 17,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  255
+                ]
+              },
+              {
+                "x": 18,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              }
+            ],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        },
+        {
+          "kind": "ansN2",
+          "base": {
+            "count": 33806,
+            "residuals": [
+              {
+                "x": 11,
+                "y": 4,
+                "rgba": [
+                  225,
+                  210,
+                  165,
+                  17
+                ]
+              },
+              {
+                "x": 12,
+                "y": 4,
+                "rgba": [
+                  221,
+                  202,
+                  168,
+                  105
+                ]
+              },
+              {
+                "x": 13,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  185
+                ]
+              },
+              {
+                "x": 14,
+                "y": 4,
+                "rgba": [
+                  221,
+                  203,
+                  170,
+                  220
+                ]
+              },
+              {
+                "x": 15,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  243
+                ]
+              },
+              {
+                "x": 16,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              },
+              {
+                "x": 17,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  255
+                ]
+              },
+              {
+                "x": 18,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              }
+            ],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        },
+        {
+          "kind": "ansN3",
+          "base": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        },
+        {
+          "kind": "ansN4",
+          "base": {
+            "count": 33806,
+            "residuals": [
+              {
+                "x": 11,
+                "y": 4,
+                "rgba": [
+                  225,
+                  210,
+                  165,
+                  17
+                ]
+              },
+              {
+                "x": 12,
+                "y": 4,
+                "rgba": [
+                  221,
+                  202,
+                  168,
+                  105
+                ]
+              },
+              {
+                "x": 13,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  185
+                ]
+              },
+              {
+                "x": 14,
+                "y": 4,
+                "rgba": [
+                  221,
+                  203,
+                  170,
+                  220
+                ]
+              },
+              {
+                "x": 15,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  243
+                ]
+              },
+              {
+                "x": 16,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              },
+              {
+                "x": 17,
+                "y": 4,
+                "rgba": [
+                  222,
+                  205,
+                  171,
+                  255
+                ]
+              },
+              {
+                "x": 18,
+                "y": 4,
+                "rgba": [
+                  222,
+                  204,
+                  170,
+                  255
+                ]
+              }
+            ],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        }
+      ]
+    },
+    {
+      "view": "tv",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21",
+      "extraQuery": {
+        "nogpu": "1",
+        "dir": "1"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=tv&seed=123456&event=idle&nogpu=1&dir=1"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 3.244,
+      "windDirection": 1,
+      "completedSceneCases": [
+        {
+          "view": "tv",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 1855,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "tv",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 2117,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "tv",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 2089,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "tv",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 2128,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "tv",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 2062,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "tv",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 2900,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "tv",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 3779,
+          "checkedAtSeconds": 5.3
+        }
+      ],
+      "currentSceneCase": {
+        "view": "tv",
+        "direction": 1,
+        "theme": "pop",
+        "material": "sand",
+        "paper": "tear",
+        "mode": "dawn"
+      },
+      "lastBitmapAlpha": [
+        {
+          "kind": "ansN1",
+          "base": {
+            "count": 220440,
+            "residuals": [
+              {
+                "x": 24,
+                "y": 1,
+                "rgba": [
+                  21,
+                  0,
+                  0,
+                  12
+                ]
+              },
+              {
+                "x": 25,
+                "y": 1,
+                "rgba": [
+                  23,
+                  9,
+                  18,
+                  87
+                ]
+              },
+              {
+                "x": 26,
+                "y": 1,
+                "rgba": [
+                  25,
+                  9,
+                  17,
+                  135
+                ]
+              },
+              {
+                "x": 27,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  18,
+                  159
+                ]
+              },
+              {
+                "x": 28,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  17,
+                  179
+                ]
+              },
+              {
+                "x": 29,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  18,
+                  199
+                ]
+              },
+              {
+                "x": 30,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  17,
+                  220
+                ]
+              },
+              {
+                "x": 31,
+                "y": 1,
+                "rgba": [
+                  26,
+                  11,
+                  17,
+                  240
+                ]
+              }
+            ],
+            "width": 392,
+            "height": 611,
+            "exposedRows": 565
+          },
+          "rel": {
+            "count": 69959,
+            "residuals": [
+              {
+                "x": 37,
+                "y": 19,
+                "rgba": [
+                  255,
+                  213,
+                  99,
+                  36
+                ]
+              },
+              {
+                "x": 38,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  103,
+                  77
+                ]
+              },
+              {
+                "x": 39,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  95
+                ]
+              },
+              {
+                "x": 40,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  112
+                ]
+              },
+              {
+                "x": 41,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  127
+                ]
+              },
+              {
+                "x": 42,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  128
+                ]
+              },
+              {
+                "x": 43,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  128
+                ]
+              },
+              {
+                "x": 44,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  128
+                ]
+              }
+            ],
+            "width": 392,
+            "height": 611,
+            "exposedRows": 565
+          }
+        },
+        {
+          "kind": "ansN2",
+          "base": {
+            "count": 220431,
+            "residuals": [
+              {
+                "x": 24,
+                "y": 1,
+                "rgba": [
+                  21,
+                  0,
+                  0,
+                  12
+                ]
+              },
+              {
+                "x": 25,
+                "y": 1,
+                "rgba": [
+                  23,
+                  9,
+                  18,
+                  87
+                ]
+              },
+              {
+                "x": 26,
+                "y": 1,
+                "rgba": [
+                  25,
+                  9,
+                  17,
+                  135
+                ]
+              },
+              {
+                "x": 27,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  18,
+                  159
+                ]
+              },
+              {
+                "x": 28,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  17,
+                  179
+                ]
+              },
+              {
+                "x": 29,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  18,
+                  199
+                ]
+              },
+              {
+                "x": 30,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  17,
+                  220
+                ]
+              },
+              {
+                "x": 31,
+                "y": 1,
+                "rgba": [
+                  26,
+                  11,
+                  17,
+                  240
+                ]
+              }
+            ],
+            "width": 392,
+            "height": 611,
+            "exposedRows": 565
+          },
+          "rel": {
+            "count": 70688,
+            "residuals": [
+              {
+                "x": 37,
+                "y": 19,
+                "rgba": [
+                  255,
+                  213,
+                  99,
+                  36
+                ]
+              },
+              {
+                "x": 38,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  103,
+                  77
+                ]
+              },
+              {
+                "x": 39,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  95
+                ]
+              },
+              {
+                "x": 40,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  112
+                ]
+              },
+              {
+                "x": 41,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  127
+                ]
+              },
+              {
+                "x": 42,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  128
+                ]
+              },
+              {
+                "x": 43,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  128
+                ]
+              },
+              {
+                "x": 44,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  128
+                ]
+              }
+            ],
+            "width": 392,
+            "height": 611,
+            "exposedRows": 565
+          }
+        },
+        {
+          "kind": "ansN3",
+          "base": {
+            "count": 1,
+            "residuals": [
+              {
+                "x": 390,
+                "y": 552,
+                "rgba": [
+                  198,
+                  113,
+                  28,
+                  9
+                ]
+              }
+            ],
+            "width": 392,
+            "height": 611,
+            "exposedRows": 565
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 392,
+            "height": 611,
+            "exposedRows": 565
+          }
+        },
+        {
+          "kind": "ansN4",
+          "base": {
+            "count": 220443,
+            "residuals": [
+              {
+                "x": 24,
+                "y": 1,
+                "rgba": [
+                  21,
+                  0,
+                  0,
+                  12
+                ]
+              },
+              {
+                "x": 25,
+                "y": 1,
+                "rgba": [
+                  23,
+                  9,
+                  18,
+                  87
+                ]
+              },
+              {
+                "x": 26,
+                "y": 1,
+                "rgba": [
+                  25,
+                  9,
+                  17,
+                  135
+                ]
+              },
+              {
+                "x": 27,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  18,
+                  159
+                ]
+              },
+              {
+                "x": 28,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  17,
+                  179
+                ]
+              },
+              {
+                "x": 29,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  18,
+                  199
+                ]
+              },
+              {
+                "x": 30,
+                "y": 1,
+                "rgba": [
+                  26,
+                  10,
+                  17,
+                  220
+                ]
+              },
+              {
+                "x": 31,
+                "y": 1,
+                "rgba": [
+                  26,
+                  11,
+                  17,
+                  240
+                ]
+              }
+            ],
+            "width": 392,
+            "height": 611,
+            "exposedRows": 565
+          },
+          "rel": {
+            "count": 70422,
+            "residuals": [
+              {
+                "x": 37,
+                "y": 19,
+                "rgba": [
+                  255,
+                  213,
+                  99,
+                  36
+                ]
+              },
+              {
+                "x": 38,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  103,
+                  77
+                ]
+              },
+              {
+                "x": 39,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  95
+                ]
+              },
+              {
+                "x": 40,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  112
+                ]
+              },
+              {
+                "x": 41,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  127
+                ]
+              },
+              {
+                "x": 42,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  128
+                ]
+              },
+              {
+                "x": 43,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  128
+                ]
+              },
+              {
+                "x": 44,
+                "y": 19,
+                "rgba": [
+                  255,
+                  209,
+                  102,
+                  128
+                ]
+              }
+            ],
+            "width": 392,
+            "height": 611,
+            "exposedRows": 565
+          }
+        }
+      ]
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21",
+      "extraQuery": {
+        "nogpu": "1",
+        "mat": "paper",
+        "paper": "shred"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=phone&seed=123456&event=idle&nogpu=1&mat=paper&paper=shred"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 0.78
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21",
+      "extraQuery": {
+        "nogpu": "1",
+        "mat": "paper",
+        "paper": "shred"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=phone&seed=123456&event=idle&nogpu=1&mat=paper&paper=shred"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 0.864,
+      "refreshSchedules": [
+        {
+          "hz": 60,
+          "clock": 3.4999999999999925,
+          "maxStateDifference": 0
+        },
+        {
+          "hz": 120,
+          "clock": 3.4999999999999925,
+          "maxStateDifference": 0
+        },
+        {
+          "hz": 144,
+          "clock": 3.4999999999999925,
+          "maxStateDifference": 0
+        }
+      ],
+      "halfTickVertexMovement": 2.0281932582966076,
+      "coldWarmComparisons": {
+        "sceneEqual": true,
+        "debrisEqual": true,
+        "pixels": [
+          {
+            "width": 390,
+            "height": 844,
+            "alpha": 255731,
+            "ink": 232188,
+            "colors": 8531,
+            "hash": 4124281709
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "alpha": 255731,
+            "ink": 232188,
+            "colors": 8531,
+            "hash": 4124281709
+          }
+        ]
+      }
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21",
+      "extraQuery": {
+        "nogpu": "1",
+        "mat": "paper",
+        "paper": "shred",
+        "warm": "0"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=phone&seed=123456&event=idle&nogpu=1&mat=paper&paper=shred&warm=0"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 0.333
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21",
+      "extraQuery": {
+        "nogpu": "1",
+        "mat": "paper",
+        "paper": "shred",
+        "warm": "1"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=phone&seed=123456&event=idle&nogpu=1&mat=paper&paper=shred&warm=1"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 0.875
+    },
+    {
+      "view": "tv",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21",
+      "extraQuery": {
+        "view": "auto",
+        "warm": "0",
+        "mat": "paper",
+        "paper": "shred"
+      },
+      "deviceScaleFactor": 2,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=auto&seed=123456&event=idle&warm=0&mat=paper&paper=shred"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 0.466
+    }
+  ],
+  "wallSeconds": 150.58,
+  "browserVersion": "151.0.7922.173",
+  "transport": "policy-harness",
+  "standaloneFileBlocker": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html?view=phone&seed=123456&event=idle&nogpu=1&dir=1",
+  "harnessDisclosure": "Exact top-document bytes fulfilled by test route; disk opening remains unverified.",
+  "functionalPassed": false,
+  "command": [
+    "python",
+    "jobs/F02-wind-sand-paper/check.py",
+    "--chromium",
+    "/usr/bin/chromium",
+    "--allow-policy-harness",
+    "--groups",
+    "scenes,paperGeometry,refreshWarm,responsive",
+    "--report",
+    "/tmp/F02-functional-focused-7bccdc25.json"
+  ],
+  "workingDirectory": "/workspace/partybox-fx-lab",
+  "processExitCode": 1,
+  "sourceSha256After": "7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21",
+  "checkerSha256After": "219f84bd84968dbbe45445c259a9f1b0fdfccb59f32027a541178171bb7cd4c1"
+}

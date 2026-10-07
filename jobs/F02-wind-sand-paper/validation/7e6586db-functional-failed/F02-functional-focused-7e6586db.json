@@ -1,0 +1,695 @@
+{
+  "html": "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+  "htmlSha256": "7e6586db09b74a40612cda918d86eb1a0b732aa8e6d09ba7eed847bd4e0f93bb",
+  "checkSha256": "2a9c4dd951ffa3ec0e7992f59b0353a0a4b48782ae7f5915481a2a94aa11776d",
+  "requestedGroups": [
+    "scenes",
+    "paperGeometry",
+    "refreshWarm",
+    "responsive"
+  ],
+  "completedGroups": [
+    "paperGeometry"
+  ],
+  "results": {
+    "paperGeometry": {
+      "wallSeconds": 12.046,
+      "evidence": {
+        "pretearPixelChange": true,
+        "segmentedSamples": 1447,
+        "maxRibbonCurvature": 0.31324753985712667,
+        "frontBackAndEdge": true,
+        "releaseSpan": 0.4833333333333316,
+        "offscreenExits": 120,
+        "reentrainedPaper": 18,
+        "stubPixels": {
+          "width": 20,
+          "height": 312,
+          "alpha": 6240,
+          "ink": 4862,
+          "colors": 15,
+          "hash": 2620156223
+        },
+        "spiralHoleContrasts": [
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166,
+          347.46654515219166
+        ]
+      }
+    }
+  },
+  "failures": {
+    "scenes": {
+      "type": "AssertionError",
+      "message": "erased scene bitmap alpha: {'view': 'phone', 'direction': 1, 'theme': 'pop', 'material': 'paper', 'paper': 'shred', 'mode': 'fakeout'}; counts=[{'kind': 'ansA', 'base': {'count': 0, 'residuals': [], 'width': 180, 'height': 220, 'exposedRows': 201}, 'rel': {'count': 0, 'residuals': [], 'width': 180, 'height': 220, 'exposedRows': 201}}, {'kind': 'ansB', 'base': {'count': 1, 'residuals': [{'x': 106, 'y': 157, 'rgba': [105, 90, 90, 17]}], 'width': 180, 'height': 220, 'exposedRows': 201}, 'rel': {'count': 0, 'residuals': [], 'width': 180, 'height': 220, 'exposedRows': 201}}, {'kind': 'ansD', 'base': {'count': 0, 'residuals': [], 'width': 180, 'height': 220, 'exposedRows': 201}, 'rel': {'count': 0, 'residuals': [], 'width': 180, 'height': 220, 'exposedRows': 201}}]",
+      "wallSeconds": 36.0
+    },
+    "refreshWarm": {
+      "type": "AssertionError",
+      "message": "warm-up alters seeded scene physics or rendered face",
+      "wallSeconds": 26.388
+    },
+    "responsive": {
+      "type": "AssertionError",
+      "message": "responsive count change resets surviving airborne GPU identities",
+      "wallSeconds": 17.903
+    }
+  },
+  "standaloneFileOpened": false,
+  "performanceAccepted": false,
+  "performanceScope": "Functional checks do not establish 60 fps TV or CPU-throttled phone performance.",
+  "records": [
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7e6586db09b74a40612cda918d86eb1a0b732aa8e6d09ba7eed847bd4e0f93bb",
+      "extraQuery": {
+        "nogpu": "1",
+        "dir": "1"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=phone&seed=123456&event=idle&nogpu=1&dir=1"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 2.44,
+      "windDirection": 1,
+      "completedSceneCases": [
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 626,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 875,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 810,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 1356,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 1301,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 2927,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 2111,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "sand",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 2848,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "sand",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4346,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "truth",
+          "shownPixelColors": 2042,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "sh",
+          "shownPixelColors": 2478,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "night",
+          "shownPixelColors": 2225,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "imp",
+          "shownPixelColors": 2207,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "door",
+          "shownPixelColors": 2212,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "fakeout",
+          "shownPixelColors": 3966,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "round",
+          "shownPixelColors": 2404,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "dawn",
+          "shownPixelColors": 3992,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "tear",
+          "paper": "tear",
+          "mode": "drawing",
+          "shownPixelColors": 4347,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "truth",
+          "shownPixelColors": 2043,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "sh",
+          "shownPixelColors": 2158,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "night",
+          "shownPixelColors": 2224,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "imp",
+          "shownPixelColors": 2207,
+          "checkedAtSeconds": 5.3
+        },
+        {
+          "view": "phone",
+          "windDirection": 1,
+          "theme": "pop",
+          "requestedMaterial": "paper",
+          "material": "paper",
+          "requestedPaper": "shred",
+          "paper": "shred",
+          "mode": "door",
+          "shownPixelColors": 2212,
+          "checkedAtSeconds": 5.3
+        }
+      ],
+      "currentSceneCase": {
+        "view": "phone",
+        "direction": 1,
+        "theme": "pop",
+        "material": "paper",
+        "paper": "shred",
+        "mode": "fakeout"
+      },
+      "lastBitmapAlpha": [
+        {
+          "kind": "ansA",
+          "base": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        },
+        {
+          "kind": "ansB",
+          "base": {
+            "count": 1,
+            "residuals": [
+              {
+                "x": 106,
+                "y": 157,
+                "rgba": [
+                  105,
+                  90,
+                  90,
+                  17
+                ]
+              }
+            ],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        },
+        {
+          "kind": "ansC",
+          "base": {
+            "count": 33806,
+            "residuals": [
+              {
+                "x": 11,
+                "y": 4,
+                "rgba": [
+                  238,
+                  187,
+                  119,
+                  15
+                ]
+              },
+              {
+                "x": 12,
+                "y": 4,
+                "rgba": [
+                  187,
+                  147,
+                  91,
+                  109
+                ]
+              },
+              {
+                "x": 13,
+                "y": 4,
+                "rgba": [
+                  126,
+                  96,
+                  65,
+                  208
+                ]
+              },
+              {
+                "x": 14,
+                "y": 4,
+                "rgba": [
+                  80,
+                  56,
+                  42,
+                  243
+                ]
+              },
+              {
+                "x": 15,
+                "y": 4,
+                "rgba": [
+                  57,
+                  38,
+                  32,
+                  253
+                ]
+              },
+              {
+                "x": 16,
+                "y": 4,
+                "rgba": [
+                  41,
+                  23,
+                  24,
+                  255
+                ]
+              },
+              {
+                "x": 17,
+                "y": 4,
+                "rgba": [
+                  26,
+                  11,
+                  18,
+                  255
+                ]
+              },
+              {
+                "x": 18,
+                "y": 4,
+                "rgba": [
+                  26,
+                  11,
+                  18,
+                  255
+                ]
+              }
+            ],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        },
+        {
+          "kind": "ansD",
+          "base": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          },
+          "rel": {
+            "count": 0,
+            "residuals": [],
+            "width": 180,
+            "height": 220,
+            "exposedRows": 201
+          }
+        }
+      ]
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7e6586db09b74a40612cda918d86eb1a0b732aa8e6d09ba7eed847bd4e0f93bb",
+      "extraQuery": {
+        "nogpu": "1",
+        "mat": "paper",
+        "paper": "shred"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=phone&seed=123456&event=idle&nogpu=1&mat=paper&paper=shred"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 4.688
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7e6586db09b74a40612cda918d86eb1a0b732aa8e6d09ba7eed847bd4e0f93bb",
+      "extraQuery": {
+        "nogpu": "1",
+        "mat": "paper",
+        "paper": "shred"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=phone&seed=123456&event=idle&nogpu=1&mat=paper&paper=shred"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 4.832,
+      "refreshSchedules": [
+        {
+          "hz": 60,
+          "clock": 3.4999999999999925,
+          "maxStateDifference": 0
+        },
+        {
+          "hz": 120,
+          "clock": 3.4999999999999925,
+          "maxStateDifference": 0
+        },
+        {
+          "hz": 144,
+          "clock": 3.4999999999999925,
+          "maxStateDifference": 0
+        }
+      ],
+      "halfTickVertexMovement": 1.4546057996787127,
+      "coldWarmComparisons": {
+        "sceneEqual": true,
+        "debrisEqual": true,
+        "pixels": [
+          {
+            "width": 390,
+            "height": 844,
+            "alpha": 260281,
+            "ink": 234478,
+            "colors": 8886,
+            "hash": 2887063719
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "alpha": 260331,
+            "ink": 234816,
+            "colors": 9466,
+            "hash": 3061107229
+          }
+        ]
+      }
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7e6586db09b74a40612cda918d86eb1a0b732aa8e6d09ba7eed847bd4e0f93bb",
+      "extraQuery": {
+        "nogpu": "1",
+        "mat": "paper",
+        "paper": "shred",
+        "warm": "0"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=phone&seed=123456&event=idle&nogpu=1&mat=paper&paper=shred&warm=0"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 0.175
+    },
+    {
+      "view": "phone",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7e6586db09b74a40612cda918d86eb1a0b732aa8e6d09ba7eed847bd4e0f93bb",
+      "extraQuery": {
+        "nogpu": "1",
+        "mat": "paper",
+        "paper": "shred",
+        "warm": "1"
+      },
+      "deviceScaleFactor": 1,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=phone&seed=123456&event=idle&nogpu=1&mat=paper&paper=shred&warm=1"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 8.189
+    },
+    {
+      "view": "tv",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "7e6586db09b74a40612cda918d86eb1a0b732aa8e6d09ba7eed847bd4e0f93bb",
+      "extraQuery": {
+        "view": "auto",
+        "warm": "0",
+        "mat": "paper",
+        "paper": "shred"
+      },
+      "deviceScaleFactor": 2,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=auto&seed=123456&event=idle&warm=0&mat=paper&paper=shred"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 0.383
+    }
+  ],
+  "wallSeconds": 93.805,
+  "browserVersion": "151.0.7922.173",
+  "transport": "policy-harness",
+  "standaloneFileBlocker": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html?view=phone&seed=123456&event=idle&nogpu=1&dir=1",
+  "harnessDisclosure": "Exact top-document bytes fulfilled by test route; disk opening remains unverified.",
+  "functionalPassed": false
+}

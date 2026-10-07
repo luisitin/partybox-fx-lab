@@ -7,29 +7,35 @@ Read README.md, RULES.md, JOBS.md and all21 ranked baseline leftovers.
 
 ## Tested source and work remaining
 
-Latest frozen index SHA00230a9ba0f07630bae339c4f175870038acb5f8a1d626e499eb9f004ed8f4a5.
-Full ten-group run225.785s: six pass, four fail. Actual sand readback/sharedforce,
-wind divergence/tick, paper forces/tumble, reduced motion and fallback pass.
-60/120/144 model states and absolute clocks agree after resetRV fix.
-Configured216-scene matrix stops after23 cases: fakeout ansB leaves1basepixel.
-Canvas history changes warm/cold raster and later notebook holes despite identical
-model/debris/draw geometry. Source author will reset full pooled drawing context,
-remove the drawing's empty revealed-card shadow/body, and fix natural perpiece
-cleanup if context reset alone does not remove it. No terminal whole-cover sweep.
-Default TVauto DPR2 warm startup exceeds30s; warm0 starts0.67s. Isolate responsive
-preservation withwarm0 but keep default high-DPR startup unresolved and explicit.
-After fixes freeze again; rerun four failed groups, then complete the scene matrix.
+Current frozen index SHA50383f0d4f4eb8f7a0966aba045a18b4271a62f18cb94e1a9bd0630279f1cf85.
+Branch checkpoint commits preserve each earlier tested revision and its failures.
+Final sand boundary patch admits actuallypaintedoverfill cells and adds a raster
+pixel guard to each naturallyreleasedcircle; no terminalcoverwipe/thresholdchange.
+One new six-second originalphonepaper clip and idle-onlyCPU4frame timing are
+committed:26.37fps,p9560.32ms (FAIL),video1.26MB,sourcebefore/aftermatch.
 
-Source3bbeff mandatory measuredTVidle/win/tick6.79/4.33/5.94fps;
-phoneCPU4x25.49/24.50/27.24fps. All60-Hz cases fail on ANGLESwiftShader.
-00230a9b singlephoneidle26.44fps also fails; one new six-second original paper
-capture includes explicitstep2.7 before resume, not measuredpaperperformance.
-Heavyphone5.20/5.83fps is below starter7.57; cold/warm tails mixed, no hitchfix.
-Reports/captures retain exact source/helper hashes. No physicalGPU throughput proof.
+Immediately rerun fourgroups scenes,paperGeometry,refreshWarm,responsive on50383
+with unchangedcheckSHA219f84bd84968dbbe45445c259a9f1b0fdfccb59f32027a541178171bb7cd4c1;
+ifallPASS runremainingwind,sandTV,sandPhone,paperPhysics,facesReduced,queriesFallback.
+Exclusivebrowserlane belongs tochecks_final; source/checks muststayfrozen.
+Also run prepared defaultTVautoDPR2warmstartup30s probe; earlier7e exceeded30s,
+whilewarm0responsive merelyisolates resizeandcannotclearstartupacceptance.
+Thenperf_final runs strictfileprobe, allsixmandatoryframecases/captures and matching
+phoneheavycoldwarm (no video) onexact50383; preparedoutsideorchestration in
+/workspace/.partybox-tools/fx_tools/F02-final/. RootaloneownsGit/claims/queue.
 
-CI workflow now has strict functional, data-hash and performance/capture gates,
-using bundledPlaywright Chromium and FFmpeg. It has not run; noPR or greenCI.
-Source is frozen during tests; parent ownsGit/claims/docs, checker ownsbrowserlane.
+Previous7bcc focused150.58s:115scene cases pass (all108phone,7TV) thenoneTVsand
+pixelalpha9fails. PaperGeometry/refreshWarm/responsivePASS: warm/coldpixelsand
+physicsbit-identical; mappedGPU/CPU/atlasresizepreservationverified. Corrected
+sharedshrededges remove4418propercrossings/211overlapcenters across100seeds×4cards.
+These source-specific outcomes are not substituted for the final fullmatrix.
+
+Earlier3bbeff mandatoryTV6.79/4.33/5.94fps andphoneCPU4x25.49/24.50/27.24fps allfail.
+Earlierheavyphone5.20/5.83fps is belowstarter7.57; cold/warmtailsmixed,nohitchfix.
+Allreport/mediahashes retain exacttestedsource/helper versions, even failed ones.
+CI has strictfunctional/datahash/performance/capturegates; noPR/run/greenCI orKEEP.
+Executioncontext/plugins restarted during this continuation; files survived and
+agentownership was recreated. Resume byreadingthishandoff, not by discardingfiles.
 Direct file:// remains blocked by managed Chromium policy. Explicitly logged
 local-byte fulfillment can validate functions but cannot pass the disk rule.
 Resolve required performance/disk checks, review all21 fixes at real-time speed,

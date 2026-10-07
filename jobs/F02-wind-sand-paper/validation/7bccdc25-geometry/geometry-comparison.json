@@ -1,0 +1,47 @@
+{
+  "scope": "Mock DOM only; actual seeded production geometry functions instrumented read-only. No graphics or browser erasure result.",
+  "script": "/workspace/.partybox-tools/fx_tools/F02-pending/shred-geometry-probe.cjs",
+  "scriptSha256": "1a91e51f6fa8deb2538dd78b80caf4b40f7fbce66fee7b40c55034edabf0fe98",
+  "cases": [
+    {
+      "command": [
+        "node",
+        "/workspace/.partybox-tools/fx_tools/F02-pending/shred-geometry-probe.cjs",
+        "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html"
+      ],
+      "htmlSha256": "7e6586db09b74a40612cda918d86eb1a0b732aa8e6d09ba7eed847bd4e0f93bb",
+      "exitCode": 0,
+      "stdout": "{\"source\":\"/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html\",\"caseCount\":400,\"intersections\":4418,\"negative\":0,\"areaError\":1.4551915228366852e-11,\"unowned\":0,\"multi\":211}\n",
+      "stderr": "",
+      "result": {
+        "source": "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+        "caseCount": 400,
+        "intersections": 4418,
+        "negative": 0,
+        "areaError": 1.4551915228366852e-11,
+        "unowned": 0,
+        "multi": 211
+      }
+    },
+    {
+      "command": [
+        "node",
+        "/workspace/.partybox-tools/fx_tools/F02-pending/shred-geometry-probe.cjs",
+        "/workspace/.partybox-tools/fx_tools/F02-pending/bounded-shred-candidate.html"
+      ],
+      "htmlSha256": "7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21",
+      "exitCode": 0,
+      "stdout": "{\"source\":\"/workspace/.partybox-tools/fx_tools/F02-pending/bounded-shred-candidate.html\",\"caseCount\":400,\"intersections\":0,\"negative\":0,\"areaError\":2.1827872842550278e-11,\"unowned\":0,\"multi\":0}\n",
+      "stderr": "",
+      "result": {
+        "source": "/workspace/.partybox-tools/fx_tools/F02-pending/bounded-shred-candidate.html",
+        "caseCount": 400,
+        "intersections": 0,
+        "negative": 0,
+        "areaError": 2.1827872842550278e-11,
+        "unowned": 0,
+        "multi": 0
+      }
+    }
+  ]
+}

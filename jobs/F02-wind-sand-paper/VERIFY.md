@@ -149,3 +149,61 @@ python3 /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py /wo
 ```
 
 Exit1: phoneCPU4 idle-only2s26.44fps,p9569.34ms. Separate six-second390×844VP8/25fps clip1,197,382bytes starts after explicit fixed2.7s paper step, then resumes actual animation; not a paper throughput measurement. Zeroerrors/runtimeattempts. Sourcebefore/after00230a9b matches. Exact helper/script/capture hashes retained. This exercises revised helper normal capture; strict-file failure reporting is not yet rerun.
+
+## Context reset and notebook revision (7e6586db candidate)
+
+Uncommitted candidateHTML SHA7e6586db09b74a40612cda918d86eb1a0b732aa8e6d09ba7eed847bd4e0f93bb resets complete pooled canvas contexts, removes the empty revealed drawing-card body/shadow and adds raw scene bitmap diagnostics.
+
+```sh
+node /tmp/f02_dom_smoke.cjs
+node /workspace/.partybox-tools/fx_tools/F02-pending/reset-probe.cjs /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html
+python jobs/F02-wind-sand-paper/check.py --chromium /usr/bin/chromium --allow-policy-harness --groups scenes,paperGeometry,refreshWarm,responsive --report /tmp/F02-functional-focused-7e6586db.json
+```
+
+Static/mock PASS within prior scopes, exactreset155 each. FocusedbrowserFAIL,93.805s: paperGeometry now passes actual periodic notebook holes and existing force/tumble/curvature/lifecycle tests; other3 groups fail. Raw bitmap confirms remaining fakeoutansB pixel(106,157),RGBA[105,90,90,17], not a count-only caption. Cold/warm physics agrees but raster still differs. Responsive test had an incorrect fixed-index expectation; real downsampling intentionally retains evenly spaced source-bin centers, and the corrected oracle must compare those mapped states independently. DefaultTVautoDPR2warm>30s startup remains unresolved; this responsive group useswarm0 only to isolate the count/state transition. Report in validation/7e6586db-functional-failed/. New shared ragged-edge geometry and consistent canvas backend are under diagnosis; these are candidates, not accepted repairs.
+
+```sh
+python /tmp/F02-diagnose-7e6586db.py
+```
+
+Exit0 diagnostic: residual alpha decreases255→207→153→143→17 as natural pieces leave, with no late repaint. Pixelcenter belongs to piece30,0.116px fromsharededge30/31. Warm/cold23745 differingcardpixels,maxchannel255,meanchannelerror0.3907/255; banner/dunesunchanged andmodels/geometryexact. This isolates the asset area without proving backend causality. Raw fullpolygons/pixel data are preserved.
+
+## Bounded shared shred geometry and consistent asset-context candidate
+
+Frozen newHTML7bccdc25e8ffbf3c22dfe72ab51b1bd09fcce684666df05b90c745d6feb82d21 bounds shared shred edges to monotone row/column coordinates and requests willReadFrequently for asset contexts. No new erase sweep/mask/animation readback; wind/GPU/timing/coupled-force code unchanged. Backend causality remains an unproved hypothesis.
+
+```sh
+node /workspace/.partybox-tools/fx_tools/F02-pending/shred-geometry-probe.cjs /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html
+node /workspace/.partybox-tools/fx_tools/F02-pending/shred-geometry-probe.cjs /workspace/.partybox-tools/fx_tools/F02-pending/bounded-shred-candidate.html
+node /tmp/f02_dom_smoke.cjs
+node /workspace/.partybox-tools/fx_tools/F02-pending/reset-probe.cjs /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html
+node /workspace/.partybox-tools/fx_tools/F02-pending/roll-probe.cjs /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html
+```
+
+Geometry comparison exit0 diagnostic both: first command was executed on7e before promotion (4418properintersections,211multi-owner sampledcenters); outside candidate7bcc and later promoted7bcc both measure400cardmeshes/100seeds withzerointersections/negativeorientation/unowned/multi-owner sampledpoints andareaerror<2.2e-11. Exact actualargv/scriptSHA/sourceSHA/results in validation/7bccdc25-geometry/geometry-comparison.json. These independently detect folded ownership but do not establish browser erasure.
+
+Newsource mock/syntaxPASS: reset154/154/154 exacthistory; roll40800samples/21057back/3488edge/maxroll4.72. Mock DOM confirms prior reduced/lazyfaces/six coldwarm finiteCPU modes; no graphical/60-fps claim. Final browser groups are currently running on this source.
+
+## Bounded-shred/asset-context browser regression (7bccdc25)
+
+```sh
+python jobs/F02-wind-sand-paper/check.py --chromium /usr/bin/chromium --allow-policy-harness --groups scenes,paperGeometry,refreshWarm,responsive --report /tmp/F02-functional-focused-7bccdc25.json
+```
+
+FAIL exit1,150.580s; source7bcc/check219f84bd unchanged.115scene cases pass (all108phone plus7TV) beforeTV/forward/Pop/sand/dawn ansN3 retains1basepixel(390,552),RGBA[198,113,28,9]; everyrel0. The zero-above-alpha8 rule is unchanged. PaperGeometry,refreshWarm,responsivePASS. Actual cold/warm raster nowidentical as are60/120/144 states andabsoluteclocks; this verifies outcome without provingbackendcausality. Responsive20,736→3,136→20,736 preserves2884mappedairborneGPUslots,166CPUfragments and573retainedDPRatlascrops underwarm0. Defaulthigh-DPR warmstartup acceptance remains separate. Remaining sixgroups have not yet rerun onthisSHA. Rawreport in validation/7bccdc25-functional-failed/. Lastsandpixelneedsnaturalboundarycoverage repair; no terminalwipe permitted.
+
+## Natural sand boundary repair and50383f0d checkpoint
+
+FrozenHTML50383f0d4f4eb8f7a0966aba045a18b4271a62f18cb94e1a9bd0630279f1cf85 changes only sand-cell admission margin and one physical-pixel guard on each naturally released cell circle. No whole-cover or terminal cleanup; alpha8threshold unchanged. Original center-filter omitted393,555 despite painted boundary overfill.
+
+```sh
+node /workspace/.partybox-tools/fx_tools/F02-pending/sand-cell-coverage-probe.cjs /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html
+```
+
+Exit0 geometry diagnostic: productionTV380×560/ov6/cs6 now admits393,555; residualpixelcenter390.5,552.5 lies inside its5.5px eraser by1.257px beyond the entirepixel square. This predicts coverage, not browseralpha. The exact prior syntax/mock/reset/roll/400geometry commands reranPASS on50383 within their documented scopes; paper/wind/GPU/math/timing unchanged.
+
+```sh
+python3 /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html --output /workspace/.partybox-tools/fx-validation/F02/50383f0d4f4e-final-milestone --chromium /usr/bin/chromium --motion no-preference --require-performance --views phone --events idle --seconds 2 --warmup 0 --capture 6 --transport routed --query 'warm=0&mat=paper&paper=shred' --capture-script /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/paper-capture.js
+```
+
+Checkpoint strictidle-onlyphoneCPU4FAIL/exit1:26.37fps,p9560.32ms,56.2%missedrefresh. Separatepaperclip1,260,246bytes,6.000sVP8/390×844/25fps follows explicitstep2.7 thenresume; not paperperformance. Noerrors/runtimeattempts; exactsource/helper/scriptbeforeaftermatch. Rawargv/hashes/frames/encoder metadata in validation/50383f0d-milestone/. Full216matrix/othergroups are stillpending at this checkpoint.

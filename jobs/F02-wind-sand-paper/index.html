@@ -344,7 +344,9 @@ function buildCells(){
   const pl = L.plaque, m = L.med, s0 = L.subs[0], s1 = L.subs[L.subs.length - 1];
   for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) {
     const px = q * cs + cs / 2, py = r * cs + cs / 2;
-    if (!inCast(px, py, cs * 0.9)) continue;
+    // Include cells owning overfilled specks and outline pixels at the rounded boundary.
+    const coatGuard=Math.max(2*Math.max(.7,S)+2,2*Math.max(.8,S)+.4);
+    if (!inCast(px, py, cs/Math.SQRT2+coatGuard+1/DPR)) continue;
     const x = px - ov, y = py - ov, u = clamp(DIR > 0 ? x / c.w : 1 - x / c.w, 0, 1), v = clamp(y / c.h, 0, 1);
     // depth 0..1 = how far inside a thick region (plaque, medallion, subtitles) the cell sits; the region erodes from its rim inward
     let depth = 0;
@@ -391,8 +393,8 @@ function riverTick(){}
 function mk(w,h){
  const iw=Math.max(1,Math.round(w*DPR)),ih=Math.max(1,Math.round(h*DPR)),key=iw+'x'+ih,list=canvasPool.get(key);
  const b=list&&list.length?list.pop():document.createElement('canvas');
- if(b.width!==iw)b.width=iw;if(b.height!==ih)b.height=ih;const c=b.getContext('2d');
- c.resetTransform();c.globalAlpha=1;c.globalCompositeOperation='source-over';c.clearRect(0,0,iw,ih);c.setTransform(DPR,0,0,DPR,0,0);activeCanvases.add(b);return[b,c];
+ if(b.width!==iw)b.width=iw;if(b.height!==ih)b.height=ih;const c=b.getContext('2d',{willReadFrequently:true});
+ if(typeof c.reset==='function')c.reset();else b.width=iw;c.setTransform(DPR,0,0,DPR,0,0);activeCanvases.add(b);return[b,c];
 }
 function rr(c, x, y, w, h, r){ c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
 function emb(c, fn, o, face, dark, lit, rule){
@@ -548,6 +550,11 @@ function edgeLine(a, b, rough, lv, q){
   }
   return pts;
 }
+function shredEdge(a,b,vertical,dy,q){
+  const pts=[a],amp=dy*(vertical?.3:.12),steps=8;
+  for(let i=1;i<steps;i++){const u=i/steps,envelope=Math.sin(Math.PI*u)**2,x=a[0]+(b[0]-a[0])*u,y=a[1]+(b[1]-a[1])*u,jitter=(q()-.5)*2*amp*envelope;pts.push(vertical?[x+jitter,y]:[x,y+jitter]);}
+  pts.push(b);return pts;
+}
 function buildShards(k){
   const cw = k.w, ch = k.h, ov = k.ov, shred = PAPER === 'shred', q = prng((seed ^ 0x51f15e) + fireN * 104729 + (k.sid || 0) * 7789), sid = (k.sid || 0) * 11.3;
   const nx = shred ? Math.max(2, Math.round(cw / (portrait ? 165 : 250))) : Math.max(3, Math.round(cw / (portrait ? 88 : 150)));
@@ -557,8 +564,8 @@ function buildShards(k){
     const inX = i > 0 && i < nx, inY = j > 0 && j < ny;
     vt[j].push([ov + i * dx + (inX ? (q() - 0.5) * 2 * jx * dx : 0), ov + j * dy + (inY ? (q() - 0.5) * 2 * jy * dy : 0)]); } }
   const rH = shred ? 0.025 : 0.11, rV = shred ? 0.4 : 0.11, H = [], Vv = [];
-  for (let j = 0; j <= ny; j++) { H.push([]); for (let i = 0; i < nx; i++) H[j].push(edgeLine(vt[j][i], vt[j][i + 1], j === 0 || j === ny ? 0 : rH, shred ? 1 : 3, q)); }
-  for (let j = 0; j < ny; j++) { Vv.push([]); for (let i = 0; i <= nx; i++) Vv[j].push(edgeLine(vt[j][i], vt[j + 1][i], i === 0 || i === nx ? 0 : rV, 3, q)); }
+  for (let j = 0; j <= ny; j++) { H.push([]); for (let i = 0; i < nx; i++) H[j].push(shred?shredEdge(vt[j][i],vt[j][i+1],false,j===0||j===ny?0:dy,q):edgeLine(vt[j][i],vt[j][i+1],j===0||j===ny?0:rH,3,q)); }
+  for (let j = 0; j < ny; j++) { Vv.push([]); for (let i = 0; i <= nx; i++) Vv[j].push(shred?shredEdge(vt[j][i],vt[j+1][i],true,i===0||i===nx?0:dy,q):edgeLine(vt[j][i],vt[j+1][i],i===0||i===nx?0:rV,3,q)); }
   const P = [], id = (i, j) => j * nx + i;
   for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
     const top = H[j][i], right = Vv[j][i + 1], bot = H[j + 1][i], left = Vv[j][i];
@@ -718,7 +725,8 @@ function grain(x, y, o){
 }
 function eraseTo(t, spawn){
   const k = cast; if (!k) return;
-  const cs2 = cs * 0.75, sp = SPD();
+  // One raster-pixel guard makes each cell fully own its square, including AA diagonals.
+  const cs2 = cs * 0.75 + 1/DPR, sp = SPD();
   while (k.ptr < k.total && k.cells[k.ptr][2] <= t) {
     const cl=k.cells[k.ptr++];if(gpu&&spawn&&k.ptr%17===1)gpu.release({x:(k.bx+cl[0])/W,y:(k.by+cl[1])/H,width:cs/W,height:cs/H},{fraction:.0023,seed:seed+k.ptr});
     for (const c of [k.bc, k.rc]) { c.globalCompositeOperation = 'destination-out'; c.beginPath(); c.arc(cl[0], cl[1], cs2, 0, 6.283); c.fill(); c.globalCompositeOperation = 'source-over'; }
@@ -823,6 +831,7 @@ function cardShadow(dy, a){
   ctx.restore();
 }
 function drawCard(dy, alpha){
+  if(cast.kind==='drawing')return;
   const k = cast, L = k.L, cxm = k.x + k.w / 2, cym = k.y + k.h / 2 + dy, sc=pulse()*(reduced?1:1+.006*Math.sin(clock*2.2)), sh = MAT === 'paper' ? 1 : ease((tt - T_THICK) / 0.3), ac = T.accent[k.kind];
   cardShadow(dy, alpha * sh);
   ctx.save(); ctx.globalAlpha = alpha; ctx.translate(cxm, cym); ctx.scale(sc, sc); ctx.drawImage(k.bmp, -k.w / 2, -k.h / 2, k.w, k.h); ctx.translate(-k.w / 2, -k.h / 2);
@@ -1130,7 +1139,7 @@ function warmAll(){
  clearDebris();recycleAssets();({rnd,rndG,rndD,rndC,fireN,faceProvider,kind,clock,uid,RV,wisps,grains,wispT,windFired,peakBurst,poofDone,held,antDone,stampDone,exitDone,landDone,accP,accH,tt,cast,scene}=save);Object.assign(metrics,oldMetrics);metrics.warmups+=4;
 }
 warmAll();initAmbient();
-window.__sand={fire:(k,auto)=>{fire(k,auto);render();},reveal,theme:setTheme,coverage,fps:()=>window.__fps,grains:()=>reduced?0:grains.length+(gpu?gpu.count:0),material:(m,p)=>{if(m)MAT=m==='paper'?'paper':'sand';if(p)PAPER=p==='shred'?'shred':'tear';syncHud();},faces:(cover,hidden)=>{if(cover===null){faceProvider=null;return;}faceProvider={cover,hidden};},event,win:()=>event('win'),tick:()=>event('tick'),skip,pause:stop,resume,reset,step,state,diagnostics:state,wind:(u,v,t=clock,strength=gpuStrength(),e=eventState())=>field?field.sample(u,v,t,strength,e):[sharedWind(u*W,v*H,t,strength)[0]/W,sharedWind(u*W,v*H,t,strength)[1]/H],windGPU:(u,v,t=clock,strength=gpuStrength(),e=eventState())=>gpu?gpu.windProbe(u,v,t,strength,e):null,ground:u=>field?field.ground(u):.8,advancePaper:(body,dt,windUV)=>advancePaper({...body},dt,[windUV[0]*W,windUV[1]*H]),particles:()=>gpu?{...gpu.readback(),count:gpu.count}:{count:grains.length,positions:Float32Array.from(grains.flatMap(g=>[g.x/W,g.y/H,0,1])),velocities:Float32Array.from(grains.flatMap(g=>[g.vx/W,g.vy/H,0,1]))},windStrength:value=>{windOverride=value===null?null:clamp(Number(value),0,1.5);},paperGeometry:()=>grains.filter(g=>g.flake).map(paperGeometry),coverPixels:()=>cast?{width:cast.bc.canvas.width,height:cast.bc.canvas.height,pixels:Array.from(cast.bc.getImageData(0,0,cast.bc.canvas.width,cast.bc.canvas.height).data)}:null,debris:()=>grains.map(g=>({uid:g.uid,releaseTime:g.releaseTime,settleAge:g.settleAge,size:g.size,x:g.x,y:g.y,vx:g.vx,vy:g.vy,theta:g.theta,omega:g.omega,roll:g.roll,settled:g.settled,flake:!!g.flake,scrap:!!g.scrap,age:g.age})),cardDrawn:()=>scene?scene.sT>=0:!!cast&&cast.hiddenReady&&cast.ptr>=cast.total,baseURL:()=>cast?cast.base.toDataURL('image/png'):null,leftover:()=>{if(scene)return sceneLeft();const k=cast;if(!k)return null;const count=c=>{const d=c.getImageData(0,0,c.canvas.width,Math.round((k.ov+k.h-1)*DPR)).data;let n=0;for(let i=3;i<d.length;i+=4)if(d[i]>8)n++;return{n};};return{base:count(k.bc),rel:count(k.rc),ptr:k.ptr,total:k.total,tt};},phase:()=>scene?'scene':!cast?'idle':tt<T_RISE?'rise':tt<T_HOLD?'cast':tt<T_THICK?'wind':tt<T_SHOWN?'shown':'sink'};
+window.__sand={fire:(k,auto)=>{fire(k,auto);render();},reveal,theme:setTheme,coverage,fps:()=>window.__fps,grains:()=>reduced?0:grains.length+(gpu?gpu.count:0),material:(m,p)=>{if(m)MAT=m==='paper'?'paper':'sand';if(p)PAPER=p==='shred'?'shred':'tear';syncHud();},faces:(cover,hidden)=>{if(cover===null){faceProvider=null;return;}faceProvider={cover,hidden};},event,win:()=>event('win'),tick:()=>event('tick'),skip,pause:stop,resume,reset,step,state,diagnostics:state,wind:(u,v,t=clock,strength=gpuStrength(),e=eventState())=>field?field.sample(u,v,t,strength,e):[sharedWind(u*W,v*H,t,strength)[0]/W,sharedWind(u*W,v*H,t,strength)[1]/H],windGPU:(u,v,t=clock,strength=gpuStrength(),e=eventState())=>gpu?gpu.windProbe(u,v,t,strength,e):null,ground:u=>field?field.ground(u):.8,advancePaper:(body,dt,windUV)=>advancePaper({...body},dt,[windUV[0]*W,windUV[1]*H]),particles:()=>gpu?{...gpu.readback(),count:gpu.count}:{count:grains.length,positions:Float32Array.from(grains.flatMap(g=>[g.x/W,g.y/H,0,1])),velocities:Float32Array.from(grains.flatMap(g=>[g.vx/W,g.vy/H,0,1]))},windStrength:value=>{windOverride=value===null?null:clamp(Number(value),0,1.5);},paperGeometry:()=>grains.filter(g=>g.flake).map(paperGeometry),scenePixels:()=>scene?scene.cards.map(k=>({kind:k.kind,DPR,ov:k.ov,h:k.h,w:k.w,ptr:k.ptr,total:k.total,pieces:k.pieces?k.pieces.map((p,id)=>({id,gone:p.gone,poly:p.poly})):[],base:{width:k.base.width,height:k.base.height,pixels:Array.from(k.bc.getImageData(0,0,k.base.width,k.base.height).data)},rel:{width:k.rel.width,height:k.rel.height,pixels:Array.from(k.rc.getImageData(0,0,k.rel.width,k.rel.height).data)}})):[],coverPixels:()=>cast?{width:cast.bc.canvas.width,height:cast.bc.canvas.height,pixels:Array.from(cast.bc.getImageData(0,0,cast.bc.canvas.width,cast.bc.canvas.height).data)}:null,debris:()=>grains.map(g=>({uid:g.uid,releaseTime:g.releaseTime,settleAge:g.settleAge,size:g.size,x:g.x,y:g.y,vx:g.vx,vy:g.vy,theta:g.theta,omega:g.omega,roll:g.roll,settled:g.settled,flake:!!g.flake,scrap:!!g.scrap,age:g.age})),cardDrawn:()=>scene?scene.sT>=0:!!cast&&cast.hiddenReady&&cast.ptr>=cast.total,baseURL:()=>cast?cast.base.toDataURL('image/png'):null,leftover:()=>{if(scene)return sceneLeft();const k=cast;if(!k)return null;const count=c=>{const d=c.getImageData(0,0,c.canvas.width,Math.round((k.ov+k.h-1)*DPR)).data;let n=0;for(let i=3;i<d.length;i+=4)if(d[i]>8)n++;return{n};};return{base:count(k.bc),rel:count(k.rc),ptr:k.ptr,total:k.total,tt};},phase:()=>scene?'scene':!cast?'idle':tt<T_RISE?'rise':tt<T_HOLD?'cast':tt<T_THICK?'wind':tt<T_SHOWN?'shown':'sink'};
 if(Q.get('fire'))fire(Q.get('fire'),!HOLDFLAG);else if(Q.get('event'))event(Q.get('event'));render();if(!reduced)resume();
 
 })();

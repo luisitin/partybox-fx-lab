@@ -492,6 +492,22 @@ async def cover_alpha(page):
     }""")
 
 
+async def scene_alpha(page, cards):
+    """Count actual pixels and retain the first residuals independently."""
+    return await page.evaluate("""cards=>{
+      const dpr=document.getElementById('c').width/innerWidth;
+      const images=window.__sand.scenePixels();
+      return images.map(image=>{
+        const card=cards.find(c=>c.kind===image.kind);if(!card)throw Error('unmapped scene bitmap');
+        const count=bitmap=>{const exposed=Math.round((card.h+(bitmap.width/dpr-card.w)/2-1)*dpr);
+          let count=0;const residuals=[];for(let y=0;y<Math.min(exposed,bitmap.height);y++)for(let x=0;x<bitmap.width;x++){
+            const i=(y*bitmap.width+x)*4;if(bitmap.pixels[i+3]>8){count++;if(residuals.length<8)residuals.push({x,y,rgba:Array.from(bitmap.pixels.slice(i,i+4))});}}
+          return{count,residuals,width:bitmap.width,height:bitmap.height,exposedRows:exposed};};
+        return {kind:image.kind,base:count(image.base),rel:count(image.rel)};
+      });
+    }""",cards)
+
+
 async def check_scene_matrix(harness,view,direction):
     context,page,record=await harness.open(view=view,extra={"nogpu":"1","dir":str(direction)})
     record["windDirection"]=direction
@@ -545,11 +561,13 @@ async def check_scene_matrix(harness,view,direction):
                     require(after["opaque"]<before["opaque"]*.12,
                             f"cover bitmap retains visible debris before cleanup: {mode}")
                 else:
-                    left=await page.evaluate("window.__sand.leftover()")
-                    record["lastBitmapAlpha"]=left
-                    require(left and left["gone"],f"scene never erodes any wrong card: {mode}")
-                    require(all(c["base"]==0 and c["rel"]==0 for c in left["gone"]),
-                            f"erased scene bitmap alpha: {record['currentSceneCase']}; counts={left['gone']}")
+                    bitmap_alpha=await scene_alpha(page,info["scene"]["cards"])
+                    record["lastBitmapAlpha"]=bitmap_alpha
+                    targets={c["kind"] for c in info["scene"]["cards"] if c["ws"] is not None}
+                    removed=[c for c in bitmap_alpha if c["kind"] in targets]
+                    require(len(removed)==len(targets) and bool(removed),f"wrong-card bitmap missing: {mode}")
+                    require(all(c["base"]["count"]==0 and c["rel"]["count"]==0 for c in removed),
+                            f"erased scene bitmap alpha: {record['currentSceneCase']}; counts={removed}")
                     survivors=[c for c in info["scene"]["cards"] if c["ws"] is None]
                     require(survivors,"scene removed every answer including the truth")
                     for c in survivors:
@@ -675,9 +693,16 @@ async def check_responsive(harness):
     require(old_geometry,"no live paper crosses the DPR change")
     await resize(page,390,844)
     after=await sand_read(page);require(3000<=after["count"]<=3200,"responsive TV-to-phone keeps20k instead of graceful3k")
-    survivors=[i for i in range(min(before["count"],after["count"])) if before["rows"][i][2]<.5 and after["rows"][i][2]<.5]
-    require(len(survivors)>100 and max(math.dist(before["xy"][i],after["xy"][i]) for i in survivors)<2e-6,
+    # Documented count reduction retains evenly spaced source-bin centers.
+    # This independently reconstructs the map; no reported slot labels used.
+    mapped=[(j,math.floor((j+.5)*before["count"]/after["count"])) for j in range(after["count"])]
+    require(all(before["rows"][i][2:]==after["rows"][j][2:] for j,i in mapped),
+            "responsive count reduction changes mapped lifecycle attributes")
+    survivors=[(j,i) for j,i in mapped if before["rows"][i][2]<.5]
+    require(len(survivors)>100 and max(math.dist(before["xy"][i],after["xy"][j]) for j,i in survivors)<2e-6,
             "responsive count change resets surviving airborne GPU identities")
+    require(max(abs(before["velocityRows"][i][k]-after["velocityRows"][j][k]) for j,i in survivors for k in range(4))<1e-6,
+            "responsive count change resets mapped velocity/response/generation")
     live={g["uid"]:g for g in await page.evaluate("__sand.debris()")}
     require(old.keys()==live.keys(),"viewport resize deletes live paper fragments")
     require(all(abs(live[uid]["x"]/390-g["x"]/1920)<1e-8 and
@@ -692,10 +717,27 @@ async def check_responsive(harness):
     require(crops>10,"too few live atlas samples after responsive resize")
     await resize(page,1920,1080)
     restored=await sand_read(page);require(restored["count"]>=20000,"responsive phone-to-TV does not restore20k")
+    original_air=[i for i in range(after["count"]) if after["rows"][i][2]<.5]
+    require(max(math.dist(after["xy"][i],restored["xy"][i]) for i in original_air)<2e-6,
+            "count enlargement resets original retained airborne slots")
+    require(all(after["rows"][i][2:]==restored["rows"][i][2:] for i in range(after["count"])),
+            "count enlargement changes retained lifecycle attributes")
+    require(max(abs(after["velocityRows"][i][k]-restored["velocityRows"][i][k])
+                for i in original_air for k in range(4))<1e-6,
+            "count enlargement changes original airborne velocity/response/generation")
+    new_air=[(j,j%after["count"]) for j in range(after["count"],restored["count"])
+             if after["rows"][j%after["count"]][2]<.5]
+    require(bool(new_air) and all(restored["rows"][j][2:]==after["rows"][i][2:]
+            and abs(restored["xy"][j][0]-after["xy"][i][0])<=.35/1920+1e-7
+            and abs(restored["xy"][j][1]-after["xy"][i][1])<=.35/1080+1e-7
+            and abs(restored["velocityRows"][j][2]-after["velocityRows"][i][2])<=.025+1e-7
+            and all(restored["velocityRows"][j][k]==after["velocityRows"][i][k] for k in (0,1,3))
+            for j,i in new_air),"new GPU slots do not remain bounded perturbed copies")
     await step(page,.1);await sand_read(page)
     await layout(page);await harness.close(context,record)
     return {"initialCount":before["count"],"phoneCount":after["count"],"restoredCount":restored["count"],
             "retainedAirborneGPUIdentities":len(survivors),"retainedPaperIdentities":len(live),
+            "boundedNewAirborneGPUCopies":len(new_air),
             "originalDprAtlasCrops":crops,
             "scope":"Eager warm-up disabled to isolate responsive count/atlas behavior; default DPR2 warm startup separately timed out at30s on revision00230a9b."}
 
@@ -789,6 +831,7 @@ async def check_queries_fallback(harness):
 async def check_refresh_warm(harness):
     context,page,record=await harness.open(view="phone",extra={"nogpu":"1","mat":"paper","paper":"shred"},manual_frames=True)
     schedules=[];reference=None
+    record["refreshSchedules"]=schedules
     for hz in (60,120,144):
         await reset(page)
         await page.evaluate("window.__sand.fire('truth');window.__sand.step(2.5);window.__sand.resume();window.__f02Frame(1000)")
@@ -817,6 +860,7 @@ async def check_refresh_warm(harness):
     a={p["uid"]:p for p in before};b={p["uid"]:p for p in middle}
     movement=[math.dist(a[uid]["segments"][0]["vertices"][0],b[uid]["segments"][0]["vertices"][0]) for uid in a.keys()&b.keys()]
     require(movement and max(movement)>.05,"120 Hz rendering repeats identical mesh positions between ticks")
+    record["halfTickVertexMovement"]=max(movement)
     await harness.close(context,record)
     # Cold and pooled construction must yield the same face and physics.
     records=[]
@@ -826,6 +870,9 @@ async def check_refresh_warm(harness):
         info=await state(p);body=await p.evaluate("window.__sand.debris()")
         records.append({"warm":warm,"scene":info["scene"],"debris":body,"pixels":await pixels(p)})
         await harness.close(c,r)
+    record["coldWarmComparisons"]={"sceneEqual":records[0]["scene"]==records[1]["scene"],
+        "debrisEqual":records[0]["debris"]==records[1]["debris"],
+        "pixels":[r["pixels"] for r in records]}
     require(records[0]["scene"]==records[1]["scene"] and records[0]["debris"]==records[1]["debris"] and records[0]["pixels"]["hash"]==records[1]["pixels"]["hash"],
             "warm-up alters seeded scene physics or rendered face")
     return {"schedules":schedules,"halfTickVertexMovement":max(movement),"coldWarmEquivalent":True,
