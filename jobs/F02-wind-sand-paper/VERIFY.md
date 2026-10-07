@@ -182,7 +182,7 @@ node /workspace/.partybox-tools/fx_tools/F02-pending/roll-probe.cjs /workspace/p
 
 Geometry comparison exit0 diagnostic both: first command was executed on7e before promotion (4418properintersections,211multi-owner sampledcenters); outside candidate7bcc and later promoted7bcc both measure400cardmeshes/100seeds withzerointersections/negativeorientation/unowned/multi-owner sampledpoints andareaerror<2.2e-11. Exact actualargv/scriptSHA/sourceSHA/results in validation/7bccdc25-geometry/geometry-comparison.json. These independently detect folded ownership but do not establish browser erasure.
 
-Newsource mock/syntaxPASS: reset154/154/154 exacthistory; roll40800samples/21057back/3488edge/maxroll4.72. Mock DOM confirms prior reduced/lazyfaces/six coldwarm finiteCPU modes; no graphical/60-fps claim. Final browser groups are currently running on this source.
+Newsource mock/syntaxPASS: reset154/154/154 exacthistory; roll40800samples/21057back/3488edge/maxroll4.72. Mock DOM confirms prior reduced/lazyfaces/six coldwarm finiteCPU modes; no graphical/60-fps claim. At that7bcc checkpoint the browser groups were running; final results are below.
 
 ## Bounded-shred/asset-context browser regression (7bccdc25)
 
@@ -207,3 +207,96 @@ python3 /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py /wo
 ```
 
 Checkpoint strictidle-onlyphoneCPU4FAIL/exit1:26.37fps,p9560.32ms,56.2%missedrefresh. Separatepaperclip1,260,246bytes,6.000sVP8/390×844/25fps follows explicitstep2.7 thenresume; not paperperformance. Noerrors/runtimeattempts; exactsource/helper/scriptbeforeaftermatch. Rawargv/hashes/frames/encoder metadata in validation/50383f0d-milestone/. Full216matrix/othergroups are stillpending at this checkpoint.
+
+##50383f0d focused regression and default high-DPR startup
+
+```sh
+python jobs/F02-wind-sand-paper/check.py --chromium /usr/bin/chromium --allow-policy-harness --groups scenes,paperGeometry,refreshWarm,responsive --report /tmp/F02-functional-focused-50383f0d.json
+```
+
+FAIL exit1,176.094s,source50383/check219f unchanged:186scene cases completed, thenTV/reverse/Pop/paper/shred/round rndOld has1basepixel(570,322),RGBA[85,85,85,9]; allrel0. The oldTVsand/dawn pixel is fixed. ThreeothergroupsPASS retain exactcoldwarm/highrefresh states/raster and responsive GPU/CPU/atlas preservation. Sourcefix neededat remainingpaperAAownership, not tolerance relaxation.
+
+At the50383 checkpoint, the checker's single-card cleanup proof was wholecover<12% (submergedfoot intentionallyretained); it does not yet independently prove zeroexposed singlecardpixels. That scope gap is being closed using rawbitmap pixels. Remaining sixgroups were not rerun after the failedgate.
+
+DefaultTVautoDPR2/fourwarmups startup nowPASS on50383:4.926sdocumentload,6.575sentireprobe,actualwebgl2/20,736particles,m4,noerrors/runtimeattempts. This clears the earlier30sloadtimeout only; not disk/60-fps acceptance. Rawexactargv/probe/source/checkSHA in validation/50383f0d-functional-failed/F02-default-startup-50383f0d.json.
+
+```sh
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python /tmp/F02-default-startup-probe.py --html /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html --expected-sha 50383f0d4f4eb8f7a0966aba045a18b4271a62f18cb94e1a9bd0630279f1cf85 --chromium /usr/bin/chromium --report /tmp/F02-default-startup-50383f0d.json
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python /tmp/F02-paper-pixel-probe-50383f0d.py
+```
+
+Startup command PASS/exit0 as above. Pixel diagnostic exit0/12.222s reproduces the reverse-TV round residual on fresh50383, all105 old pieces gone. The pixel center is inside piece64 and0.0115px from shared edge65; every pixel corner is within0.616px of that released union. The next-nearest piece61 edge is5.3075px away. Static100-seed/200wide-card geometry has zero proper intersections, negative areas, unowned or multiply-owned sampled centers. No geometric-hole or raster/backend cause is proved by these diagnostics.
+
+## Final local paper boundary guard (1cd4d482)
+
+Frozen index SHA1cd4d48254672b0ac5ac1342585551354fe571822065b92b1c68d63d10c1f810 changes the per-owned-piece eraser stroke from10 to10+2/DPR: one physical-pixel guard on each side. No terminal whole-cover wipe, field/force/event timing change or alpha-threshold change. Checker SHA91b2cb099cc5c230748b99ca2308d5ef3a638a73e6a31a5074a8c20b559c76a0 strengthens single-card cleanup to zero exposed pixels above alpha8, excluding only the geometrically submerged foot, and retains the earlier whole-cover check.
+
+```sh
+node /tmp/f02_dom_smoke.cjs
+node /workspace/.partybox-tools/fx_tools/F02-pending/reset-probe.cjs /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html
+node /workspace/.partybox-tools/fx_tools/F02-pending/roll-probe.cjs /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html
+node /workspace/.partybox-tools/fx_tools/F02-pending/shred-geometry-probe.cjs /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html
+node /workspace/.partybox-tools/fx_tools/F02-pending/round-tv-geometry-probe.cjs /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html
+```
+
+All PASS in static/mock scope: reduced/lazy callbacks/six finite CPU scene modes;154/154/154 history-identical reset;40,800 rendered geometry segments with21,057 back-facing and3,488 edge samples;400 phone meshes plus200 wide TV meshes across100 seeds with no proper intersections, negative area, unowned or multiply-owned sampled centers (area error<3.5e-10). These catch deterministic state/geometry regressions and do not prove graphical fidelity or performance.
+
+```sh
+python jobs/F02-wind-sand-paper/check.py --chromium /usr/bin/chromium --allow-policy-harness --groups scenes,paperGeometry,refreshWarm,responsive --report /tmp/F02-functional-focused-1cd4d482.json
+```
+
+PASS exit0/227.203s, unchanged source/check hashes: all216 scenes, both directions, both themes, both layouts and all requested materials. Strict exposed-alpha cleanup passes for single and multi-card modes, including the formerly failing reverse-TV round/shred pixel. Actual render geometry/lifecycle/notebook holes,60/120/144 state agreement and cold/warm pixel identity, and mapped GPU/CPU/atlas responsive preservation also PASS. Raw report in validation/1cd4d482-functional/. Remaining six groups are a separate run on the same frozen bytes; no disk, performance, CI or perceptual acceptance is implied by this functional result.
+
+```sh
+python jobs/F02-wind-sand-paper/check.py --chromium /usr/bin/chromium --allow-policy-harness --groups wind,sandTV,sandPhone,paperPhysics,facesReduced,queriesFallback --report /tmp/F02-functional-remaining-1cd4d482.json
+```
+
+PASS exit0/61.390s, identical before/after HTML1cd4d482/checker91b2 hashes. Wind GPU/CPU and independent force oracles,20,736/3,136 actual GPU readback/lifecycle/events/replay, paper relative-wind/angular dynamics, callback authorization/initial+live reduced-motion idle, query controls/resize/context-loss/no-WebGL fallbacks all PASS. Together the two partitioned commands cover all10 groups without repeating the216 scenes. Across18contexts zero page/console errors and runtime attempts; both reports record exact argv/exit/hash/transport. Native file:// remains blocked; routed bytes are functional evidence only. No performance or CI pass is implied.
+
+```sh
+python3 -m py_compile jobs/F02-wind-sand-paper/check.py
+```
+
+PASS syntax-only on219f and final91b2 checker revisions, executed by checks_final. This catches Python parse/import compilation errors, not runtime behavior.
+
+## Final required gates and original captures (1cd4d482)
+
+Exact commands from each retained provenance file, executed serially after all functional contexts closed:
+
+```sh
+python3 /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html --output /workspace/.partybox-tools/fx-validation/F02/1cd4d4825467-final-file-policy --chromium /usr/bin/chromium --motion no-preference --require-performance --views phone --events idle --seconds 2 --warmup 0 --capture 0 --transport file
+python3 /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html --output /workspace/.partybox-tools/fx-validation/F02/1cd4d4825467-final-mandatory --chromium /usr/bin/chromium --motion no-preference --require-performance --views tv,phone --events idle,win,tick --seconds 8 --warmup 2 --capture 6 --transport routed
+python3 /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html --output /workspace/.partybox-tools/fx-validation/F02/1cd4d4825467-final-heavy-cold-phone --chromium /usr/bin/chromium --motion no-preference --require-performance --views phone --events idle --seconds 18 --warmup 0 --capture 0 --transport routed --query 'warm=0&theme=gouache&mat=paper&paper=tear&seed=1' --hitch-fire fakeout --hitch-repeats 3 --hitch-gap 6 --hitch-window 3
+python3 /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/tools/measure.py /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html --output /workspace/.partybox-tools/fx-validation/F02/1cd4d4825467-final-heavy-warm-phone --chromium /usr/bin/chromium --motion no-preference --require-performance --views phone --events idle --seconds 18 --warmup 0 --capture 0 --transport routed --query 'theme=gouache&mat=paper&paper=tear&seed=1' --hitch-fire fakeout --hitch-repeats 3 --hitch-gap 6 --hitch-window 3
+```
+
+Every command exits1, preserving strict failure rather than accepting an observational run. Source1cd4d482 and helper983c3252 match before/after every run. File probe fails at document load with ERR_BLOCKED_BY_ADMINISTRATOR and standaloneFileOpened=false; no frame result exists for that failed load. Its structured failure also verifies the helper's corrected file-open status/reporting path. No browser policy, proxy or TLS setting was changed.
+
+Mandatory8s native-rAF timing (performance recorded without video; mean<=17.5ms,p95<=20ms,missed60Hz<=1%):
+
+| View/event | fps | arrival p95 ms | missed refreshes | Result |
+|---|---:|---:|---:|---|
+| TV idle |4.95|326.70|91.75%|FAIL|
+| TV win |4.73|370.92|92.32%|FAIL|
+| TV tick |5.66|216.05|90.55%|FAIL|
+| phone CPU4 idle |28.79|68.95|52.18%|FAIL|
+| phone CPU4 win |23.11|76.30|61.46%|FAIL|
+| phone CPU4 tick |16.36|190.10|72.56%|FAIL|
+
+All6 separate original VP8 captures are6.000s,25fps encoding, correct1920x1080/390x844 and1,133,426–1,584,884bytes each (<10MB). No page/console errors or runtime requests in routed timing/capture contexts. Actual reported renderer is SwiftShader; no hardware GPU device nodes. This is the available software-rendering measurement, not proof of performance on a physical mid phone or hardware GPU. The commands catch real frame arrivals, long stalls, runtime requests, page errors, capture completeness and size, separately from encoding rate.
+
+Matching heavy phone-only18s cold/warm Gouache/paper-tear/fakeout comparison: final5.82/6.93fps,p95399.38/287.22ms; both strictFAIL, zero errors/network/trigger errors and complete3s windows at first scheduled300ms and repeats6300/12300ms. First-fire CPU162.10/87.90ms; first-windowp95378.43/263.40ms. Starter cold7.57fps/p95257.56ms/firstcall304.50ms; preceding3bbe cold5.20/393.26/169.00 and warm5.83/310.87/37.90. Thus final warm remains below starter throughput and above its p95; no overall phone gain or perceptible hitch removal is claimed. Single runs, source/helper changes and no physical hardware limit causal comparison. No final heavy TV run was performed. Exact raw intervals/windows/commands/hashes and scope are in validation/1cd4d482-final-COMPARISON.md/.json and the four named evidence folders.
+
+All10 functional groups passing on frozen bytes does not clear these required gates. No PR was opened, no CI was run/green, and LOOP.md records no rounds because KEEP GOING starts only after green PR. BLOCKED.md records the unavailable native-file capability and failed required frame measurements; main F02 must be marked BLOCKED after pushing this handoff.
+
+## Final evidence integrity and handoff review
+
+```sh
+cd /workspace/partybox-fx-lab/jobs/F02-wind-sand-paper
+sha256sum --strict --check SHA256SUMS.txt
+wc -l README.md
+cd /workspace/partybox-fx-lab
+git diff --check
+```
+
+PASS:119 manifest entries cover every file in validation/ and media/, including retained failed reports and all new evidence/captures. README44lines (<60); diff whitespace clean. These catch changed artifact bytes, missing evidence entries (generation enumerates both full directories), oversized documentation and whitespace errors; they do not clear failed disk/frame/CI gates. Read-only independent handoff audit confirmed workflow PR/path filters, ubuntu-latest,30-minute timeout, read-only permissions, actions/* only, strict functional/file/performance/hash checks. It found only pending evidence/BLOCKED/manifest and historical wording gaps, now recorded; no new test/browser run was required.

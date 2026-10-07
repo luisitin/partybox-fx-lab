@@ -487,8 +487,19 @@ async def pixels(page, rectangle=None, canvas="c"):
 async def cover_alpha(page):
     return await page.evaluate("""() => {
       const c=window.__sand.coverPixels();if(!c)return null;
-      let opaque=0;for(let i=3;i<c.pixels.length;i+=4)if(c.pixels[i]>8)opaque++;
-      return {width:c.width,height:c.height,opaque};
+      const card=window.__sand.state().cast;
+      const dpr=document.getElementById('c').width/innerWidth;
+      // Infer the symmetric bitmap overfill from actual pixels and card width;
+      // omit only the submerged foot, as in the independent scene raster oracle.
+      const overfill=(c.width/dpr-card.w)/2;
+      const exposedRows=Math.min(c.height,Math.round((card.h+overfill-1)*dpr));
+      let opaque=0,exposedOpaque=0;const exposedResiduals=[];
+      for(let i=0;i<c.pixels.length;i+=4)if(c.pixels[i+3]>8){
+        opaque++;const pixel=i/4,y=Math.floor(pixel/c.width);
+        if(y<exposedRows){exposedOpaque++;if(exposedResiduals.length<8)
+          exposedResiduals.push({x:pixel%c.width,y,rgba:Array.from(c.pixels.slice(i,i+4))});}
+      }
+      return {width:c.width,height:c.height,dpr,opaque,exposedRows,exposedOpaque,exposedResiduals};
     }""")
 
 
@@ -557,6 +568,9 @@ async def check_scene_matrix(harness,view,direction):
                 info=await state(page)
                 if info["cast"]:
                     after=await cover_alpha(page)
+                    record["lastCoverAlpha"]=after
+                    require(after["exposedOpaque"]==0,
+                            f"single-card exposed cover alpha: {record['currentSceneCase']}; counts={after}")
                     # The foot is intentionally retained below the exposed face.
                     require(after["opaque"]<before["opaque"]*.12,
                             f"cover bitmap retains visible debris before cleanup: {mode}")

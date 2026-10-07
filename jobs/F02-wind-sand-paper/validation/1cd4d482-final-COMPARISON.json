@@ -1,0 +1,674 @@
+[
+  {
+    "label": "starter/cold",
+    "sourceSha256": "e7353f2b3c0ac7881337e6ea46fcd8399b6d02ae19fec69c57641d96e1127098",
+    "directory": "/workspace/.partybox-tools/fx-validation/F02/baseline-gouache-tear-fakeout",
+    "performance": {
+      "elapsedMs": 18108,
+      "fps": 7.565716810249614,
+      "arrivalIntervals": {
+        "count": 137,
+        "meanMs": 132.17518248175182,
+        "p50Ms": 97.6000000005588,
+        "p95Ms": 257.56000000014865,
+        "p99Ms": 1028.9919999995036,
+        "maxMs": 1365.0999999996275
+      },
+      "scheduledIntervals": {
+        "count": 137,
+        "meanMs": 132.23357664233575,
+        "p50Ms": 100.0,
+        "p95Ms": 286.6399999999992,
+        "p99Ms": 837.9479999999998,
+        "maxMs": 1366.5999999999995
+      },
+      "callbackWork": {
+        "count": 138,
+        "meanMs": 5.147101449260515,
+        "p50Ms": 3.6000000000931323,
+        "p95Ms": 14.474999999580907,
+        "p99Ms": 28.987000000020466,
+        "maxMs": 32.89999999944121
+      },
+      "missedRefreshes": 950,
+      "missedRefreshFraction": 0.8747697974217311,
+      "longTasks": [
+        {
+          "start": 861.1000000005588,
+          "duration": 314
+        },
+        {
+          "start": 12899,
+          "duration": 104
+        }
+      ],
+      "meets60FpsTolerance": false,
+      "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+    },
+    "hitchProfiles": [
+      {
+        "label": "cold-fire",
+        "scheduledAtMs": 300,
+        "firedAt": 869.4000000003725,
+        "firedAtMs": 308,
+        "callDurationMs": 304.5,
+        "error": null,
+        "windowSeconds": 3.0,
+        "arrivalIntervals": {
+          "count": 19,
+          "meanMs": 169.45263157892776,
+          "p50Ms": 102.5,
+          "p95Ms": 426.1899999999424,
+          "p99Ms": 1007.1579999995421,
+          "maxMs": 1152.3999999994412
+        },
+        "over33ms": 17,
+        "over50ms": 17,
+        "over100ms": 10,
+        "over250ms": 2
+      },
+      {
+        "label": "warm-fire-1",
+        "scheduledAtMs": 6300,
+        "firedAt": 7106.600000000559,
+        "firedAtMs": 6545.200000000186,
+        "callDurationMs": 31.199999999254942,
+        "error": null,
+        "windowSeconds": 3.0,
+        "arrivalIntervals": {
+          "count": 11,
+          "meanMs": 302.2454545454715,
+          "p50Ms": 181.79999999981374,
+          "p95Ms": 900.0,
+          "p99Ms": 1272.0799999997023,
+          "maxMs": 1365.0999999996275
+        },
+        "over33ms": 10,
+        "over50ms": 10,
+        "over100ms": 10,
+        "over250ms": 4
+      },
+      {
+        "label": "warm-fire-2",
+        "scheduledAtMs": 12300,
+        "firedAt": 12923.700000000186,
+        "firedAtMs": 12362.299999999814,
+        "callDurationMs": 76.79999999981374,
+        "error": null,
+        "windowSeconds": 3.0,
+        "arrivalIntervals": {
+          "count": 27,
+          "meanMs": 120.85925925926615,
+          "p50Ms": 87.90000000037253,
+          "p95Ms": 213.51000000024203,
+          "p99Ms": 664.5459999997719,
+          "maxMs": 809.5999999996275
+        },
+        "over33ms": 27,
+        "over50ms": 27,
+        "over100ms": 6,
+        "over250ms": 2
+      }
+    ]
+  },
+  {
+    "label": "3bbeffdb/cold",
+    "sourceSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+    "directory": "/workspace/.partybox-tools/fx-validation/F02/3bbeffdb7c94-heavy-cold",
+    "performance": {
+      "elapsedMs": 18071.900000000373,
+      "fps": 5.2014453377895,
+      "arrivalIntervals": {
+        "count": 94,
+        "meanMs": 192.2542553191529,
+        "p50Ms": 132.74999999953434,
+        "p95Ms": 393.26499999975783,
+        "p99Ms": 934.5880000005188,
+        "maxMs": 1054
+      },
+      "scheduledIntervals": {
+        "count": 94,
+        "meanMs": 192.368085106383,
+        "p50Ms": 133.30000000000064,
+        "p95Ms": 389.1450000000006,
+        "p99Ms": 925.9379999999994,
+        "maxMs": 1049.999999999999
+      },
+      "callbackWork": {
+        "count": 95,
+        "meanMs": 8.887368421001653,
+        "p50Ms": 6.6000000005587935,
+        "p95Ms": 20.380000000260765,
+        "p99Ms": 37.98400000052528,
+        "maxMs": 44
+      },
+      "missedRefreshes": 991,
+      "missedRefreshFraction": 0.9142066420664207,
+      "longTasks": [
+        {
+          "start": 1259.4000000003725,
+          "duration": 176
+        },
+        {
+          "start": 7180.700000000186,
+          "duration": 93
+        },
+        {
+          "start": 13261.400000000373,
+          "duration": 82
+        }
+      ],
+      "meets60FpsTolerance": false,
+      "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+    },
+    "hitchProfiles": [
+      {
+        "label": "cold-fire",
+        "scheduledAtMs": 300,
+        "firedAt": 1265.2000000001863,
+        "firedAtMs": 538.2000000001863,
+        "callDurationMs": 169,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 17533.700000000186,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 21,
+          "meanMs": 160.21904761902988,
+          "p50Ms": 112.29999999981374,
+          "p95Ms": 305.40000000037253,
+          "p99Ms": 757.6399999994788,
+          "maxMs": 870.6999999992549
+        },
+        "over33ms": 20,
+        "over50ms": 20,
+        "over100ms": 14,
+        "over250ms": 3
+      },
+      {
+        "label": "warm-fire-1",
+        "scheduledAtMs": 6300,
+        "firedAt": 7219.100000000559,
+        "firedAtMs": 6492.100000000559,
+        "callDurationMs": 53.09999999962747,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 11579.799999999814,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 14,
+          "meanMs": 242.10714285714286,
+          "p50Ms": 154.45000000018626,
+          "p95Ms": 608.6199999998787,
+          "p99Ms": 964.9239999999753,
+          "maxMs": 1054
+        },
+        "over33ms": 14,
+        "over50ms": 14,
+        "over100ms": 11,
+        "over250ms": 4
+      },
+      {
+        "label": "warm-fire-2",
+        "scheduledAtMs": 12300,
+        "firedAt": 13268,
+        "firedAtMs": 12541,
+        "callDurationMs": 68.40000000037253,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 5530.9000000003725,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 14,
+          "meanMs": 239.1500000000399,
+          "p50Ms": 135.70000000018626,
+          "p95Ms": 580.3850000001953,
+          "p99Ms": 856.5570000004857,
+          "maxMs": 925.6000000005588
+        },
+        "over33ms": 14,
+        "over50ms": 14,
+        "over100ms": 11,
+        "over250ms": 5
+      }
+    ]
+  },
+  {
+    "label": "3bbeffdb/warm",
+    "sourceSha256": "3bbeffdb7c9482b9c1974f56e4973799b81378c590c8089a184ade99cec9d2a6",
+    "directory": "/workspace/.partybox-tools/fx-validation/F02/3bbeffdb7c94-heavy-warm",
+    "performance": {
+      "elapsedMs": 18184.60000000056,
+      "fps": 5.829108146453414,
+      "arrivalIntervals": {
+        "count": 106,
+        "meanMs": 171.5528301886845,
+        "p50Ms": 123.5,
+        "p95Ms": 310.87499999976717,
+        "p99Ms": 802.3699999996464,
+        "maxMs": 949.0999999996275
+      },
+      "scheduledIntervals": {
+        "count": 106,
+        "meanMs": 171.37641509433962,
+        "p50Ms": 116.70000000000073,
+        "p95Ms": 312.4499999999989,
+        "p99Ms": 795.0000000000002,
+        "maxMs": 916.5
+      },
+      "callbackWork": {
+        "count": 107,
+        "meanMs": 11.425233644868516,
+        "p50Ms": 8.799999999813735,
+        "p95Ms": 29.97000000039113,
+        "p99Ms": 42.67200000032781,
+        "maxMs": 49.59999999962747
+      },
+      "missedRefreshes": 984,
+      "missedRefreshFraction": 0.9019248395967002,
+      "longTasks": [
+        {
+          "start": 9719.700000000186,
+          "duration": 57
+        },
+        {
+          "start": 10223.900000000373,
+          "duration": 50
+        },
+        {
+          "start": 10645.100000000559,
+          "duration": 51
+        },
+        {
+          "start": 11658.400000000373,
+          "duration": 77
+        },
+        {
+          "start": 16331.799999999814,
+          "duration": 50
+        },
+        {
+          "start": 20540,
+          "duration": 65
+        },
+        {
+          "start": 21812.400000000373,
+          "duration": 59
+        }
+      ],
+      "meets60FpsTolerance": false,
+      "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+    },
+    "hitchProfiles": [
+      {
+        "label": "cold-fire",
+        "scheduledAtMs": 300,
+        "firedAt": 5505.299999999814,
+        "firedAtMs": 335.29999999981374,
+        "callDurationMs": 37.90000000037253,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 17849.300000000745,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 23,
+          "meanMs": 153.67391304347825,
+          "p50Ms": 108.29999999981374,
+          "p95Ms": 438.18000000053974,
+          "p99Ms": 843.389999999833,
+          "maxMs": 949.0999999996275
+        },
+        "over33ms": 23,
+        "over50ms": 22,
+        "over100ms": 14,
+        "over250ms": 2
+      },
+      {
+        "label": "warm-fire-1",
+        "scheduledAtMs": 6300,
+        "firedAt": 11685.5,
+        "firedAtMs": 6515.5,
+        "callDurationMs": 44.700000000186265,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 11669.100000000559,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 22,
+          "meanMs": 149.71818181817335,
+          "p50Ms": 107.34999999962747,
+          "p95Ms": 275.1550000003539,
+          "p99Ms": 613.6240000000779,
+          "maxMs": 703.0
+        },
+        "over33ms": 22,
+        "over50ms": 22,
+        "over100ms": 13,
+        "over250ms": 2
+      },
+      {
+        "label": "warm-fire-2",
+        "scheduledAtMs": 12300,
+        "firedAt": 17676.400000000373,
+        "firedAtMs": 12506.400000000373,
+        "callDurationMs": 7.7000000001862645,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 5678.200000000186,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 21,
+          "meanMs": 160.50476190474416,
+          "p50Ms": 113.79999999981374,
+          "p95Ms": 282.29999999981374,
+          "p99Ms": 702.539999999665,
+          "maxMs": 807.5999999996275
+        },
+        "over33ms": 21,
+        "over50ms": 21,
+        "over100ms": 12,
+        "over250ms": 2
+      }
+    ]
+  },
+  {
+    "label": "1cd4d4825467/cold",
+    "sourceSha256": "1cd4d48254672b0ac5ac1342585551354fe571822065b92b1c68d63d10c1f810",
+    "directory": "/workspace/.partybox-tools/fx-validation/F02/1cd4d4825467-final-heavy-cold-phone",
+    "performance": {
+      "elapsedMs": 18028.200000001118,
+      "fps": 5.824208739640868,
+      "arrivalIntervals": {
+        "count": 105,
+        "meanMs": 171.6971428571535,
+        "p50Ms": 121.70000000111759,
+        "p95Ms": 399.38000000081956,
+        "p99Ms": 609.5399999989568,
+        "maxMs": 611.0
+      },
+      "scheduledIntervals": {
+        "count": 105,
+        "meanMs": 171.42190476190478,
+        "p50Ms": 133.29999999999927,
+        "p95Ms": 413.3799999999995,
+        "p99Ms": 631.3039999999994,
+        "maxMs": 749.8000000000011
+      },
+      "callbackWork": {
+        "count": 106,
+        "meanMs": 12.744339622592307,
+        "p50Ms": 6.999999999068677,
+        "p95Ms": 42.47500000055879,
+        "p99Ms": 65.27500000065196,
+        "maxMs": 153.30000000074506
+      },
+      "missedRefreshes": 975,
+      "missedRefreshFraction": 0.9011090573012939,
+      "longTasks": [
+        {
+          "start": 2516.2000000011176,
+          "duration": 172
+        },
+        {
+          "start": 2927.5,
+          "duration": 78
+        },
+        {
+          "start": 4778.5,
+          "duration": 100
+        },
+        {
+          "start": 6572.0999999996275,
+          "duration": 69
+        },
+        {
+          "start": 8642,
+          "duration": 61
+        },
+        {
+          "start": 11188.400000000373,
+          "duration": 82
+        },
+        {
+          "start": 12291.800000000745,
+          "duration": 86
+        },
+        {
+          "start": 13213.800000000745,
+          "duration": 159
+        },
+        {
+          "start": 14541.599999999627,
+          "duration": 176
+        },
+        {
+          "start": 15708,
+          "duration": 106
+        }
+      ],
+      "meets60FpsTolerance": false,
+      "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+    },
+    "hitchProfiles": [
+      {
+        "label": "cold-fire",
+        "scheduledAtMs": 300,
+        "firedAt": 2522.9000000003725,
+        "firedAtMs": 359.80000000074506,
+        "callDurationMs": 162.09999999962747,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 17668.400000000373,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 24,
+          "meanMs": 137.42500000004657,
+          "p50Ms": 96.95000000018626,
+          "p95Ms": 378.4349999996831,
+          "p99Ms": 531.3099999996274,
+          "maxMs": 571.0999999996275
+        },
+        "over33ms": 23,
+        "over50ms": 22,
+        "over100ms": 11,
+        "over250ms": 3
+      },
+      {
+        "label": "warm-fire-1",
+        "scheduledAtMs": 6300,
+        "firedAt": 8667.099999999627,
+        "firedAtMs": 6504,
+        "callDurationMs": 32.90000000037253,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 11524.200000001118,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 26,
+          "meanMs": 128.38076923078356,
+          "p50Ms": 111.55000000074506,
+          "p95Ms": 233.0500000002794,
+          "p99Ms": 251.87499999953434,
+          "maxMs": 256.69999999925494
+        },
+        "over33ms": 26,
+        "over50ms": 26,
+        "over100ms": 19,
+        "over250ms": 1
+      },
+      {
+        "label": "warm-fire-2",
+        "scheduledAtMs": 12300,
+        "firedAt": 14559.5,
+        "firedAtMs": 12396.400000000373,
+        "callDurationMs": 116.90000000037253,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 5631.800000000745,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 22,
+          "meanMs": 164.3772727273066,
+          "p50Ms": 115.50000000093132,
+          "p95Ms": 547.3950000006703,
+          "p99Ms": 575.940000000745,
+          "maxMs": 579.3000000007451
+        },
+        "over33ms": 22,
+        "over50ms": 22,
+        "over100ms": 17,
+        "over250ms": 2
+      }
+    ]
+  },
+  {
+    "label": "1cd4d4825467/warm",
+    "sourceSha256": "1cd4d48254672b0ac5ac1342585551354fe571822065b92b1c68d63d10c1f810",
+    "directory": "/workspace/.partybox-tools/fx-validation/F02/1cd4d4825467-final-heavy-warm-phone",
+    "performance": {
+      "elapsedMs": 18168.800000000745,
+      "fps": 6.934965435251356,
+      "arrivalIntervals": {
+        "count": 126,
+        "meanMs": 144.19682539683131,
+        "p50Ms": 121.54999999981374,
+        "p95Ms": 287.22499999962747,
+        "p99Ms": 332.65000000037253,
+        "maxMs": 367.0
+      },
+      "scheduledIntervals": {
+        "count": 126,
+        "meanMs": 143.90873015873018,
+        "p50Ms": 116.69999999999982,
+        "p95Ms": 283.375,
+        "p99Ms": 312.4500000000003,
+        "maxMs": 366.60000000000036
+      },
+      "callbackWork": {
+        "count": 127,
+        "meanMs": 11.578740157568314,
+        "p50Ms": 7.100000001490116,
+        "p95Ms": 37.54000000003724,
+        "p99Ms": 49.680000000633285,
+        "maxMs": 61.100000001490116
+      },
+      "missedRefreshes": 962,
+      "missedRefreshFraction": 0.8825688073394495,
+      "longTasks": [
+        {
+          "start": 3276.699999999255,
+          "duration": 96
+        },
+        {
+          "start": 5436.799999998882,
+          "duration": 53
+        },
+        {
+          "start": 7935.199999999255,
+          "duration": 61
+        },
+        {
+          "start": 8210.199999999255,
+          "duration": 54
+        },
+        {
+          "start": 9064.89999999851,
+          "duration": 56
+        },
+        {
+          "start": 9313.39999999851,
+          "duration": 112
+        },
+        {
+          "start": 15243.799999998882,
+          "duration": 101
+        }
+      ],
+      "meets60FpsTolerance": false,
+      "criterion": "mean arrival <=17.5 ms; p95 <=20 ms; missed 60-Hz refreshes <=1%"
+    },
+    "hitchProfiles": [
+      {
+        "label": "cold-fire",
+        "scheduledAtMs": 300,
+        "firedAt": 3280,
+        "firedAtMs": 309.30000000074506,
+        "callDurationMs": 87.89999999850988,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 17859.5,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 28,
+          "meanMs": 112.9392857142458,
+          "p50Ms": 104.8999999994412,
+          "p95Ms": 263.3950000005773,
+          "p99Ms": 347.18200000040235,
+          "maxMs": 367.0
+        },
+        "over33ms": 26,
+        "over50ms": 25,
+        "over100ms": 15,
+        "over250ms": 2
+      },
+      {
+        "label": "warm-fire-1",
+        "scheduledAtMs": 6300,
+        "firedAt": 9346.599999999627,
+        "firedAtMs": 6375.9000000003725,
+        "callDurationMs": 71.5,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 11792.900000000373,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 30,
+          "meanMs": 111.94666666667908,
+          "p50Ms": 110.45000000018626,
+          "p95Ms": 214.23500000108027,
+          "p99Ms": 256.5159999991581,
+          "maxMs": 270.8999999985099
+        },
+        "over33ms": 27,
+        "over50ms": 25,
+        "over100ms": 18,
+        "over250ms": 1
+      },
+      {
+        "label": "warm-fire-2",
+        "scheduledAtMs": 12300,
+        "firedAt": 15305,
+        "firedAtMs": 12334.300000000745,
+        "callDurationMs": 39.79999999888241,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 5834.5,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 30,
+          "meanMs": 108.28000000001242,
+          "p50Ms": 107.44999999925494,
+          "p95Ms": 184.49000000050285,
+          "p99Ms": 231.93199999947103,
+          "maxMs": 246.19999999925494
+        },
+        "over33ms": 28,
+        "over50ms": 27,
+        "over100ms": 18,
+        "over250ms": 0
+      }
+    ]
+  }
+]

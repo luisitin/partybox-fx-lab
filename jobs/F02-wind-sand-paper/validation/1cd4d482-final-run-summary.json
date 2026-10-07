@@ -1,0 +1,38 @@
+[
+  {
+    "label": "final-file-policy",
+    "directory": "/workspace/.partybox-tools/fx-validation/F02/1cd4d4825467-final-file-policy",
+    "exitCode": 1,
+    "frozenSourceConfirmed": true,
+    "frozenHelperConfirmed": true,
+    "standaloneFileOpened": false,
+    "filePolicyFailureObserved": true
+  },
+  {
+    "label": "final-mandatory",
+    "directory": "/workspace/.partybox-tools/fx-validation/F02/1cd4d4825467-final-mandatory",
+    "exitCode": 1,
+    "frozenSourceConfirmed": true,
+    "frozenHelperConfirmed": true,
+    "standaloneFileOpened": false,
+    "filePolicyFailureObserved": false
+  },
+  {
+    "label": "final-heavy-cold-phone",
+    "directory": "/workspace/.partybox-tools/fx-validation/F02/1cd4d4825467-final-heavy-cold-phone",
+    "exitCode": 1,
+    "frozenSourceConfirmed": true,
+    "frozenHelperConfirmed": true,
+    "standaloneFileOpened": false,
+    "filePolicyFailureObserved": false
+  },
+  {
+    "label": "final-heavy-warm-phone",
+    "directory": "/workspace/.partybox-tools/fx-validation/F02/1cd4d4825467-final-heavy-warm-phone",
+    "exitCode": 1,
+    "frozenSourceConfirmed": true,
+    "frozenHelperConfirmed": true,
+    "standaloneFileOpened": false,
+    "filePolicyFailureObserved": false
+  }
+]

@@ -1,0 +1,98 @@
+{
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "/tmp/F02-default-startup-probe.py",
+    "--html",
+    "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+    "--expected-sha",
+    "50383f0d4f4eb8f7a0966aba045a18b4271a62f18cb94e1a9bd0630279f1cf85",
+    "--chromium",
+    "/usr/bin/chromium",
+    "--report",
+    "/tmp/F02-default-startup-50383f0d.json"
+  ],
+  "html": "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+  "htmlSha256": "50383f0d4f4eb8f7a0966aba045a18b4271a62f18cb94e1a9bd0630279f1cf85",
+  "checkSha256": "219f84bd84968dbbe45445c259a9f1b0fdfccb59f32027a541178171bb7cd4c1",
+  "probeSha256": "21111315d1b3e4b4f4d2ae80e1af76deda9bd432529ceb6bbbcc5a42e97f7a3f",
+  "scope": "Actual default four-scene warm startup, unforced TV-auto at1920x1080 deviceScaleFactor2; separate from warm0 responsive behavior and frame performance.",
+  "startupAccepted": true,
+  "performanceAccepted": false,
+  "standaloneFileOpened": false,
+  "browserVersion": "151.0.7922.173",
+  "state": {
+    "scene": null,
+    "tt": -1,
+    "clock": 0.19999999999999998,
+    "mat": "paper",
+    "material": "paper",
+    "paper": "shred",
+    "kind": null,
+    "held": false,
+    "ptr": 0,
+    "total": 0,
+    "grains": 0,
+    "dep": 0,
+    "portrait": false,
+    "reduced": false,
+    "dir": 1,
+    "cell": 6,
+    "renderer": "webgl2",
+    "gpuReason": "",
+    "gpuParticles": 20736,
+    "width": 1920,
+    "height": 1080,
+    "seed": 123456,
+    "frames": 3,
+    "winAge": -1,
+    "tickAge": -1,
+    "paused": true,
+    "frameTimes": [
+      3549.9,
+      666.5999999999995
+    ],
+    "metrics": {
+      "exits": 0,
+      "settled": 0,
+      "reentrained": 0,
+      "midairRemovals": 0,
+      "maxTurn": 0,
+      "denied": 0,
+      "coverCalls": 0,
+      "hiddenCalls": 0,
+      "warmups": 4
+    },
+    "pooledCanvases": 49,
+    "hiddenReady": false,
+    "cast": null,
+    "L": null
+  },
+  "records": [
+    {
+      "view": "tv",
+      "event": "idle",
+      "reducedMotion": false,
+      "htmlSha256": "50383f0d4f4eb8f7a0966aba045a18b4271a62f18cb94e1a9bd0630279f1cf85",
+      "extraQuery": {
+        "view": "auto",
+        "mat": "paper",
+        "paper": "shred"
+      },
+      "deviceScaleFactor": 2,
+      "loaded": true,
+      "harnessDocumentLoads": [
+        "https://partybox-offline.invalid/F02/index.html?view=auto&seed=123456&event=idle&mat=paper&paper=shred"
+      ],
+      "runtimeNetworkAttempts": [],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "transport": "policy-harness",
+      "loadWallSeconds": 4.926
+    }
+  ],
+  "transport": "policy-harness",
+  "standaloneFileBlocker": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html?view=auto&seed=123456&event=idle&mat=paper&paper=shred",
+  "wallSeconds": 6.575,
+  "sourceSha256After": "50383f0d4f4eb8f7a0966aba045a18b4271a62f18cb94e1a9bd0630279f1cf85",
+  "processExitCode": 0
+}

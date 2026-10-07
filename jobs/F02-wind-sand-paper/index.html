@@ -583,7 +583,7 @@ function tearTo(t, spawn){
   const k = cast; if (!k || !k.pieces) return;
   while (k.ptr < k.total && k.pieces[k.order[k.ptr]].te <= t) {
     const p=k.pieces[k.order[k.ptr++]];p.gone=true;
-    const c=k.bc;c.save();c.globalCompositeOperation='destination-out';c.globalAlpha=1;c.fillStyle=c.strokeStyle='#000';pathPts(c,p.poly,true);c.fill();c.lineWidth=10;c.lineJoin=c.lineCap='round';c.stroke();c.restore();
+    const c=k.bc;c.save();c.globalCompositeOperation='destination-out';c.globalAlpha=1;c.fillStyle=c.strokeStyle='#000';pathPts(c,p.poly,true);c.fill();c.lineWidth=10+2/DPR;c.lineJoin=c.lineCap='round';c.stroke();c.restore();
     k.vc.fillStyle = k.vc.strokeStyle = '#000'; pathPts(k.vc, p.poly, true); k.vc.fill(); k.vc.lineWidth = 2; k.vc.lineJoin = 'round'; k.vc.stroke();
     for (const e of p.edges) if (e.nb >= 0 && !k.pieces[e.nb].gone) rimEdge(c, k.pieces[e.nb], e.pts);
     if (spawn && !reduced) flyPiece(k, p, t);

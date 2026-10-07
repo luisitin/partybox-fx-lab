@@ -1,0 +1,284 @@
+[
+  {
+    "label": "final-mandatory",
+    "view": "tv",
+    "event": "idle",
+    "fps": 4.946699314882601,
+    "arrivalIntervals": {
+      "count": 40,
+      "meanMs": 202.15499999998138,
+      "p50Ms": 185.8999999994412,
+      "p95Ms": 326.69999999860295,
+      "p99Ms": 398.2639999994635,
+      "maxMs": 434.2999999988824
+    },
+    "missedRefreshFraction": 0.9175257731958762,
+    "meets60FpsTolerance": false,
+    "hitchProfiles": []
+  },
+  {
+    "label": "final-mandatory",
+    "view": "tv",
+    "event": "win",
+    "fps": 4.729309271935283,
+    "arrivalIntervals": {
+      "count": 38,
+      "meanMs": 211.44736842105263,
+      "p50Ms": 180.0499999988824,
+      "p95Ms": 370.9200000004842,
+      "p99Ms": 414.86300000088295,
+      "maxMs": 422.30000000074506
+    },
+    "missedRefreshFraction": 0.9232365145228216,
+    "meets60FpsTolerance": false,
+    "hitchProfiles": []
+  },
+  {
+    "label": "final-mandatory",
+    "view": "tv",
+    "event": "tick",
+    "fps": 5.664396803309717,
+    "arrivalIntervals": {
+      "count": 46,
+      "meanMs": 176.5413043478342,
+      "p50Ms": 166.95000000018626,
+      "p95Ms": 216.0499999988824,
+      "p99Ms": 286.89000000040977,
+      "maxMs": 291.30000000074506
+    },
+    "missedRefreshFraction": 0.9055441478439425,
+    "meets60FpsTolerance": false,
+    "hitchProfiles": []
+  },
+  {
+    "label": "final-mandatory",
+    "view": "phone",
+    "event": "idle",
+    "fps": 28.78612284570985,
+    "arrivalIntervals": {
+      "count": 231,
+      "meanMs": 34.738961038965876,
+      "p50Ms": 29.800000000745058,
+      "p95Ms": 68.94999999925494,
+      "p99Ms": 94.21999999955287,
+      "maxMs": 143.7000000011176
+    },
+    "missedRefreshFraction": 0.5218295218295218,
+    "meets60FpsTolerance": false,
+    "hitchProfiles": []
+  },
+  {
+    "label": "final-mandatory",
+    "view": "phone",
+    "event": "win",
+    "fps": 23.112865745485774,
+    "arrivalIntervals": {
+      "count": 185,
+      "meanMs": 43.265945945941915,
+      "p50Ms": 38.5,
+      "p95Ms": 76.30000000074506,
+      "p99Ms": 168.05199999950818,
+      "maxMs": 191.5
+    },
+    "missedRefreshFraction": 0.6145833333333334,
+    "meets60FpsTolerance": false,
+    "hitchProfiles": []
+  },
+  {
+    "label": "final-mandatory",
+    "view": "phone",
+    "event": "tick",
+    "fps": 16.35598616608421,
+    "arrivalIntervals": {
+      "count": 131,
+      "meanMs": 61.13969465648002,
+      "p50Ms": 40.5,
+      "p95Ms": 190.09999999962747,
+      "p99Ms": 332.320000000484,
+      "maxMs": 476.7000000011176
+    },
+    "missedRefreshFraction": 0.7255717255717256,
+    "meets60FpsTolerance": false,
+    "hitchProfiles": []
+  },
+  {
+    "label": "final-heavy-cold-phone",
+    "view": "phone",
+    "event": "idle",
+    "fps": 5.824208739640868,
+    "arrivalIntervals": {
+      "count": 105,
+      "meanMs": 171.6971428571535,
+      "p50Ms": 121.70000000111759,
+      "p95Ms": 399.38000000081956,
+      "p99Ms": 609.5399999989568,
+      "maxMs": 611.0
+    },
+    "missedRefreshFraction": 0.9011090573012939,
+    "meets60FpsTolerance": false,
+    "hitchProfiles": [
+      {
+        "label": "cold-fire",
+        "scheduledAtMs": 300,
+        "firedAt": 2522.9000000003725,
+        "firedAtMs": 359.80000000074506,
+        "callDurationMs": 162.09999999962747,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 17668.400000000373,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 24,
+          "meanMs": 137.42500000004657,
+          "p50Ms": 96.95000000018626,
+          "p95Ms": 378.4349999996831,
+          "p99Ms": 531.3099999996274,
+          "maxMs": 571.0999999996275
+        },
+        "over33ms": 23,
+        "over50ms": 22,
+        "over100ms": 11,
+        "over250ms": 3
+      },
+      {
+        "label": "warm-fire-1",
+        "scheduledAtMs": 6300,
+        "firedAt": 8667.099999999627,
+        "firedAtMs": 6504,
+        "callDurationMs": 32.90000000037253,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 11524.200000001118,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 26,
+          "meanMs": 128.38076923078356,
+          "p50Ms": 111.55000000074506,
+          "p95Ms": 233.0500000002794,
+          "p99Ms": 251.87499999953434,
+          "maxMs": 256.69999999925494
+        },
+        "over33ms": 26,
+        "over50ms": 26,
+        "over100ms": 19,
+        "over250ms": 1
+      },
+      {
+        "label": "warm-fire-2",
+        "scheduledAtMs": 12300,
+        "firedAt": 14559.5,
+        "firedAtMs": 12396.400000000373,
+        "callDurationMs": 116.90000000037253,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 5631.800000000745,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 22,
+          "meanMs": 164.3772727273066,
+          "p50Ms": 115.50000000093132,
+          "p95Ms": 547.3950000006703,
+          "p99Ms": 575.940000000745,
+          "maxMs": 579.3000000007451
+        },
+        "over33ms": 22,
+        "over50ms": 22,
+        "over100ms": 17,
+        "over250ms": 2
+      }
+    ]
+  },
+  {
+    "label": "final-heavy-warm-phone",
+    "view": "phone",
+    "event": "idle",
+    "fps": 6.934965435251356,
+    "arrivalIntervals": {
+      "count": 126,
+      "meanMs": 144.19682539683131,
+      "p50Ms": 121.54999999981374,
+      "p95Ms": 287.22499999962747,
+      "p99Ms": 332.65000000037253,
+      "maxMs": 367.0
+    },
+    "missedRefreshFraction": 0.8825688073394495,
+    "meets60FpsTolerance": false,
+    "hitchProfiles": [
+      {
+        "label": "cold-fire",
+        "scheduledAtMs": 300,
+        "firedAt": 3280,
+        "firedAtMs": 309.30000000074506,
+        "callDurationMs": 87.89999999850988,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 17859.5,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 28,
+          "meanMs": 112.9392857142458,
+          "p50Ms": 104.8999999994412,
+          "p95Ms": 263.3950000005773,
+          "p99Ms": 347.18200000040235,
+          "maxMs": 367.0
+        },
+        "over33ms": 26,
+        "over50ms": 25,
+        "over100ms": 15,
+        "over250ms": 2
+      },
+      {
+        "label": "warm-fire-1",
+        "scheduledAtMs": 6300,
+        "firedAt": 9346.599999999627,
+        "firedAtMs": 6375.9000000003725,
+        "callDurationMs": 71.5,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 11792.900000000373,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 30,
+          "meanMs": 111.94666666667908,
+          "p50Ms": 110.45000000018626,
+          "p95Ms": 214.23500000108027,
+          "p99Ms": 256.5159999991581,
+          "maxMs": 270.8999999985099
+        },
+        "over33ms": 27,
+        "over50ms": 25,
+        "over100ms": 18,
+        "over250ms": 1
+      },
+      {
+        "label": "warm-fire-2",
+        "scheduledAtMs": 12300,
+        "firedAt": 15305,
+        "firedAtMs": 12334.300000000745,
+        "callDurationMs": 39.79999999888241,
+        "error": null,
+        "windowSeconds": 3.0,
+        "windowComplete": true,
+        "availableAfterFireMs": 5834.5,
+        "intervalPolicy": "include entire actual intervals intersecting fire-100ms to fire+window; long intervals can overlap windows",
+        "arrivalIntervals": {
+          "count": 30,
+          "meanMs": 108.28000000001242,
+          "p50Ms": 107.44999999925494,
+          "p95Ms": 184.49000000050285,
+          "p99Ms": 231.93199999947103,
+          "maxMs": 246.19999999925494
+        },
+        "over33ms": 28,
+        "over50ms": 27,
+        "over100ms": 18,
+        "over250ms": 0
+      }
+    ]
+  }
+]

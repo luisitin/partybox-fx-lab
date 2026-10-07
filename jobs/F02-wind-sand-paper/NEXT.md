@@ -1,63 +1,57 @@
-# F02 handoff — GPU implementation milestone, not accepted
+# Resume F02 — most advanced implementation, blocked required gates
 
-Branch job/F02-wind-sand-paper, nickname codex-flock. Claim acquired on main
-b292be1; preserve other claims and refresh main at every push. No PR, green CI
-or KEEP GOING rounds: required performance fails on the available renderer.
-Read README.md, RULES.md, JOBS.md and all21 ranked baseline leftovers.
+Branch job/F02-wind-sand-paper; nickname codex-flock. Claim began on main
+b292be1. Main F02 is to be marked BLOCKED after this push. No PR, green CI or
+KEEP GOING rounds. Read root README/RULES/JOBS and all21 starter leftovers.
 
-## Tested source and work remaining
+## Frozen final evidence
 
-Current frozen index SHA50383f0d4f4eb8f7a0966aba045a18b4271a62f18cb94e1a9bd0630279f1cf85.
-Branch checkpoint commits preserve each earlier tested revision and its failures.
-Final sand boundary patch admits actuallypaintedoverfill cells and adds a raster
-pixel guard to each naturallyreleasedcircle; no terminalcoverwipe/thresholdchange.
-One new six-second originalphonepaper clip and idle-onlyCPU4frame timing are
-committed:26.37fps,p9560.32ms (FAIL),video1.26MB,sourcebefore/aftermatch.
+Index SHA1cd4d48254672b0ac5ac1342585551354fe571822065b92b1c68d63d10c1f810.
+Checker SHA91b2cb099cc5c230748b99ca2308d5ef3a638a73e6a31a5074a8c20b559c76a0.
+All10 functional groups PASS in two partitioned runs227.203s+61.390s,216scene
+cases, zero page/console errors or runtime attempts across18contexts. Actual
+GPU20,736/3,136 state/lifecycle/events/replay, wind/force oracles, geometry,
+callback authorization/reduced idle, cold/warm pixels,60/120/144 state and
+mapped responsive GPU/CPU/atlas preservation are covered. All browsers closed.
+Do not repeat completed checks absent new changes, failures or concerns.
 
-Immediately rerun fourgroups scenes,paperGeometry,refreshWarm,responsive on50383
-with unchangedcheckSHA219f84bd84968dbbe45445c259a9f1b0fdfccb59f32027a541178171bb7cd4c1;
-ifallPASS runremainingwind,sandTV,sandPhone,paperPhysics,facesReduced,queriesFallback.
-Exclusivebrowserlane belongs tochecks_final; source/checks muststayfrozen.
-Also run prepared defaultTVautoDPR2warmstartup30s probe; earlier7e exceeded30s,
-whilewarm0responsive merelyisolates resizeandcannotclearstartupacceptance.
-Thenperf_final runs strictfileprobe, allsixmandatoryframecases/captures and matching
-phoneheavycoldwarm (no video) onexact50383; preparedoutsideorchestration in
-/workspace/.partybox-tools/fx_tools/F02-final/. RootaloneownsGit/claims/queue.
+Bounded shared shred edges, reset history and complete pooled drawing contexts
+fix real regressions. Natural sand and paper owned-edge erasure includes a
+physical-pixel guard without terminal wipe or alpha-threshold relaxation.
+Default TV-auto/DPR2/four-warmup startup passed on preceding50383 in4.926s;
+this source-specific load evidence is separate from disk/60-fps acceptance.
 
-Previous7bcc focused150.58s:115scene cases pass (all108phone,7TV) thenoneTVsand
-pixelalpha9fails. PaperGeometry/refreshWarm/responsivePASS: warm/coldpixelsand
-physicsbit-identical; mappedGPU/CPU/atlasresizepreservationverified. Corrected
-sharedshrededges remove4418propercrossings/211overlapcenters across100seeds×4cards.
-These source-specific outcomes are not substituted for the final fullmatrix.
+Fresh final strictfile FAIL/exit1:ERR_BLOCKED_BY_ADMINISTRATOR. Mandatory native
+frame timing FAIL for all6: TV4.95/4.73/5.66fps; phoneCPU4 28.79/23.11/16.36fps.
+Heavy matched phone cold/warm5.82/6.93fps vs startercold7.57; no overall gain or
+hitch-removal claim. Actual SwiftShader, no hardware GPU device nodes; physical
+phone/hardware performance unverified. Six separate original6s captures are
+<1.59MB each. Source/helper frozen, zero routed errors/network/trigger errors.
+Exact commands/provenance/raw intervals/capture metadata in VERIFY/validation.
+Capture25fps encoding and fixed simulation stepping are not throughput evidence.
 
-Earlier3bbeff mandatoryTV6.79/4.33/5.94fps andphoneCPU4x25.49/24.50/27.24fps allfail.
-Earlierheavyphone5.20/5.83fps is belowstarter7.57; cold/warmtailsmixed,nohitchfix.
-Allreport/mediahashes retain exacttestedsource/helper versions, even failed ones.
-CI has strictfunctional/datahash/performance/capturegates; noPR/run/greenCI orKEEP.
-Executioncontext/plugins restarted during this continuation; files survived and
-agentownership was recreated. Resume byreadingthishandoff, not by discardingfiles.
-Direct file:// remains blocked by managed Chromium policy. Explicitly logged
-local-byte fulfillment can validate functions but cannot pass the disk rule.
-Resolve required performance/disk checks, review all21 fixes at real-time speed,
-then openPR only when every check passes, obtain greenCI and do KEEP GOING.
+## Remaining work
 
-## All21 implementation mechanisms — acceptance pending
-
-1Potentialtaper/gentleflow;2staggeredseamrelease;3phone2x2/largertextstamp;
-4debrisbehindcards;5cornerlift/crack/fray;6seededsegmentphases;7largerTVbanner;
-8coupledangularforce/frontback/edges/shadows;9freshtextdrawnafterdebris;
-10per-owned-polygonerasurewithoutfinalsweep;11separateroundslots/continuousbanner;
-12originalnotebookdrawing/stubholes;13puffsettlement/heldflex;14fixed60step+
-interpolation/exitmetrics;15deferredcover/hiddencallbacks;16canvas/grainpools;
-17phoneDPR1/cheaperfibresatlas;18isolatedfour-scenewarmup;19fardunepersistence
-andtickre-entrainment;20attachedsegmentedcrumple;21segmentedcurlingribbons.
-These are code mechanisms, not proof of every perceptual or performance outcome.
+1. Use a permitted native-file-capable browser/environment and suitable renderer;
+   do not alter managed policy or call routed bytes a disk pass. Reclaim main
+   under RUN-ALL, preserving others' claims. No research-only403 block applies.
+2. Clear exact failed native disk and TV/phone CPU4 frame gates in VERIFY.md.
+   Match heavy Gouache/paper-tear/fakeout baseline; measure real playback.
+3. Review all21 mechanisms at real-time speed and strengthen any unmet visible
+   requirement. Physics uses artistic drag/lift/angular coefficients, not a
+   calibrated fluid/cloth solver. Footage/calibration/perceptual acceptance
+   remains pending; see original REPORT and SOURCES/CONFLICTS.
+4. Preserve earlier failed reports; run affected checks after actual changes,
+   record original captures<10MB and hash every data/media file. Push every
+   milestone and at least30minutes, refreshing main CLAIMS each time.
+5. Only when every check passes open PR, obtain green job CI, then KEEP GOING:
+   re-read job, list five weaknesses, fix worst, measure/log/push; stop after
+   three consecutive rounds with no player-noticeable gains and claim next job.
 
 ## Re-verify when web works
 
-Primarycurl/paper/sand sources and officialOpenStax GitHubcurriculum were read.
-FullAPS equationPDF routes returnedHTTP401; deeperphysicalcalibration/observed
-footage remains unverified. No source code/art/film is copied. The inherited
-flamingo/grey fixture is fromknowledge,unverified: check species-qualified
-wording with two independent zoo sources when animals.sandiegozoo.org and
-nationalzoo.si.edu are reachable. Research-only403 is not a job blocker.
+Primary curl/paper/sand and independent OpenStax sources were read live.
+Full APS equation PDFs returned401; deeper calibration/observed footage pending.
+No code/art/film copied. Flamingo/grey fixture is from knowledge,unverified:
+check species-qualified wording against two independent zoo sources when
+animals.sandiegozoo.org and nationalzoo.si.edu work.403 alone cannot stop work.

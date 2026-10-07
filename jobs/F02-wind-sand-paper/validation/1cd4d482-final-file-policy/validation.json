@@ -1,0 +1,85 @@
+{
+  "source": "/workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html",
+  "chromium": "/usr/bin/chromium",
+  "flags": [
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+    "--autoplay-policy=no-user-gesture-required",
+    "--disable-background-networking",
+    "--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE localhost",
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader"
+  ],
+  "hardwareGpuNodes": [],
+  "transport": "file",
+  "standaloneFileOpened": false,
+  "fileDocumentLoads": [],
+  "extraQuery": {},
+  "hitchConfiguration": {
+    "fire": null,
+    "repeats": 3,
+    "gapSeconds": 6,
+    "windowSeconds": 3,
+    "meaning": "cold=first explicit fire on fresh page, after initial document load; warm=repeated fire on same page; browser startup itself is not sampled"
+  },
+  "transportExplanation": "routed mode fulfills the top document from local disk bytes without any server or socket. This environment's Chromium enterprise URL policy blocks file://. Use --transport file in a browser with disk access.",
+  "method": "Actual performance.now arrival intervals sampled with native rAF; page rAF callback CPU time measured separately. CPU throttling via CDP. Performance without video recording. HTTP(S) and other nonlocal runtime requests blocked and logged.",
+  "cases": [
+    {
+      "view": "phone",
+      "event": "idle",
+      "motion": "no-preference",
+      "cpuThrottle": 4,
+      "failure": {
+        "stage": "load_document",
+        "type": "Error",
+        "message": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html?view=phone&event=idle\nCall log:\n  - navigating to \"file:///workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html?view=phone&event=idle\", waiting until \"load\"\n",
+        "url": "file:///workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html?view=phone&event=idle"
+      },
+      "errors": [
+        "load_document: Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html?view=phone&event=idle\nCall log:\n  - navigating to \"file:///workspace/partybox-fx-lab/jobs/F02-wind-sand-paper/index.html?view=phone&event=idle\", waiting until \"load\"\n"
+      ],
+      "runtimeNetworkAttempts": [],
+      "harnessDocumentLoads": []
+    }
+  ],
+  "gpu": {
+    "devices": [
+      {
+        "vendorId": 65535,
+        "deviceId": 65535,
+        "vendorString": "Google Inc. (Google)",
+        "deviceString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+        "driverVendor": "SwANGLE",
+        "driverVersion": "5.0.0"
+      }
+    ],
+    "featureStatus": {
+      "2d_canvas": "enabled",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "enabled",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "enabled_on",
+      "rasterization": "enabled_force",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "disabled_off",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "enabled",
+      "video_encode": "disabled_software",
+      "vulkan": "disabled_off",
+      "webgl": "enabled",
+      "webgpu": "unavailable_software",
+      "webgpu_on_vk_via_gl_interop": "disabled_off",
+      "webnn": "disabled_off"
+    },
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+    "vendor": "Google Inc. (Google)"
+  },
+  "allCasesMeetFrameTolerance": false,
+  "noRuntimeNetworkAttempts": true,
+  "noPageErrors": false,
+  "noHitchTriggerErrors": true,
+  "allHitchWindowsComplete": true,
+  "allCapturesUnder10MB": true
+}
