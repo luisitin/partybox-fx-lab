@@ -35,6 +35,8 @@ export interface StageOptions {
   host: boolean;
   reduced: boolean;
   aspect: number;
+  /** With auto off: the players whose roll waits for a press (the others roll by themselves). Default: all. */
+  waitFor?: number[];
 }
 
 export interface TokenState {
@@ -549,9 +551,11 @@ export class Stage {
           this.emit('prompt', { player: this.active, auto: this.opts.auto });
         }
         break;
-      case 'prompt':
-        if (this.opts.auto && since >= T.autoRollMs / 1000) this.roll();
+      case 'prompt': {
+        const waits = !this.opts.auto && (!this.opts.waitFor || this.opts.waitFor.includes(this.active));
+        if (!waits && since >= T.autoRollMs / 1000) this.roll();
         break;
+      }
       case 'act':
         if (this.now >= this.actUntil) this.endAct();
         break;
