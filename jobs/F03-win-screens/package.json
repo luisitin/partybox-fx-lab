@@ -1,0 +1,20 @@
+{
+  "name": "f03-win-screens",
+  "private": true,
+  "version": "1.0.0",
+  "description": "PartyBox win screens: a default winner moment and eight themed endings, one offline HTML page.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "check:build": "node build.mjs --check",
+    "test": "node build.mjs --check && node --test --test-concurrency=1 test/",
+    "test:unit": "node --test test/unit.test.mjs",
+    "shots": "node tools/shots.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.27.4",
+    "playwright": "1.56.1",
+    "three": "0.186.1"
+  }
+}
