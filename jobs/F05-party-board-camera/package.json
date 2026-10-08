@@ -1,0 +1,30 @@
+{
+  "name": "f05-party-board-camera",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PartyBox fx-lab F05: a party-board camera on a floating island (three.js, one offline HTML page).",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "check:built": "node build.mjs --check",
+    "typecheck": "tsc -p tsconfig.json",
+    "test:unit": "node --experimental-strip-types --no-warnings=ExperimentalWarning --test test/unit/*.test.ts",
+    "test:browser": "node --test --test-concurrency=1 test/browser/*.test.mjs",
+    "test": "npm run typecheck && npm run check:built && npm run test:unit && npm run test:browser && npm run sums",
+    "sums": "sha256sum --check --quiet SHA256SUMS.txt",
+    "shots": "node scripts/shots.mjs",
+    "capture": "node scripts/capture.mjs",
+    "perf": "node scripts/perf.mjs"
+  },
+  "devDependencies": {
+    "@types/three": "0.186.0",
+    "esbuild": "0.25.10",
+    "playwright": "1.56.1",
+    "three": "0.186.1",
+    "typescript": "5.9.3"
+  }
+}
