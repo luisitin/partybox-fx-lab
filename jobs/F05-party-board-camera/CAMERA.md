@@ -56,7 +56,9 @@ that a critically damped spring chases (section 3). Every shot below is only a g
 | R12 | Branch choice (O5). Frame the junction and the next 3 spaces of every branch, steeper so the routes read as a map. | pitch 62; overview margins; settle 0.7 s; held until a branch is picked, then the follow shot, settle 0.5 s |
 | R13 | Safety. After the spring, the camera is lifted if it would come within the clearance of the island's surface or the sea. | 2.5 units over the island, 2.0 over the water |
 | R14 | Cut or glide. Glide every change on the board, including far turn changes (R8, R9). Cut only: reduced motion (every change), the first frame, a tab coming back after being hidden. | a cut is `settle = 0` |
-| R15 | Reduced motion. Every camera change is a cut. A walk is framed once (a cut to a shot that holds the start and the end spaces) and the token slides without hops or squash; no island bob, no cloud drift, no idle breathing. | token slide 0.26 s per space, scale always 1 |
+| R15 | Reduced motion. Every camera change is a cut. A walk is framed once (a cut to a shot that holds the start and the end spaces) and the token slides without hops or squash; no island bob, no cloud drift, no idle breathing. | walk frame: pitch 48, margins 0.2, distance >= 14; token slide 0.26 s per space, scale always 1 |
+| R16 | Action waits for the camera. A move, a die or a roll for a token that is not yet framed starts once the camera has covered 87 % of its glide (0.75 of the settle; after the crane's middle pose; after an overview's fly-back). | 0.75 x settle |
+| R17 | Opening. The page opens on the whole island from farther out, settles onto the overview, holds, then glides (the fly-back settle) to the first player. | 1.4 x the overview distance, settle 1.6 s, hold 0.6 s, then 0.95 s |
 
 Why these numbers:
 - **R4/R6 thirds:** at 40 deg, 11 units, aim 1.6 up, the feet land exactly on the lower third line (y = 0.667)
@@ -131,6 +133,9 @@ Height 0.85 units, forward lean 7 deg at the apex. Reduced motion: no hop, no sq
   "overview": { "pitchDeg": 58, "margins": { "left": 0.06, "right": 0.06, "top": 0.11, "bottom": 0.17 }, "settleOut": 1.1, "holdSec": 2.2, "settleBack": 0.95 },
   "pair": { "pitchDeg": 50, "margins": { "left": 0.3, "right": 0.3, "top": 0.28, "bottom": 0.3 }, "minDistance": 12.5, "settle": 0.7, "holdSec": 1.4 },
   "choice": { "pitchDeg": 62, "spacesPerBranch": 3, "settle": 0.7, "exitSettle": 0.5 },
+  "intro": { "distanceScale": 1.4, "settle": 1.6, "holdSec": 0.6 },
+  "reducedMove": { "pitchDeg": 48, "margin": 0.2, "minDistance": 14 },
+  "actionWaits": 0.75,
   "safety": { "islandClearance": 2.5, "waterClearance": 2 },
   "hop": { "windUpMs": 120, "stepMs": 400, "airMs": 280, "launchMs": 50, "settleMs": 300, "height": 0.85, "crouch": 0.8, "windUpCrouch": 0.76, "stretchLaunch": 1.16, "stretchFall": 1.06, "contact": 0.8, "leanDeg": 7, "reducedStepMs": 260 },
   "turn": { "bannerMs": 300, "dieInAtMs": 450, "dieInMs": 300, "autoRollMs": 1100, "bonkMs": 320, "moveAfterRollMs": 1100, "actMs": 700, "nextTurnMs": 400 }

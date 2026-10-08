@@ -21,6 +21,7 @@
     "perf": "node scripts/perf.mjs"
   },
   "devDependencies": {
+    "@types/node": "22.20.5",
     "@types/three": "0.186.0",
     "esbuild": "0.25.10",
     "playwright": "1.56.1",
